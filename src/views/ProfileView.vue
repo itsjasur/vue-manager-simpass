@@ -1,9 +1,7 @@
-
 <template>
-    <h3>Profile page</h3>
+  <h3>Profile page</h3>
 </template>
 
+<script setup></script>
 
-<script setup>
-
-</script>
+<style scoped></style>

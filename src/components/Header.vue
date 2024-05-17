@@ -1,16 +1,18 @@
 <template>
   <div class="header">
-    <h2>Header content</h2>
+    <p><MenuTitle /></p>
   </div>
 </template>
 
 <script setup>
+import MenuTitle from '..//components/MenuTitle.vue'
 </script>
 
 <style scoped>
 .header {
-  background-color: rebeccapurple;
-
   align-content: center;
+  padding: 0 15px;
+  font-size: 18px;
+  font-weight: 500;
 }
 </style>

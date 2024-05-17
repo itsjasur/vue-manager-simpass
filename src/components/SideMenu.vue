@@ -1,23 +1,28 @@
-
 <template>
   <div class="logo">
-    <img src="../assets/logo.png" alt="Logo" style="width: 200px" />
+    <router-link to="/"
+      ><img src="../assets/logo.png" alt="Logo" style="width: 200px"
+    /></router-link>
   </div>
   <ul>
-    <li><RouterLink to="/">Home</RouterLink></li>
-    <li><RouterLink to="/profile">Profile</RouterLink></li>
-    <li><RouterLink to="/about">About</RouterLink></li>
+    <li>
+      <router-link to="/profile">{{ SIDEMENUNAMES[0] }}</router-link>
+    </li>
+    <li>
+      <router-link to="/registration">{{ SIDEMENUNAMES[1] }}</router-link>
+    </li>
+    <li>
+      <router-link to="/rental-registration">{{ SIDEMENUNAMES[2] }}</router-link>
+    </li>
   </ul>
 </template>
 
-
-
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
+import MenuTitle from '../components/MenuTitle.vue'
+import { SIDEMENUNAMES } from '../assets/constants'
 </script>
 
-
-<style scoped >
+<style scoped>
 .logo {
   padding: 10px;
   margin: 15px 10px;
@@ -50,8 +55,7 @@ ul li a:hover {
   border-radius: 5px;
 }
 
-a:hover,
-a.router-link-active {
+ul li .router-link-active {
   background-color: #313131;
   border-radius: 5px;
 }
