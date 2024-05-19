@@ -10,23 +10,38 @@
         <label for="password">Password</label>
         <input type="password" id="password" name="password" required v-model="password" />
       </div>
-      <button type="submit">Login</button>
+      <button type="submit" :disabled="isLoading">
+        <div v-if="isLoading">
+          <LoadingSpinner height="30px" color="#ffffff" />
+        </div>
+        <div v-else>Login</div>
+      </button>
 
       <p>{{ error }}</p>
+
+      <Snackbar />
     </form>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import LoadingSpinner from '../components/Loader.vue'
+import Snackbar from '../components/Snackbar.vue'
+import { useSnackbarStore } from '@/stores/snackbar'
 
 const username = ref('')
 const password = ref('')
+
 const error = ref(null)
+const isLoading = ref(false)
 
 async function login(event) {
-  console.log('submit clicked')
+  // Show the snackbar with a success message
+  useSnackbarStore().showSnackbar('asdas')
 
+  console.log('button clicked')
+  isLoading.value = true
   try {
     const response = await fetch('http://192.168.0.251:8091/api/auth/signin', {
       method: 'POST',
@@ -36,7 +51,6 @@ async function login(event) {
         password: password.value
       })
     })
-
     if (response.ok) {
       const data = await response.json()
       // Handle successful login
@@ -47,14 +61,12 @@ async function login(event) {
     error.value = 'An error occurred during login'
     console.error(err)
   }
+
+  isLoading.value = false
 }
 </script>
 
 <style>
-/* * {
-  box-sizing: border-box;
-} */
-
 body {
   display: flex;
   justify-content: center;
@@ -73,53 +85,8 @@ body {
   width: 400px;
 }
 
-h2 {
-  margin-bottom: 20px;
-  color: orange;
-}
-
 .input-group {
-  margin-bottom: 20px;
+  margin: 20px 0;
   text-align: left;
-}
-
-label {
-  display: block;
-  margin-bottom: 5px;
-  color: #414141;
-  font-size: 16px;
-}
-
-input {
-  box-sizing: border-box;
-  width: 100%;
-  height: 50px;
-  padding-left: 13px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 16px;
-}
-
-input:focus {
-  outline: none;
-  border-color: orange;
-  box-shadow: 0 0 2px orange;
-}
-
-button {
-  margin: 15px 0;
-  width: 100%;
-  height: 50px;
-  background-color: orange;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-button:hover {
-  background-color: orange;
 }
 </style>

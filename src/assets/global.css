@@ -1,0 +1,56 @@
+:root {
+  --main-color: #ffa622;
+  --main-color-hover: #e28b07;
+  --border-color: #dddddd;
+  --label-color: #414141;
+  --disabled-color: #959595;
+  --text-color: #333;
+}
+
+body {
+  color: var(--text-color);
+}
+
+button {
+  margin: 15px 0;
+  width: 100%;
+  height: 50px;
+  background-color: var(--main-color);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:disabled {
+  background-color: #959595;
+}
+
+button:hover:enabled {
+  background-color: var(--main-color-hover);
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--label-color);
+  font-size: 16px;
+}
+
+input {
+  box-sizing: border-box;
+  width: 100%;
+  height: 50px;
+  padding-left: 13px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--main-color);
+  box-shadow: 0 0 2px var(--main-color);
+}
