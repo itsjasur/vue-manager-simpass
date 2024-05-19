@@ -2,8 +2,8 @@ import { defineStore } from 'pinia'
 
 export const useSnackbarStore = defineStore('snackbar', {
   state: () => ({
-    message: 'asda aksjdlhas ldhaslkjdh askdhjakljs',
-    show: true,
+    message: '',
+    show: false,
     type: 'success', // or 'error', 'warning', etc.
     timeout: null
   }),
