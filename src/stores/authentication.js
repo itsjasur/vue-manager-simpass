@@ -3,7 +3,9 @@ import { defineStore } from 'pinia'
 export const useAuthenticationStore = defineStore('status', {
   state: () => ({
     isLoggedIn: true,
-    role: []
+    // role: [],
+    id: '',
+    userName: ''
   }),
 
   actions: {
@@ -11,14 +13,16 @@ export const useAuthenticationStore = defineStore('status', {
       this.isLoggedIn = false
       localStorage.removeItem('token')
       localStorage.removeItem('refreshToken')
-      localStorage.removeItem('role')
+      // localStorage.removeItem('role')
     },
 
-    login(token, refreshToken) {
+    login(token, refreshToken, id, userName) {
       this.isLoggedIn = true
-      localStorage.setItem('token', token)
+      localStorage.setItem('accessToken', token)
       localStorage.setItem('refreshToken', refreshToken)
-      localStorage.setItem('role', JSON.stringify(roles))
+      // localStorage.setItem('role', JSON.stringify(roles))
+      localStorage.setItem('id', id)
+      localStorage.setItem('userName', userName)
     }
 
     // retrieveFromStorage() {

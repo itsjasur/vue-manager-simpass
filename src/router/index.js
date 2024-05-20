@@ -4,6 +4,7 @@ import RegistrationView from '../views/RegistrationView.vue'
 import RentalRegistrationView from '../views/RentalRegistrationView.vue'
 import LoginView from '../views/LoginView.vue'
 import DashBaordView from '../views/DashBoardView.vue'
+import { useAuthenticationStore } from '../stores/authentication'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -65,17 +66,17 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth) {
-    const token = localStorage.getItem('token')
-    console.log(token)
+    const token = localStorage.getItem('accessToken')
+    // console.log(token)
     if (token) {
-      // User is authenticated, proceed to the route
+      // authenticated, proceed to the route
       next()
     } else {
-      // User is not authenticated, redirect to login
+      //  not authenticated, redirect to login
       next('/login')
     }
   } else {
-    // Non-protected route, allow access
+    // non-protected route, allow access
     next()
   }
 })

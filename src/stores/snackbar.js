@@ -4,31 +4,32 @@ export const useSnackbarStore = defineStore('snackbar', {
   state: () => ({
     message: '',
     show: false,
-    type: 'success', // or 'error', 'warning', etc.
     timeout: null
   }),
 
   actions: {
-    showSnackbar(message, type = 'success') {
-      this.message = message
-      this.type = type
-      this.show = true
+    showSnackbar(message) {
+      //if text is empty, no need to show snackbar
+      if (message) {
+        this.message = message
+        this.show = true
 
-      // clearing any existing timeout
-      if (this.timeout) {
-        clearTimeout(this.timeout)
+        // clearing any existing timeout
+        if (this.timeout) {
+          clearTimeout(this.timeout)
+        }
+
+        // setting  new timeout to hide the snackbar after 5 seconds
+        this.timeout = setTimeout(() => {
+          this.hideSnackbar()
+        }, 4000)
       }
-
-      // setting  new timeout to hide the snackbar after 5 seconds
-      this.timeout = setTimeout(() => {
-        this.hideSnackbar()
-      }, 4000)
     },
 
+    //this hides snackbar
     hideSnackbar() {
       this.show = false
       this.message = ''
-      this.type = 'success'
       this.timeout = null
     }
   }
