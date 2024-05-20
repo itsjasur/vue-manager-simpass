@@ -1,11 +1,4 @@
-<template>
-  <div class="header">
-    <svg
-      class="svg"
-      viewBox="0 0 24 24"
-      xmlns="http://www.w3.org/2000/svg"
-      @click="useSideMenuStore().toggle()"
-    >
+   <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
       <path
         d="M1 6H23C23.2652 6 23.5196 5.89464 23.7071 5.7071C23.8946 5.51957 24 5.26521 24 5C24 4.73478 23.8946 4.48043 23.7071 4.29289C23.5196 4.10536 23.2652 4 23 4H1C0.734784 4 0.48043 4.10536 0.292893 4.29289C0.105357 4.48043 0 4.73478 0 5C0 5.26521 0.105357 5.51957 0.292893 5.7071C0.48043 5.89464 0.734784 6 1 6Z"
       />
@@ -19,42 +12,3 @@
         d="M23 14H1C0.734784 14 0.48043 14.1054 0.292893 14.2929C0.105357 14.4804 0 14.7348 0 15C0 15.2652 0.105357 15.5196 0.292893 15.7071C0.48043 15.8947 0.734784 16 1 16H23C23.2652 16 23.5196 15.8947 23.7071 15.7071C23.8946 15.5196 24 15.2652 24 15C24 14.7348 23.8946 14.4804 23.7071 14.2929C23.5196 14.1054 23.2652 14 23 14Z"
       />
     </svg>
-
-    <p><MenuTitle /></p>
-  </div>
-</template>
-
-<script setup>
-import MenuTitle from '../components/MenuTitle.vue'
-import { useSideMenuStore } from '../stores/side-menu'
-</script>
-
-<style scoped>
-.header {
-  align-items: center;
-  font-size: 18px;
-  font-weight: 500;
-  display: flex;
-  /* background-color: aqua; */
-  height: 60px;
-  width: 100%;
-}
-
-.svg {
-  padding: 0 10px;
-  fill: #2a2a2a;
-  height: 21px;
-}
-
-.svg:hover {
-  fill: var(--main-color);
-}
-
-.icon {
-  display: block;
-}
-
-.mySVG {
-  background-image: url(src/components/MenuTitle.vue);
-}
-</style>

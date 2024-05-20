@@ -1,25 +1,28 @@
 <template>
-  <div class="logo">
-    <router-link to="/"
-      ><img src="../assets/logo.png" alt="Logo" style="width: 200px"
-    /></router-link>
+  <div class="side-menu">
+    <div class="logo" @click="useSideMenuStore().close()">
+      <router-link to="/"
+        ><img src="../assets/logo.png" alt="Logo" style="width: 200px"
+      /></router-link>
+    </div>
+    <ul>
+      <li>
+        <router-link to="/profile">{{ SIDEMENUNAMES[0] }}</router-link>
+      </li>
+      <li>
+        <router-link to="/registration">{{ SIDEMENUNAMES[1] }}</router-link>
+      </li>
+      <li>
+        <router-link to="/rental-registration">{{ SIDEMENUNAMES[2] }}</router-link>
+      </li>
+    </ul>
   </div>
-  <ul>
-    <li>
-      <router-link to="/profile">{{ SIDEMENUNAMES[0] }}</router-link>
-    </li>
-    <li>
-      <router-link to="/registration">{{ SIDEMENUNAMES[1] }}</router-link>
-    </li>
-    <li>
-      <router-link to="/rental-registration">{{ SIDEMENUNAMES[2] }}</router-link>
-    </li>
-  </ul>
 </template>
 
 <script setup>
 import MenuTitle from '../components/MenuTitle.vue'
 import { SIDEMENUNAMES } from '../assets/constants'
+import { useSideMenuStore } from '../stores/side-menu'
 </script>
 
 <style scoped>
@@ -31,11 +34,6 @@ import { SIDEMENUNAMES } from '../assets/constants'
 .logo:hover {
   background-color: #4e4e4e;
   border-radius: 5px;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
 }
 
 ul li {
