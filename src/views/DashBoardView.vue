@@ -5,11 +5,15 @@
       class="overlay"
       @click="useSideMenuStore().close()"
     />
-    <div v-if="useSideMenuStore().isSideMenuOpen" class="side-menu">
+    <div
+      v-if="useSideMenuStore().isSideMenuOpen"
+      class="side-menu"
+      :class="{ sideMenuOpen: useSideMenuStore().isSideMenuOpen }"
+    >
       <SideMenu />
     </div>
 
-    <div class="main-content" :class="{ open: useSideMenuStore().isSideMenuOpen }">
+    <div class="main-content" :class="{ sideMenuOpen: useSideMenuStore().isSideMenuOpen }">
       <div class="header">
         <Header />
       </div>
@@ -42,46 +46,49 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.container {
-  height: 100vh;
-}
-
 .side-menu {
-  position: fixed;
-  top: 0;
-  width: 280px; /* Fixed width */
+  width: 280px;
   height: 100vh;
   background-color: #1a1a1a;
-  z-index: 1000; /* Ensure the side-menu is on top of the overlay */
-}
-
-.header {
+  transition: transform 0.3s ease;
   position: fixed;
   top: 0;
-  align-items: center;
-  font-size: 18px;
-  font-weight: 500;
-  display: flex;
-  height: 60px;
-  width: 100%;
-  z-index: 1000;
-  background-color: #fff;
+  left: 0;
+  z-index: 1002;
+}
+
+.side-menu.closed {
+  transform: translateX(-100%);
 }
 
 .main-content {
-  /* this is side menu width */
-  margin-left: 0px;
-  /* this is header width */
-  margin-top: 60px;
-  height: 100vh;
+  position: relative;
+  height: 100%;
+  background-color: white;
 }
 
-.main-content.open {
+.main-content.sideMenuOpen {
   margin-left: 280px;
 }
 
+/* Style for Header */
+.header {
+  position: sticky;
+  top: 0;
+  height: 60px;
+  background-color: #fff;
+  text-align: center;
+  line-height: 50px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 15px;
+}
+
 .view {
-  overflow-y: auto; /* Enable vertical scrolling */
+  z-index: 1000;
+  overflow-x: auto;
+  white-space: nowrap;
+  padding-bottom: 2000px;
 }
 
 /* Media query for mobile devices */

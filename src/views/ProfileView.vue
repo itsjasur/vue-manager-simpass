@@ -1,7 +1,9 @@
 <template>
   <div class="container">
     <div class="row">
-      <!-- <a-form
+      <a-form
+        class="form1"
+        layout="vertical"
         :model="formState"
         name="basic"
         :label-col="{ span: 8 }"
@@ -17,7 +19,7 @@
         >
           <a-input v-model:value="username" />
         </a-form-item>
-      </a-form> -->
+      </a-form>
 
       <p>asdkjlaslkj lkjasdlkj asajaslkdj aslkjdlaks jdlkasjlk</p>
 
@@ -57,12 +59,15 @@ const options = [...Array(25)].map((_, i) => ({
   min-width: 300px;
 }
 
+.form1 {
+}
+
 .row {
   display: flex;
   width: 100%;
   gap: 15px; /* adds spacing between items */
   align-items: center;
-  /*   
+  /* 
   justify-content: center;
   justify-items: center;
   align-content: center; */
