@@ -4,12 +4,13 @@
     <div class="title"><MenuTitle /></div>
   </div>
 
-  <a-button class="button">Logout</a-button>
+  <a-button class="button" @click="useAuthenticationStore().logout()">Logout</a-button>
 </template>
 
 <script setup>
 import MenuTitle from '../components/MenuTitle.vue'
 import { useSideMenuStore } from '../stores/side-menu'
+import { useAuthenticationStore } from '../stores/authentication'
 </script>
 
 <style scoped>

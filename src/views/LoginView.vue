@@ -76,24 +76,19 @@ async function login(event) {
     })
     if (response.ok) {
       const data = await response.json()
-      console.log(data)
 
       useAuthenticationStore().login(
         data['accessToken'],
         data['refreshToken'],
-        [],
         data['id'],
         data['username']
       )
-
-      window.location.href = '/'
 
       // Handle successful login
     } else {
       useSnackbarStore().showSnackbar('Invalid credentials') // show snackbar with a success message
     }
   } catch (err) {
-    console.log(err.toString())
     useSnackbarStore().showSnackbar(err.toString())
   }
 

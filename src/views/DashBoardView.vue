@@ -26,11 +26,11 @@
 </template>
 
 <script setup>
+import { onMounted } from 'vue'
 import { RouterView } from 'vue-router'
 import SideMenu from '../components/SideMenu.vue'
 import Header from '../components/Header.vue'
 import { useSideMenuStore } from '../stores/side-menu'
-import { onMounted } from 'vue'
 
 const handleResize = () => {
   if (window.innerWidth <= 767) {
@@ -54,7 +54,7 @@ onMounted(() => {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 1002;
+  z-index: 1003;
 }
 
 .side-menu.closed {
@@ -82,10 +82,10 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   padding: 0 15px;
+  z-index: 1001;
 }
 
 .view {
-  z-index: 1000;
   overflow-x: auto;
   white-space: nowrap;
   padding-bottom: 2000px;
@@ -108,7 +108,7 @@ onMounted(() => {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.346); /* Semi-transparent black background */
-    z-index: 999; /* Ensure the overlay is on top of other elements */
+    z-index: 1002; /* Ensure the overlay is on top of other elements */
   }
 }
 </style>

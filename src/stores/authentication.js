@@ -11,18 +11,19 @@ export const useAuthenticationStore = defineStore('status', {
   actions: {
     logout() {
       this.isLoggedIn = false
-      localStorage.removeItem('token')
+      localStorage.removeItem('accessToken')
       localStorage.removeItem('refreshToken')
-      // localStorage.removeItem('role')
+      window.location.href = '/login'
+      // router.push('/login')
     },
 
     login(token, refreshToken, id, userName) {
       this.isLoggedIn = true
       localStorage.setItem('accessToken', token)
       localStorage.setItem('refreshToken', refreshToken)
-      // localStorage.setItem('role', JSON.stringify(roles))
       localStorage.setItem('id', id)
       localStorage.setItem('userName', userName)
+      window.location.href = '/'
     }
 
     // retrieveFromStorage() {

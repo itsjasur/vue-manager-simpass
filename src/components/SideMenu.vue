@@ -1,11 +1,11 @@
 <template>
   <div class="side-menu">
-    <div class="logo" @click="useSideMenuStore().close()">
+    <div class="logo" @click="handleResize()">
       <router-link to="/"
         ><img src="../assets/logo.png" alt="Logo" style="width: 200px" />
       </router-link>
     </div>
-    <ul>
+    <ul @click="handleResize()">
       <li>
         <router-link to="/profile">
           <span class="material-symbols-outlined"> person </span>{{ SIDEMENUNAMES[0] }}</router-link
@@ -31,6 +31,12 @@
 import MenuTitle from '../components/MenuTitle.vue'
 import { SIDEMENUNAMES } from '../assets/constants'
 import { useSideMenuStore } from '../stores/side-menu'
+
+const handleResize = () => {
+  if (window.innerWidth <= 767) {
+    useSideMenuStore().close()
+  }
+}
 </script>
 
 <style scoped>

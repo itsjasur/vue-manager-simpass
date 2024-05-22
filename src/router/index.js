@@ -1,10 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import DashBaordView from '../views/DashBoardView.vue'
 import ProfileView from '../views/ProfileView.vue'
 import RegistrationView from '../views/RegistrationView.vue'
 import RentalRegistrationView from '../views/RentalRegistrationView.vue'
 import LoginView from '../views/LoginView.vue'
-import DashBaordView from '../views/DashBoardView.vue'
-import { useAuthenticationStore } from '../stores/authentication'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -73,7 +72,8 @@ router.beforeEach((to, from, next) => {
       next()
     } else {
       //  not authenticated, redirect to login
-      next('/login')
+      // next('/login')
+      window.location.href = '/login'
     }
   } else {
     // non-protected route, allow access
