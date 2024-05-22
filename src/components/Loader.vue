@@ -8,7 +8,7 @@
 import { computed, defineProps } from 'vue'
 
 const props = defineProps({
-  height: { type: String, default: '50px' },
+  height: { type: String, default: '40px' },
   color: { type: String, default: '#ffffff' },
   thickness: { type: String, default: '4px' }
 })

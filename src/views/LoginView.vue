@@ -17,7 +17,7 @@
         </div>
         <button type="submit" :disabled="isLoading">
           <div v-if="isLoading">
-            <LoadingSpinner height="30px" color="#ffffff" />
+            <LoadingSpinner height="20px" color="#ffffff" />
           </div>
           <div v-else>Login</div>
         </button>

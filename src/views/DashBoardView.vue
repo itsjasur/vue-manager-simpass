@@ -88,7 +88,7 @@ onMounted(() => {
 .view {
   overflow-x: auto;
   white-space: nowrap;
-  padding-bottom: 2000px;
+  height: calc(100vh - 60px);
 }
 
 /* Media query for mobile devices */
