@@ -33,8 +33,10 @@ export async function refreshToken() {
     }
   } catch (error) {
     console.error('Token refresh failed:', error)
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('refreshToken')
     window.location.href = '/login'
-    // router.push('/login')
+
     throw error
   }
 }

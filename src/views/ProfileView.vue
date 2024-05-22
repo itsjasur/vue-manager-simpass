@@ -126,6 +126,7 @@ onMounted(fetchProfileData)
   width: 80%;
   min-width: 300px;
   max-width: 1000px;
+  margin-top: 20px;
   padding: 0 15px;
   box-sizing: border-box; /*  padding and border in the element's total width and height */
 }

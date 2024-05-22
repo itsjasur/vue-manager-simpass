@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="card">
+    <div class="card" @click="router.push('/registration')">
       <div class="img">
         <img src="../assets/icons/sim.png" alt="" />
       </div>
@@ -38,8 +38,8 @@
   <!-- <div class="card1"></div> -->
 </template>
 
-<script>
-export default {}
+<script setup>
+import router from '../router'
 </script>
 
 <style scoped>

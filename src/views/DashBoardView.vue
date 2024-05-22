@@ -27,7 +27,7 @@
 
 <script setup>
 import { onMounted } from 'vue'
-import { RouterView } from 'vue-router'
+
 import SideMenu from '../components/SideMenu.vue'
 import Header from '../components/Header.vue'
 import { useSideMenuStore } from '../stores/side-menu'
