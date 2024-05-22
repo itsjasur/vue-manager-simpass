@@ -1,9 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import DashBaordView from '../views/DashBoardView.vue'
 import ProfileView from '../views/ProfileView.vue'
+import HomeView from '../views/HomeView.vue'
 import RegistrationView from '../views/RegistrationView.vue'
 import RentalRegistrationView from '../views/RentalRegistrationView.vue'
 import LoginView from '../views/LoginView.vue'
+import NotFoundView from '../views/NotFoundView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -20,11 +22,21 @@ const router = createRouter({
     {
       path: '/',
       name: 'dashboard',
+      redirect: '/home',
+
       component: DashBaordView,
       meta: {
         requiresAuth: true
       },
       children: [
+        {
+          path: '/home',
+          name: 'home',
+          component: HomeView,
+          meta: {
+            requiresAuth: true
+          }
+        },
         {
           path: '/profile',
           name: 'profile',
@@ -50,6 +62,13 @@ const router = createRouter({
           }
         }
       ]
+    },
+
+    // this catchs any route
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'NotFound',
+      component: NotFoundView
     }
 
     // {
@@ -72,8 +91,7 @@ router.beforeEach((to, from, next) => {
       next()
     } else {
       //  not authenticated, redirect to login
-      // next('/login')
-      window.location.href = '/login'
+      next('/login')
     }
   } else {
     // non-protected route, allow access

@@ -23,7 +23,7 @@ export const useAuthenticationStore = defineStore('status', {
       localStorage.setItem('refreshToken', refreshToken)
       localStorage.setItem('id', id)
       localStorage.setItem('userName', userName)
-      window.location.href = '/'
+      window.location.href = '/home'
     }
 
     // retrieveFromStorage() {

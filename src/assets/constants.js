@@ -1,4 +1,5 @@
 export const SIDEMENUNAMES = [
+  '홈',
   '나의 정보',
   '가입/번호이동 신청서',
   '랜탈가입 신청서',

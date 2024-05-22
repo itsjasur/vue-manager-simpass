@@ -17,6 +17,6 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: blueviolet;
+  background-color: white;
 }
 </style>

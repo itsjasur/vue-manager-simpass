@@ -1,26 +1,31 @@
 <template>
   <div class="side-menu">
     <div class="logo" @click="handleResize()">
-      <router-link to="/"
+      <router-link to="/home"
         ><img src="../assets/logo.png" alt="Logo" style="width: 200px" />
       </router-link>
     </div>
     <ul @click="handleResize()">
       <li>
+        <router-link to="/home">
+          <span class="material-symbols-outlined"> home </span>{{ SIDEMENUNAMES[0] }}</router-link
+        >
+      </li>
+      <li>
         <router-link to="/profile">
-          <span class="material-symbols-outlined"> person </span>{{ SIDEMENUNAMES[0] }}</router-link
+          <span class="material-symbols-outlined"> person </span>{{ SIDEMENUNAMES[1] }}</router-link
         >
       </li>
       <li>
         <router-link to="/registration">
           <span class="material-symbols-outlined"> description </span
-          >{{ SIDEMENUNAMES[1] }}</router-link
+          >{{ SIDEMENUNAMES[2] }}</router-link
         >
       </li>
       <li>
         <router-link to="/rental-registration">
           <span class="material-symbols-outlined"> demography </span
-          >{{ SIDEMENUNAMES[2] }}</router-link
+          >{{ SIDEMENUNAMES[3] }}</router-link
         >
       </li>
     </ul>

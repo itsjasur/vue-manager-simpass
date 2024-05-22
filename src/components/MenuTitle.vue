@@ -10,21 +10,24 @@ import { SIDEMENUNAMES } from '../assets/constants'
 const route = useRoute()
 
 const title = computed(() => {
-  if (route.path === '/profile') {
+  if (route.path === '/home') {
     return SIDEMENUNAMES[0]
   }
 
-  if (route.path === '/registration') {
+  if (route.path === '/profile') {
     return SIDEMENUNAMES[1]
   }
 
+  if (route.path === '/registration') {
+    return SIDEMENUNAMES[2]
+  }
+
   if (route.path === '/rental-registration') {
-    return SIDEMENUNAMES[1]
+    return SIDEMENUNAMES[3]
   }
 
   return 'Nothing'
 })
 </script>
 
-<style>
-</style>
+<style></style>
