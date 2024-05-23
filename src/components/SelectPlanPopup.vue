@@ -44,11 +44,12 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 
 const selectedType = ref('PO')
 
 const props = defineProps(['selectedType', 'carrierCode', 'mvnoCode'])
+const emit = defineEmits(['closePopup'])
 
 console.log(props.selectedType)
 console.log(props.carrierCode)
@@ -62,6 +63,14 @@ const types = ref([
 function changeType(cd) {
   selectedType.value = cd
 }
+
+onMounted(() => {
+  document.addEventListener('keydown', (event) => emit('closePopup'))
+})
+
+// onUnmounted(() => {
+//   document.removeEventListener('keydown', closeOnEsc)
+// })
 </script>
 
 <style scoped>

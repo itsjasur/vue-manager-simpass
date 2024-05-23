@@ -20,8 +20,6 @@
       </div>
     </div>
 
-    <div style="height: 40px"></div>
-
     <div class="carriers">
       <div
         class="button"
@@ -33,8 +31,6 @@
         {{ item.label }}
       </div>
     </div>
-
-    <div style="height: 40px"></div>
 
     <div class="mvnos">
       <div
@@ -127,7 +123,9 @@ onMounted(fetchData)
 <style scoped>
 .container {
   padding: 20px;
-  /* background-color: aquamarine; */
+  display: flex;
+  flex-flow: column;
+  gap: 40px;
 }
 
 .types {
