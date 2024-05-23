@@ -93,10 +93,7 @@ onMounted(() => {
 
 /* Media query for mobile devices */
 @media (max-width: 767px) {
-  .main-content {
-    margin-left: 0px;
-  }
-  .main-content.open {
+  .main-content.sideMenuOpen {
     margin-left: 0px;
   }
 

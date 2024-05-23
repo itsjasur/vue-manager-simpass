@@ -85,14 +85,8 @@ const status = ref('')
 
 async function fetchProfileData() {
   try {
-    let accessToken = localStorage.getItem('accessToken')
-    console.log(accessToken)
     const response = await fetchWithTokenRefresh('agent/partnerInfo', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`
-      }
+      method: 'GET'
       // body: JSON.stringify(requestModel)
     })
     if (response.ok) {
@@ -116,8 +110,6 @@ async function fetchProfileData() {
     useSnackbarStore().showSnackbar(error.toString())
   }
 }
-// let data = onMounted(fetchProfileData)
-// console.log(data)
 onMounted(fetchProfileData)
 </script>
 
