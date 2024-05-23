@@ -81,6 +81,7 @@ onMounted(() => {
   line-height: 50px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding: 0 15px;
   z-index: 1001;
 }

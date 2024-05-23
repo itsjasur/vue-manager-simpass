@@ -3,8 +3,7 @@
     <i @click="useSideMenuStore().toggle()" class="material-symbols-outlined"> menu </i>
     <div class="title"><MenuTitle /></div>
   </div>
-
-  <a-button class="button" @click="useAuthenticationStore().logout()">Logout</a-button>
+  <div class="button" @click="useAuthenticationStore().logout()">Logout</div>
 </template>
 
 <script setup>
@@ -15,9 +14,9 @@ import { useAuthenticationStore } from '../stores/authentication'
 
 <style scoped>
 .button {
-  width: auto;
+  font-size: 14px;
+  padding: 10px;
 }
-
 .left {
   display: flex;
   align-items: center;
@@ -25,12 +24,12 @@ import { useAuthenticationStore } from '../stores/authentication'
 
 i {
   font-size: 24px;
-
   cursor: pointer;
 }
 
 .title {
   padding: 0 15px;
+  line-height: 1;
 }
 
 i:hover {

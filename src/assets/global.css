@@ -16,7 +16,6 @@ body {
 }
 
 button {
-  margin: 15px 0;
   width: 100%;
   height: 40px;
   background-color: var(--main-color);
@@ -34,6 +33,40 @@ button:disabled {
 
 button:hover:enabled {
   background-color: var(--main-color-hover);
+}
+
+.button:hover {
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.button:active {
+  cursor: pointer;
+  border-color: #bebebe;
+  color: #bebebe;
+}
+
+.button {
+  width: auto;
+
+  line-height: 1;
+  box-sizing: border-box;
+  border-radius: 8px;
+  font-weight: 600;
+  border: 1.5px solid #797979;
+  color: #797979;
+  text-align: center;
+  align-content: center;
+}
+
+.button.selected {
+  border-color: var(--main-color);
+  color: var(--main-color);
+}
+
+.close-button:hover {
+  opacity: 0.6;
+  cursor: pointer;
 }
 
 label {
@@ -85,3 +118,13 @@ select:focus {
   border-color: var(--main-color);
   box-shadow: 0 0 2px var(--main-color);
 }
+
+/* BACKGROUND IMAGE AND HOW TO GIVE PADDING */
+/* 
+.carriers .button {
+  background-size: contain; Add this line
+  background-repeat: no-repeat; Add this line
+  background-position: center; Add this line
+  padding: 15px;
+  background-origin: content-box; this applies padding to background image
+} */

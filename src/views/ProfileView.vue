@@ -27,8 +27,8 @@
 
     <div class="row">
       <div class="groups">
-        <label>연락처</label>
-        <a-input v-model:value="contact" size="medium" placeholder="" readonly />
+        <label for="contact">연락처</label>
+        <a-input id="contact" v-model:value="contact" size="medium" placeholder="" readonly />
       </div>
 
       <div class="groups">

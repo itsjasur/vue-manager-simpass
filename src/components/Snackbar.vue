@@ -29,6 +29,7 @@ const snackbarStore = useSnackbarStore()
   min-width: 40%;
   align-items: center;
   justify-content: space-between;
+  z-index: 1200;
 }
 
 .snackbar-content {

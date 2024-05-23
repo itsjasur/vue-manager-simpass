@@ -1,7 +1,13 @@
 <template>
+  <div class="mypopup" v-if="showPopup">
+    <SelectPlanPopup
+      :selectedType="selectedType"
+      :carrierCode="selectedCarrier"
+      :mvnoCode="selectedMvno"
+      @closePopup="showPopup = false"
+    />
+  </div>
   <div class="container">
-    <!-- <div class="typeButton">Postpaid</div> -->
-
     <div class="types">
       <div
         class="button"
@@ -38,18 +44,23 @@
         @click="selectMvno(item.mvno_cd)"
       >
         <img :src="item.image_url" :alt="item.mvno_nm" width="100%" />
+        <img class="logo" :src="logoFinder(item.carrier_cd)" :alt="item.carrier_nm" height="100%" />
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { useSnackbarStore } from '@/stores/snackbar'
-import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
+import { useSnackbarStore } from '../stores/snackbar'
+import { fetchWithTokenRefresh } from '../utils/tokenUtils'
 import { onMounted, ref } from 'vue'
+import SelectPlanPopup from '../components/SelectPlanPopup.vue'
 
 const selectedType = ref('PO')
 const selectedCarrier = ref('')
+const selectedMvno = ref('')
+
+const showPopup = ref(false)
 
 const types = ref([
   { cd: 'PO', label: '후불' },
@@ -63,6 +74,13 @@ const carriers = ref([
   { cd: 'LG', label: 'LG U+' }
 ])
 
+function logoFinder(carrierCd) {
+  if (carrierCd === 'KT') return 'src/assets/logos/kt.png'
+  if (carrierCd === 'SK') return 'src/assets/logos/skt.png'
+  if (carrierCd === 'LG') return 'src/assets/logos/lgu.png'
+  return ''
+}
+
 const mvnos = ref([])
 
 function changeType(cd) {
@@ -75,7 +93,10 @@ function changeCarrier(cd) {
   fetchData()
 }
 
-function selectMvno(cd) {}
+function selectMvno(mvnoCd) {
+  selectedMvno.value = mvnoCd
+  showPopup.value = true
+}
 
 async function fetchData() {
   try {
@@ -105,7 +126,7 @@ onMounted(fetchData)
 
 <style scoped>
 .container {
-  margin: 20px;
+  padding: 20px;
   /* background-color: aquamarine; */
 }
 
@@ -127,32 +148,9 @@ onMounted(fetchData)
   flex-flow: wrap;
 }
 
-.button.selected {
-  border-color: var(--main-color);
-  color: var(--main-color);
-}
 .button {
-  min-height: 50px;
-  min-width: 120px;
-  width: auto;
-  box-sizing: border-box;
-  border-radius: 5px;
-  font-weight: 600;
-  border: 1.5px solid #797979;
-  color: #797979;
-
-  text-align: center;
-  align-content: center;
-}
-.button:hover {
-  cursor: pointer;
-  opacity: 0.6;
-}
-
-.button:active {
-  cursor: pointer;
-  border-color: #bebebe;
-  color: #bebebe;
+  min-height: 60px;
+  min-width: 140px;
 }
 
 .card {
@@ -161,11 +159,15 @@ onMounted(fetchData)
   padding: 50px 30px;
   box-sizing: border-box;
   border-radius: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
   font-size: 20px;
+  position: relative;
+}
+
+.card .logo {
+  position: absolute;
+  right: 5%;
+  top: 8%;
+  height: 10%;
 }
 
 .card:hover {
@@ -196,7 +198,7 @@ onMounted(fetchData)
   .card {
     flex: 1 0 calc(50% - 20px); /* each item takes half of the container width with a gap of 20px */
     max-width: calc(50% - 10px); /* ensures items don't exceed half of the container width */
-    padding: 6vw 8vw;
+    padding: 8vw 8vw;
   }
 
   .textbox {

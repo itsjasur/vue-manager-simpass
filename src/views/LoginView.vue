@@ -15,6 +15,7 @@
           <input type="password" id="password" name="password" v-model="password" />
           <p v-if="!password" class="input-error-message">{{ passwordErr }}</p>
         </div>
+        <div style="height: 20px"></div>
         <button type="submit" :disabled="isLoading">
           <div v-if="isLoading">
             <LoadingSpinner height="20px" color="#ffffff" />
