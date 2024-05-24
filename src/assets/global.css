@@ -1,13 +1,13 @@
 :root {
-  --main-color: #ffa622;
-  --main-color-hover: #e28b07;
+  --main-color: #fa9b0d;
+  --main-color-hover: hwb(36 5% 27%);
   --border-color: #dddddd;
   --label-color: #727272;
   --disabled-color: #959595;
   --text-color: #333;
 
-  --primary-color: #ffa622;
-  --secondary-color: #ffa622;
+  /* --primary-color: #ffa622; */
+  /* --secondary-color: #ffa622; */
 }
 
 body {

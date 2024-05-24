@@ -76,7 +76,8 @@ onMounted(() => {
   position: sticky;
   top: 0;
   height: 60px;
-  background-color: #fff;
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Bottom shadow */
   text-align: center;
   line-height: 50px;
   display: flex;

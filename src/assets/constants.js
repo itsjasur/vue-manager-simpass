@@ -8,3 +8,15 @@ export const SIDEMENUNAMES = [
 ]
 
 export const BASEURL = 'http://192.168.0.251:8091/api/'
+
+export const PLANTYPES = [
+  { cd: 'PO', label: '후불' },
+  { cd: 'PR', label: '선불' }
+]
+
+export const CARRIERS = [
+  { cd: '', label: '전체' },
+  { cd: 'KT', label: 'KT' },
+  { cd: 'SK', label: 'SKT' },
+  { cd: 'LG', label: 'LG U+' }
+]

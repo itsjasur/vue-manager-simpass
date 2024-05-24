@@ -2,8 +2,7 @@
   <div class="mypopup" v-if="showPopup">
     <SelectPlanPopup
       :selectedType="selectedType"
-      :carrierCode="selectedCarrier"
-      :mvnoCode="selectedMvno"
+      :mvnoInfo="selectedMvno"
       @closePopup="showPopup = false"
     />
   </div>
@@ -25,7 +24,7 @@
         class="button"
         v-for="(item, index) in carriers"
         :key="index"
-        :class="{ selected: selectedCarrier === item.cd }"
+        :class="{ selected: selectedCarrierCd === item.cd }"
         @click="changeCarrier(item.cd)"
       >
         {{ item.label }}
@@ -33,12 +32,7 @@
     </div>
 
     <div class="mvnos">
-      <div
-        class="card"
-        v-for="(item, index) in mvnos"
-        :key="index"
-        @click="selectMvno(item.mvno_cd)"
-      >
+      <div class="card" v-for="(item, index) in mvnos" :key="index" @click="selectMvno(item)">
         <img :src="item.image_url" :alt="item.mvno_nm" width="100%" />
         <img class="logo" :src="logoFinder(item.carrier_cd)" :alt="item.carrier_nm" height="100%" />
       </div>
@@ -49,33 +43,20 @@
 <script setup>
 import { useSnackbarStore } from '../stores/snackbar'
 import { fetchWithTokenRefresh } from '../utils/tokenUtils'
+import { logoFinder } from '../utils/logoFinder'
 import { onMounted, ref } from 'vue'
 import SelectPlanPopup from '../components/SelectPlanPopup.vue'
+import { CARRIERS, PLANTYPES } from '../assets/constants'
 
 const selectedType = ref('PO')
-const selectedCarrier = ref('')
+const selectedCarrierCd = ref('')
+
 const selectedMvno = ref('')
 
 const showPopup = ref(false)
 
-const types = ref([
-  { cd: 'PO', label: '후불' },
-  { cd: 'PR', label: '선불' }
-])
-
-const carriers = ref([
-  { cd: '', label: '전체' },
-  { cd: 'KT', label: 'KT' },
-  { cd: 'SK', label: 'SKT' },
-  { cd: 'LG', label: 'LG U+' }
-])
-
-function logoFinder(carrierCd) {
-  if (carrierCd === 'KT') return 'src/assets/logos/kt.png'
-  if (carrierCd === 'SK') return 'src/assets/logos/skt.png'
-  if (carrierCd === 'LG') return 'src/assets/logos/lgu.png'
-  return ''
-}
+const types = ref(PLANTYPES)
+const carriers = ref(CARRIERS)
 
 const mvnos = ref([])
 
@@ -85,12 +66,12 @@ function changeType(cd) {
 }
 
 function changeCarrier(cd) {
-  selectedCarrier.value = cd
+  selectedCarrierCd.value = cd
   fetchData()
 }
 
-function selectMvno(mvnoCd) {
-  selectedMvno.value = mvnoCd
+function selectMvno(item) {
+  selectedMvno.value = item
   showPopup.value = true
 }
 
@@ -100,7 +81,7 @@ async function fetchData() {
       method: 'POST',
       body: {
         carrier_type: selectedType.value,
-        carrier_cd: selectedCarrier.value
+        carrier_cd: selectedCarrierCd.value
       }
     })
     if (response.ok) {
@@ -110,7 +91,7 @@ async function fetchData() {
         mvnos.value = info
       }
     } else {
-      throw new Error('Fetch profile data error')
+      throw new Error('Fetch data error')
     }
   } catch (error) {
     useSnackbarStore().showSnackbar(error.toString())
