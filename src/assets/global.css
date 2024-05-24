@@ -1,13 +1,9 @@
 :root {
   --main-color: #fa9b0d;
-  --main-color-hover: hwb(36 5% 27%);
-  --border-color: #dddddd;
-  --label-color: #727272;
-  --disabled-color: #959595;
   --text-color: #333;
-
-  /* --primary-color: #ffa622; */
-  /* --secondary-color: #ffa622; */
+  --border-color: #cccccc;
+  --label-color: #959595;
+  --placeholder-color: #cacaca;
 }
 
 body {
@@ -24,7 +20,7 @@ button {
   border-radius: 8px;
   font-size: 16px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background-color 0.3s; /* Corrected transition property */
 }
 
 button:disabled {
@@ -32,40 +28,42 @@ button:disabled {
 }
 
 button:hover:enabled {
-  background-color: var(--main-color-hover);
-}
-
-.button:hover {
-  cursor: pointer;
-  opacity: 0.6;
-}
-
-.button:active {
-  cursor: pointer;
-  border-color: #bebebe;
-  color: #bebebe;
+  filter: brightness(0.8); /* 80% brightness to make it darker */
 }
 
 .button {
   width: auto;
-
   line-height: 1;
   box-sizing: border-box;
   border-radius: 8px;
-  font-weight: 600;
-  border: 1.5px solid #797979;
-  color: #797979;
+  background-color: #cbcbcb;
+  color: #fff;
   text-align: center;
   align-content: center;
 }
 
 .button.selected {
-  border-color: var(--main-color);
-  color: var(--main-color);
+  background-color: var(--main-color);
+  color: #fff;
+}
+
+.button:hover {
+  cursor: pointer;
+  filter: brightness(0.9); /* 80% brightness to make it darker */
 }
 
 .close-button:hover {
-  opacity: 0.6;
+  opacity: 0.8;
+  cursor: pointer;
+}
+
+.card {
+  background-color: #f0efef;
+  border-radius: 8px;
+}
+
+.card:hover {
+  filter: brightness(0.9); /* 70% brightness to make it darker */
   cursor: pointer;
 }
 
@@ -85,6 +83,10 @@ input {
   border: 1px solid var(--border-color);
   border-radius: 8px;
   font-size: 16px;
+}
+
+input::placeholder {
+  color: var(--placeholder-color);
 }
 
 input:focus {

@@ -58,16 +58,9 @@ img {
 .card {
   height: 170px;
   width: 170px;
-  background-color: #f1f1f1;
   padding: 10px;
   box-sizing: border-box;
-  border-radius: 10px;
   align-content: center;
-}
-
-.card:hover {
-  filter: brightness(0.7); /* 70% brightness to make it darker */
-  cursor: pointer;
 }
 
 .img {
@@ -105,8 +98,6 @@ img {
     width: 100%;
     height: auto;
     min-height: 100px;
-    background-color: #f1f1f1;
-
     display: flex;
     align-items: center;
     align-content: center;

@@ -38,6 +38,7 @@
         <div style="height: 30px"></div>
 
         <a-table
+          class="table"
           :columns="columns"
           :data-source="dataList"
           bordered
@@ -56,6 +57,8 @@
             </template>
           </template>
         </a-table>
+
+        <div class="card"></div>
 
         <div style="height: 100px"></div>
       </div>
@@ -186,13 +189,6 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.linkText {
-  color: var(--main-color);
-  display: inline-flex;
-  font-weight: 600;
-  cursor: pointer;
-}
-
 .overlay {
   box-sizing: border-box;
   position: fixed;
@@ -240,7 +236,6 @@ onUnmounted(() => {
 .inputRow {
   position: relative;
   width: 30%;
-  min-width: 300px;
 }
 
 input {
@@ -265,11 +260,37 @@ input {
 
 .button {
   min-height: 50px;
-  min-width: 140px;
+  min-width: 150px;
 }
 
-@media (max-width: 767px) {
+.linkText {
+  color: var(--main-color);
+  display: inline-flex;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+@media (min-width: 767px) {
+  .card {
+    display: none;
+  }
+}
+
+.card {
+  width: 100%;
+  height: 100px;
+}
+
+@media (max-width: 768px) {
+  .table {
+    display: none;
+  }
+
+  .inputRow {
+    width: 100%;
+  }
   .button {
+    min-width: 50px;
     flex: 1 0 calc(50% - 20px); /* each item takes half of the container width with a gap of 20px */
     max-width: calc(50% - 10px); /* ensures items don't exceed half of the container width */
   }

@@ -134,10 +134,8 @@ onMounted(fetchData)
 
 .card {
   width: 200px;
-  background-color: #f3f3f3;
   padding: 50px 30px;
   box-sizing: border-box;
-  border-radius: 10px;
   font-size: 20px;
   position: relative;
 }
@@ -147,11 +145,6 @@ onMounted(fetchData)
   right: 5%;
   top: 8%;
   height: 10%;
-}
-
-.card:hover {
-  filter: brightness(0.7); /* 70% brightness to make it darker */
-  cursor: pointer;
 }
 
 @media (max-width: 767px) {

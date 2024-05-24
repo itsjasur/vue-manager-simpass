@@ -2,8 +2,9 @@
   <a-config-provider
     :theme="{
       token: {
-        colorPrimary: '#ffa622',
-        colorPrimaryActive: '#fff'
+        colorPrimary: '#fa9b0d',
+        colorPrimaryActive: '#fff',
+        colorBorder: '#cccccc' // Default border color for input and select
       }
     }"
   >
