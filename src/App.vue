@@ -2,9 +2,13 @@
   <a-config-provider
     :theme="{
       token: {
-        colorPrimary: '#fa9b0d',
-        colorPrimaryActive: '#fff',
-        colorBorder: '#cccccc' // Default border color for input and select
+        colorPrimary: '#fa9b0d', //primary
+        colorPrimaryHover: '#fa9b0d', //primary hover
+        colorBorder: '#cccccc', // border color
+        controlHeight: 50, // input/select/button height
+        borderRadius: 4, //all border radius
+        lineWidth: 1, //border line width
+        controlOutline: 'none' //focus outline
       }
     }"
   >

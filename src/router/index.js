@@ -87,7 +87,7 @@ router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth) {
     const token = localStorage.getItem('accessToken')
     // console.log(token)
-    if (token) {
+    if (!token) {
       // authenticated, proceed to the route
       next()
     } else {

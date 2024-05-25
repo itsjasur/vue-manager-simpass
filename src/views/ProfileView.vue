@@ -3,21 +3,20 @@
     <div class="row">
       <div class="groups">
         <label>판매점코드 </label>
-        <a-input v-model:value="pcode" size="medium" placeholder="SM00000" readonly />
+        <input v-model="pcode" placeholder="SM00000" readonly />
       </div>
 
       <div class="groups">
         <label>판매점명</label>
-        <a-input v-model:value="pname" size="medium" placeholder="" readonly />
+        <input v-model="pname" placeholder="" readonly />
       </div>
-
       <!-- <div class="groups">
         <label>판매점명 </label>
         <a-select
           ref="select"
+          allowClear
           v-model:value="pname"
-          style="width: 100%"
-          size="medium"
+          :style="{ width: '100%' }"
           placeholder="Please select"
           :options="options"
         >
@@ -28,36 +27,36 @@
     <div class="row">
       <div class="groups">
         <label for="contact">연락처</label>
-        <a-input id="contact" v-model:value="contact" size="medium" placeholder="" readonly />
+        <input id="contact" v-model="contact" placeholder="" readonly />
       </div>
 
       <div class="groups">
         <label>이메일</label>
-        <a-input v-model:value="email" size="medium" placeholder="" readonly />
+        <input v-model="email" placeholder="" readonly />
       </div>
     </div>
 
     <div class="row">
       <div class="groups">
         <label>매장주소</label>
-        <a-input v-model:value="storeAddress" size="medium" placeholder="" readonly />
+        <input v-model="storeAddress" placeholder="" readonly />
       </div>
 
       <div class="groups">
         <label>매장상세주소</label>
-        <a-input v-model:value="storeDetailAddress" size="medium" placeholder="" readonly />
+        <input v-model="storeDetailAddress" placeholder="" readonly />
       </div>
     </div>
 
     <div class="row">
       <div class="groups">
         <label>계약일자 </label>
-        <a-input v-model:value="contractDate" size="medium" placeholder="" readonly />
+        <input v-model="contractDate" placeholder="" readonly />
       </div>
 
       <div class="groups">
         <label>상태 </label>
-        <a-input v-model:value="status" size="medium" placeholder="" readonly />
+        <input v-model="status" placeholder="" readonly />
       </div>
     </div>
   </div>
@@ -81,7 +80,7 @@ const status = ref('')
 // const options = [...Array(25)].map((_, i) => ({
 //   value: (i + 10).toString(36) + (i + 1)
 // }))
-// const options = [{ value: 'a' }, { value: 'b' }]
+const options = [{ value: 'a' }, { value: 'b' }]
 
 async function fetchProfileData() {
   try {
