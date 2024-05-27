@@ -18,11 +18,11 @@ const title = computed(() => {
     return SIDEMENUNAMES[1]
   }
 
-  if (route.path === '/registration') {
+  if (route.path === '/registration-forms') {
     return SIDEMENUNAMES[2]
   }
 
-  if (route.path === '/rental-registration') {
+  if (route.path === '/rental-forms') {
     return SIDEMENUNAMES[3]
   }
 

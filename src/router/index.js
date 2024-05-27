@@ -1,10 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import DashBaordView from '../views/DashBoardView.vue'
-
 import HomeView from '../views/HomeView.vue'
-import RegistrationView from '../views/RegistrationView.vue'
+import RegistrationFormsView from '../views/RegistrationFormsView.vue'
 import ProfileView from '../views/ProfileView.vue'
-import RentalRegistrationView from '../views/RentalRegistrationView.vue'
+// import RentalFormsView from '../views/RentalFormsView.vue'
+import FormDetailsView from '../views/FormDetailsView.vue'
+
 import LoginView from '../views/LoginView.vue'
 import NotFoundView from '../views/NotFoundView.vue'
 
@@ -47,17 +48,19 @@ const router = createRouter({
           }
         },
         {
-          path: '/registration',
-          name: 'registration',
-          component: RegistrationView,
+          path: '/registration-forms',
+          name: 'registration-forms',
+          component: RegistrationFormsView,
           meta: {
             requiresAuth: true
           }
         },
+
         {
-          path: '/rental-registration',
-          name: 'rental-registration',
-          component: RentalRegistrationView,
+          path: '/rental-forms',
+          name: 'rental-forms',
+          // component: RentalRegistrationView,
+          component: FormDetailsView,
           meta: {
             requiresAuth: true
           }
@@ -67,7 +70,8 @@ const router = createRouter({
 
     // this catchs any route
     {
-      path: '/:pathMatch(.*)*',
+      // path: '/:pathMatch(.*)*',
+      path: '/:catchAll(.*)',
       name: 'NotFound',
       component: NotFoundView
     }
@@ -87,7 +91,7 @@ router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth) {
     const token = localStorage.getItem('accessToken')
     // console.log(token)
-    if (!token) {
+    if (token) {
       // authenticated, proceed to the route
       next()
     } else {

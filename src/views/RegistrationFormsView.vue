@@ -50,7 +50,6 @@ import { CARRIERS, PLANTYPES } from '../assets/constants'
 
 const selectedType = ref('PO')
 const selectedCarrierCd = ref('')
-
 const selectedMvno = ref('')
 
 const showPopup = ref(false)
@@ -103,7 +102,8 @@ onMounted(fetchData)
 
 <style scoped>
 .container {
-  padding: 20px;
+  margin-top: 20px;
+  padding: 0 15px;
   display: flex;
   flex-flow: column;
   gap: 40px;

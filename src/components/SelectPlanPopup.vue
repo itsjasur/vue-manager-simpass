@@ -32,8 +32,9 @@
             placeholder="검색할 요금제명을 입력해주세요"
             v-model="searchText"
           />
-
-          <span @click="searchText = ''" class="icon material-symbols-outlined"> close </span>
+          <span v-if="searchText" @click="searchText = ''" class="icon material-symbols-outlined">
+            close
+          </span>
         </div>
         <div style="height: 30px"></div>
 
@@ -58,7 +59,36 @@
           </template>
         </a-table>
 
-        <div class="card"></div>
+        <div class="card" v-for="(item, index) in dataList" :key="index">
+          <div class="title">
+            <span>{{ item.usim_plan_nm }}</span>
+            <span class="icon material-symbols-outlined"> arrow_forward_ios </span>
+          </div>
+
+          <div class="body">
+            <div class="data">
+              <span @click="searchText = ''" class="icon material-symbols-outlined">
+                swap_vert
+              </span>
+              <span> {{ item.cell_data }}{{ item.qos }} </span>
+            </div>
+
+            <div class="calls">
+              <span @click="searchText = ''" class="icon material-symbols-outlined"> call </span>
+              <span> {{ item.voice }} </span>
+            </div>
+
+            <div class="sms">
+              <span @click="searchText = ''" class="icon material-symbols-outlined"> mail </span>
+              <span> {{ item.message }} </span>
+            </div>
+          </div>
+
+          <div class="price">
+            <span class="original">{{ item.basic_fee.toLocaleString() }} 원</span>
+            <span class="sale"> {{ item.sales_fee.toLocaleString() }} 원/월</span>
+          </div>
+        </div>
 
         <div style="height: 100px"></div>
       </div>
@@ -238,11 +268,6 @@ onUnmounted(() => {
   width: 30%;
 }
 
-input {
-  height: 50px;
-  padding-right: 40px;
-}
-
 .inputRow .icon {
   position: absolute;
   top: 50%;
@@ -276,11 +301,6 @@ input {
   }
 }
 
-.card {
-  width: 100%;
-  height: 100px;
-}
-
 @media (max-width: 768px) {
   .table {
     display: none;
@@ -293,6 +313,71 @@ input {
     min-width: 50px;
     flex: 1 0 calc(50% - 20px); /* each item takes half of the container width with a gap of 20px */
     max-width: calc(50% - 10px); /* ensures items don't exceed half of the container width */
+  }
+
+  .card {
+    width: 100%;
+    margin-bottom: 25px;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .card:hover {
+    opacity: 1;
+    cursor: default;
+  }
+
+  .card .title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-weight: bold;
+  }
+
+  .card .title .icon {
+    font-size: 20px;
+    color: #797979;
+  }
+
+  .card .body {
+    display: flex;
+    flex-direction: column;
+    color: #707070;
+    gap: 10px;
+  }
+
+  .card .body div {
+    display: flex;
+    align-items: center;
+  }
+
+  .card .body .material-symbols-outlined {
+    font-variation-settings:
+      'FILL' 1,
+      'wght' 700,
+      'opsz' 40;
+
+    font-size: 22px;
+    padding-right: 10px;
+    padding-left: 5px;
+    color: #afafaf;
+  }
+
+  .card .price {
+    align-self: flex-end;
+  }
+  .card .price .original {
+    color: #afafaf;
+    text-decoration: line-through;
+  }
+  .card .price .sale {
+    padding-left: 15px;
+    padding-right: 10px;
+    font-weight: bold;
+    color: var(--main-color);
   }
 }
 </style>

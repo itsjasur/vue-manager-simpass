@@ -14,7 +14,6 @@
         <label>판매점명 </label>
         <a-select
           ref="select"
-          allowClear
           v-model:value="pname"
           :style="{ width: '100%' }"
           placeholder="Please select"

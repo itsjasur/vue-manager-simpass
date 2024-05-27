@@ -17,13 +17,13 @@
         >
       </li>
       <li>
-        <router-link to="/registration">
+        <router-link to="/registration-forms">
           <span class="material-symbols-outlined"> description </span
           >{{ SIDEMENUNAMES[2] }}</router-link
         >
       </li>
       <li>
-        <router-link to="/rental-registration">
+        <router-link to="/rental-forms">
           <span class="material-symbols-outlined"> demography </span
           >{{ SIDEMENUNAMES[3] }}</router-link
         >

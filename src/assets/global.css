@@ -2,7 +2,6 @@
   --main-color: #fa9b0d;
   --text-color: #333;
   --border-color: #cccccc;
-  --label-color: #959595;
   --placeholder-color: #cacaca;
 }
 
@@ -58,19 +57,21 @@ button:hover:enabled {
 }
 
 .card {
-  background-color: #f0efef;
-  border-radius: 8px;
+  background-color: #0000000a;
+  /* background-color: #fa9b0d15; */
+  border-radius: 4px;
+  box-sizing: border-box;
 }
 
 .card:hover {
-  filter: brightness(0.9); /* 70% brightness to make it darker */
+  opacity: 0.7;
   cursor: pointer;
 }
 
 label {
   display: block;
   margin-bottom: 3px;
-  color: var(--label-color);
+  color: #7e7e7e;
   font-size: 14px;
 }
 
