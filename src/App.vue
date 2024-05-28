@@ -5,7 +5,7 @@
         colorPrimary: '#fa9b0d', //primary
         colorPrimaryHover: '#fa9b0d', //primary hover
         colorBorder: '#cccccc', // border color
-        controlHeight: 50, // input/select/button height
+        controlHeight: 40, // input/select/button height
         borderRadius: 4, //all border radius
         lineWidth: 1, //border line width
         controlOutline: 'none', //focus outline

@@ -80,8 +80,8 @@ async function fetchData() {
       method: 'POST',
       body: {
         carrier_type: selectedType.value,
-        carrier_cd: selectedCarrierCd.value
-      }
+        carrier_cd: selectedCarrierCd.value,
+      },
     })
     if (response.ok) {
       const decodedResponse = await response.json()

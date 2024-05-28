@@ -116,46 +116,46 @@ const columns = ref([
     dataIndex: 'usim_plan_nm',
     key: 'usim_plan_nm',
     sorter: (a, b) => (a.usim_plan_nm ?? '').localeCompare(b.usim_plan_nm), // sorter function for alphabetical sorting
-    sortDirections: ['descend', 'ascend']
+    sortDirections: ['descend', 'ascend'],
   },
   {
     title: '기본금액 (월)',
     dataIndex: 'basic_fee',
     key: 'basic_fee',
-    sorter: (a, b) => a.basic_fee ?? 0 - b.basic_fee ?? 0
+    sorter: (a, b) => a.basic_fee ?? 0 - b.basic_fee ?? 0,
   },
   {
     title: '판매금액 (월)',
     dataIndex: 'sales_fee',
     key: 'sales_fee',
-    sorter: (a, b) => a.sales_fee ?? 0 - b.sales_fee ?? 0
+    sorter: (a, b) => a.sales_fee ?? 0 - b.sales_fee ?? 0,
   },
 
   {
     title: '음성',
     dataIndex: 'voice',
     key: 'voice',
-    sorter: (a, b) => (a.voice ?? '').localeCompare(b.voice ?? '')
+    sorter: (a, b) => (a.voice ?? '').localeCompare(b.voice ?? ''),
   },
   {
     title: '문자',
     dataIndex: 'message',
     key: 'message',
-    sorter: (a, b) => (a.message ?? '').localeCompare(b.message ?? '')
+    sorter: (a, b) => (a.message ?? '').localeCompare(b.message ?? ''),
   },
   {
     title: '데이터',
     dataIndex: 'cell_data',
     key: 'cell_data',
-    sorter: (a, b) => (a.cell_data ?? '').localeCompare(b.cell_data ?? '')
+    sorter: (a, b) => (a.cell_data ?? '').localeCompare(b.cell_data ?? ''),
   },
 
   {
     title: 'QOS',
     dataIndex: 'qos',
     key: 'qos',
-    sorter: (a, b) => (a.qos ?? '').localeCompare(b.qos ?? '')
-  }
+    sorter: (a, b) => (a.qos ?? '').localeCompare(b.qos ?? ''),
+  },
 ])
 
 const types = ref(PLANTYPES)
@@ -176,8 +176,8 @@ async function fetchData() {
         carrier_cd: props.mvnoInfo.carrier_cd, // SKT : SK ,KT : KT,LG U+ : LG
         mvno_cd: props.mvnoInfo.mvno_cd,
         carrier_type: selectedType.value, // 선불:PR ,후불:PO
-        usim_plan_nm: searchText.value
-      }
+        usim_plan_nm: searchText.value,
+      },
     })
     if (response.ok) {
       const decodedResponse = await response.json()

@@ -1,9 +1,10 @@
 <template>
+  <AddressSearchPopup ref="addressSearchPopupRef" />
   <div class="container">
     <p class="title">고객정보</p>
     <div class="mainInfo">
       <div class="row">
-        <div id="plan-type" class="groups" style="width: 25%; max-width: 250px">
+        <div id="plan-type" class="groups" style="width: 25%">
           <label>고객유형</label>
           <!-- <input v-model="cust_type_cd" placeholder="" /> -->
           <a-select
@@ -19,28 +20,26 @@
           </a-select>
         </div>
 
-        <div v-if="isFormAvailable('contact')" class="groups" style="width: 25%; max-width: 250px">
+        <div v-if="isFormAvailable('contact')" class="groups" style="width: 25%">
           <label>개통번호외 연락번호</label>
-          <input v-model="contact" placeholder="" />
+          <input v-model="contact" placeholder="010-0000-0000" />
         </div>
 
         <div id="name" class="groups" style="width: 50%">
           <label>가입자명</label>
-          <input v-model="applicant_name" placeholder="" />
+          <input v-model="applicant_name" placeholder="홍길동" />
         </div>
       </div>
 
       <div class="row">
-        <div id="birthdate" class="groups" style="width: 20%; max-width: 250px">
+        <div id="birthdate" class="groups" style="width: 20%">
           <label for="birthdate">생년월일</label>
-
-          <!-- <input type="text" v-model="birthdate" @input="formatDate" placeholder="YYYY-MM-DD" /> -->
 
           <input
             name="text"
             v-model="birthdate"
+            placeholder="1991-01-31"
             v-cleave="{
-              //
               date: true,
               delimiter: '-',
               datePattern: ['Y', 'm', 'd'],
@@ -48,16 +47,17 @@
           />
         </div>
 
-        <div id="address" class="groups" style="width: 55%">
+        <div id="address" class="groups" style="width: 50%">
           <label>주소</label>
-          <input v-model="contact" placeholder="" />
+          <input v-model="contact" placeholder="우림이비지센터 1차 1210호" />
         </div>
 
-        <div id="address-details" class="groups" style="width: 25%">
+        <div id="address-details" class="groups" style="width: 30%">
           <label>상세주소</label>
           <input v-model="applicant_name" placeholder="" />
         </div>
       </div>
+      <button @click="openPop">click me for address</button>
     </div>
   </div>
 </template>
@@ -66,6 +66,13 @@
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { FORMLABELS } from '../assets/constants.js'
 import { DATASAMPLE, PLANSINFO } from '../assets/constants.js'
+import AddressSearchPopup from '../components/AddressSearchPopup.vue'
+
+function openPop() {
+  addressSearchPopupRef.value.openMe()
+}
+
+const addressSearchPopupRef = ref(null)
 
 const selectedType = ref('PO')
 const selectedCarrier = ref('KT')
@@ -73,13 +80,13 @@ const selectedMvnoCode = ref('KTM')
 
 const customerType = ref('')
 const birthdate = ref('')
-
 const contact = ref('')
+const address = ref('')
+const address_additions = ref('')
+
 const applicant_name = ref('')
 const id_passport_number = ref('')
 const country = ref('')
-const address = ref('')
-const address_additions = ref('')
 const gender = ref('')
 const usim_plan_nm = ref('')
 const usim_model_no = ref('')
