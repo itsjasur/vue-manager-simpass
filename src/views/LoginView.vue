@@ -26,9 +26,9 @@
     </div>
 
     <p class="foot-note">
-      상호 : 심패스(Simpass) | 대표 : 김익태 | 대표전화 : 02-2108-3121 | FAX : 02-2108-3120
-      사업자등록번호 : 343-18-00713 | 통신판매신고번호 : 제 2021-서울구로-1451 호 서울시 구로구
-      디지털로33길 28, 우림이비지센터 1차 1210호
+      상호 : 심패스(Simpass) | 대표 : 김익태 | 대표전화 : 02-2108-3121 | FAX : 02-2108-3120 사업자등록번호 :
+      343-18-00713 | 통신판매신고번호 : 제 2021-서울구로-1451 호 서울시 구로구 디지털로33길 28, 우림이비지센터 1차
+      1210호
     </p>
   </div>
 </template>
@@ -37,9 +37,9 @@
 import { ref } from 'vue'
 import LoadingSpinner from '../components/Loader.vue'
 import Snackbar from '../components/Snackbar.vue'
-import { useSnackbarStore } from '@/stores/snackbar'
+import { useSnackbarStore } from '../stores/snackbar'
 import { useAuthenticationStore } from '../stores/authentication'
-import { BASEURL } from '@/assets/constants'
+import { BASEURL } from '../assets/constants'
 
 const username = ref('')
 const password = ref('')
@@ -72,18 +72,13 @@ async function login(event) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         username: username.value,
-        password: password.value
-      })
+        password: password.value,
+      }),
     })
     if (response.ok) {
       const data = await response.json()
 
-      useAuthenticationStore().login(
-        data['accessToken'],
-        data['refreshToken'],
-        data['id'],
-        data['username']
-      )
+      useAuthenticationStore().login(data['accessToken'], data['refreshToken'], data['id'], data['username'])
 
       // Handle successful login
     } else {

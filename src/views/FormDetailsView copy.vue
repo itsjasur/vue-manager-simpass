@@ -43,7 +43,7 @@
 
 <script setup>
 import { onMounted, reactive, ref } from 'vue'
-import { FORMLABELS } from '../assets/constants.js'
+import { FORMNAMES } from '../assets/constants.js'
 
 const planName = ref('')
 const usimFee = ref('')
@@ -72,17 +72,17 @@ const formData = {
   chk_partner_sign: 'Y',
   paid_transfer_cd: [
     { cd: 'B', value: '은행계좌' },
-    { cd: 'C', value: '신용카드 ' }
+    { cd: 'C', value: '신용카드 ' },
   ],
   gender_cd: [],
   mnp_carrier_type: [
     { cd: 'PR', value: '선불' },
-    { cd: 'PO', value: '후불' }
+    { cd: 'PO', value: '후불' },
   ],
   usim_model_list: [],
   relationship_cd: [
     { cd: 'F', value: '부' },
-    { cd: 'M', value: '모' }
+    { cd: 'M', value: '모' },
   ],
   data_block_cd: [],
   data_roming_block_cd: [],
@@ -91,30 +91,30 @@ const formData = {
     { cd: 'MEA', value: '외국인' },
     { cd: 'COL', value: '청소년' },
     { cd: 'MEP', value: '개인사업자' },
-    { cd: 'MEC', value: '법인사업자' }
+    { cd: 'MEC', value: '법인사업자' },
   ],
   cust_type: [
     { cd: 'ME', value: '일반' },
-    { cd: 'CO', value: '청소년' }
+    { cd: 'CO', value: '청소년' },
   ],
   cust_cd: [
     { cd: 'L', value: '내국인' },
     { cd: 'A', value: '외국인' },
     { cd: 'C', value: '법인' },
-    { cd: 'P', value: '개인사업자' }
+    { cd: 'P', value: '개인사업자' },
   ],
   mnp_pre_carrier: [
     { cd: 'SK', value: 'SKT' },
     { cd: 'KT', value: 'KT' },
     { cd: 'LG', value: 'LG U+' },
-    { cd: 'MV', value: '알뜰폰' }
+    { cd: 'MV', value: '알뜰폰' },
   ],
   chk_usim_model: 'N',
   phone_bill_block_cd: [],
   usim_act_cd: [
     { cd: 'N', value: '신규가입' },
-    { cd: 'M', value: '번호이동' }
-  ]
+    { cd: 'M', value: '번호이동' },
+  ],
 }
 </script>
 

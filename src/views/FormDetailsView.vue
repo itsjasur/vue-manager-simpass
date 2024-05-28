@@ -1,277 +1,161 @@
 <template>
-  <div class="container"></div>
+  <div class="container">
+    <p class="title">고객정보</p>
+    <div class="mainInfo">
+      <div class="row">
+        <div id="plan-type" class="groups" style="width: 25%; max-width: 250px">
+          <label>고객유형</label>
+          <!-- <input v-model="cust_type_cd" placeholder="" /> -->
+          <a-select
+            v-model:key="DATASAMPLE.cust_type_cd.label"
+            v-model:value="customerType"
+            :style="{ width: '100%' }"
+            placeholder="Please select"
+            :options="
+              DATASAMPLE.cust_type_cd.map((item) => ({ value: item?.cd, label: item?.value }))
+            "
+            :onChange="console.log(customerType)"
+          >
+          </a-select>
+        </div>
+
+        <div v-if="isFormAvailable('contact')" class="groups" style="width: 25%; max-width: 250px">
+          <label>개통번호외 연락번호</label>
+          <input v-model="contact" placeholder="" />
+        </div>
+
+        <div id="name" class="groups" style="width: 50%">
+          <label>가입자명</label>
+          <input v-model="applicant_name" placeholder="" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div id="birthdate" class="groups" style="width: 20%; max-width: 250px">
+          <label for="birthdate">생년월일</label>
+
+          <!-- <input type="text" v-model="birthdate" @input="formatDate" placeholder="YYYY-MM-DD" /> -->
+
+          <input
+            name="text"
+            v-model="birthdate"
+            v-cleave="{
+              //
+              date: true,
+              delimiter: '-',
+              datePattern: ['Y', 'm', 'd'],
+            }"
+          />
+        </div>
+
+        <div id="address" class="groups" style="width: 55%">
+          <label>주소</label>
+          <input v-model="contact" placeholder="" />
+        </div>
+
+        <div id="address-details" class="groups" style="width: 25%">
+          <label>상세주소</label>
+          <input v-model="applicant_name" placeholder="" />
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { FORMLABELS } from '../assets/constants.js'
+import { DATASAMPLE, PLANSINFO } from '../assets/constants.js'
 
-const showingForms = ref([
-  {
-    key: 'cust_type_cd',
-    type: 'select',
+const selectedType = ref('PO')
+const selectedCarrier = ref('KT')
+const selectedMvnoCode = ref('KTM')
 
-    carriers: 'ALL',
-    mvnos: 'ALL',
-  },
+const customerType = ref('')
+const birthdate = ref('')
 
-  {
-    key: 'contact',
-    type: 'input',
-    planType: 'ALL',
-    carriers: 'ALL',
-    mvnos: 'ALL',
-  },
-  {
-    key: 'applicant_name',
-    type: 'input',
-    carriers: 'ALL',
-    mvnos: 'ALL',
-  },
+const contact = ref('')
+const applicant_name = ref('')
+const id_passport_number = ref('')
+const country = ref('')
+const address = ref('')
+const address_additions = ref('')
+const gender = ref('')
+const usim_plan_nm = ref('')
+const usim_model_no = ref('')
+const usim_no = ref('')
+const usim_fee_cd = ref('')
+const extra_service = ref('')
+const usim_act_cd = ref('')
+const plan_fee_cd = ref('')
+const data_block_cd = ref('')
+const phone_bill_block_cd = ref('')
 
-  {
-    key: 'applicant_birthday',
-    type: 'input',
-    carriers: 'ALL',
-    mvnos: 'ALL',
-  },
-  {
-    key: 'gender',
-    type: 'select',
-    carriers: 'ALL',
-    mvnos: 'ALL',
-  },
-])
+const data = ref(DATASAMPLE)
 
-const info = ref([
-  {
-    code: 'PR',
-    carriers: [
-      {
-        code: 'KT',
-        mvnos: [
-          {
-            code: 'COM',
-            userInfoForms: [
-              'cust_type_cd',
-              'contact',
-              'applicant_name',
-              'application_birthday',
-              'id_passport_number',
-              'country',
-              'address',
-              'address_additions',
-            ],
-            planInfoForms: [
-              //
-              'usim_plan_nm',
-              'usim_model_no',
-              'usim_no',
-              'usim_fee_cd',
-            ],
-          },
-        ],
-      },
-      {
-        code: 'LG',
-        mvnos: [
-          {
-            code: 'HPM',
-            userInfoForms: [
-              'cust_type_cd',
-              'contact',
-              'applicant_name',
-              'application_birthday',
-              'id_passport_number',
-              'country',
-              'address',
-              'address_additions',
-            ],
-            planInfoForms: [
-              'usim_plan_nm',
-              'usim_model_no',
-              'usim_no',
-              'plan_fee_cd',
-              'usim_fee_cd',
-            ],
-          },
-        ],
-      },
-    ],
-  },
+function showContact() {}
 
-  {
-    code: 'PO',
-    carriers: [
-      {
-        code: 'SK',
-        mvnos: [
-          //
-          {
-            //
-            code: SVM,
-
-            userInfoForms: [
-              'cust_type_cd',
-              'contact',
-              'applicant_name',
-              'application_birthday',
-              'address',
-              'address_additions',
-            ],
-            planInfoForms: [
-              'usim_plan_nm',
-              'usim_model_no',
-              'usim_no',
-              'usim_fee_cd',
-              'data_block_cd',
-              'phone_bill_block_cd',
-              'usim_act_cd',
-            ],
-          },
-        ],
-      },
-      {
-        code: 'KT',
-        mvnos: [
-          //
-          {
-            //
-            code: 'KTM',
-            userInfoForms: [
-              //
-              'cust_type_cd',
-              'contact',
-              'applicant_name',
-              'application_birthday',
-              'gender',
-              'address',
-              'address_additions',
-            ],
-            planInfoForms: [
-              //
-              'usim_plan_nm',
-              'usim_model_no',
-              'usim_no',
-              'usim_fee_cd',
-              'data_block_cd',
-              'phone_bill_block_cd',
-              'plan_fee_cd',
-              'usim_act_cd',
-            ],
-          },
-          {
-            //
-            code: 'KTS',
-            userInfoForms: [
-              //
-              'cust_type_cd',
-              'contact',
-              'applicant_name',
-              'application_birthday',
-              'address',
-              'address_additions',
-            ],
-            planInfoForms: [
-              //
-              'usim_plan_nm',
-              'usim_model_no',
-              'usim_no',
-              'data_block_cd',
-              'phone_bill_block_cd',
-              'usim_act_cd',
-            ],
-          },
-        ],
-      },
-      {
-        code: 'LG',
-        mvnos: [
-          //
-          {
-            //
-            code: 'HPM',
-            userInfoForms: [
-              //
-              'cust_type_cd',
-              'contact',
-              'applicant_name',
-              'application_birthday',
-              'id_passport_number',
-              'country',
-              'address',
-              'address_additions',
-            ],
-            planInfoForms: [
-              //
-              'usim_plan_nm',
-              'usim_model_no',
-              'usim_no',
-              'usim_fee_cd',
-              'usim_act_cd',
-            ],
-          },
-          {
-            //
-            code: 'HVS',
-            userInfoForms: [
-              //
-              'cust_type_cd',
-              'contact',
-              'applicant_name',
-              'application_birthday',
-              'address',
-              'address_additions',
-            ],
-
-            planInfoForms: [
-              //
-              'usim_plan_nm',
-              'usim_model_no',
-              'usim_no',
-              'usim_fee_cd',
-              'extra_service',
-              'data_block_cd',
-              'plan_fee_cd',
-              'usim_act_cd',
-            ],
-          },
-          {
-            //
-            code: 'UPM',
-            userInfoForms: [
-              //
-              'cust_type_cd',
-              'contact',
-              'applicant_name',
-              'application_birthday',
-              'address',
-              'address_additions',
-            ],
-            planInfoForms: [
-              'usim_plan_nm',
-              'usim_model_no',
-              'usim_no',
-              'usim_fee_cd',
-              'extra_service',
-              'data_block_cd',
-              'usim_act_cd',
-            ],
-          },
-        ],
-      },
-    ],
-  },
-])
+function isFormAvailable(formId) {
+  return (
+    PLANSINFO.find((item) => item.code === selectedType.value) // which type (postpaid or prepaid)
+      ?.carriers.find((carrier) => carrier.code === selectedCarrier.value) // which carrier
+      ?.mvnos.find((mvno) => mvno.code === selectedMvnoCode.value) //which mvno
+      ?.userInfoForms.some((form) => form === formId) || false //if available returns true
+  )
+}
 </script>
 
 <style scoped>
 .container {
-  width: 80%;
-  min-width: 300px;
-  max-width: 1000px;
+  /* width: 80%; */
+  /* min-width: 800px; */
+  max-width: 1200px;
   margin-top: 20px;
   padding: 0 15px;
   box-sizing: border-box;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1;
+  padding: 0;
+  margin-bottom: 20px;
+  /* background-color: aqua; */
+}
+
+.mainInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.row {
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
+  gap: 20px;
+  flex-flow: row;
+  /* background-color: yellow; */
+}
+
+.groups {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .container {
+    width: 100%;
+  }
+
+  .row {
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .groups {
+    width: 100% !important;
+  }
 }
 </style>

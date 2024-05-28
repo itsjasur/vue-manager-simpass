@@ -8,8 +8,8 @@
         controlHeight: 50, // input/select/button height
         borderRadius: 4, //all border radius
         lineWidth: 1, //border line width
-        controlOutline: 'none' //focus outline
-      }
+        controlOutline: 'none', //focus outline
+      },
     }"
   >
   </a-config-provider>

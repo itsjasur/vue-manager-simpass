@@ -8,7 +8,7 @@
 </template>
 
 <script setup>
-import { useSnackbarStore } from '@/stores/snackbar'
+import { useSnackbarStore } from '../stores/snackbar'
 
 const snackbarStore = useSnackbarStore()
 </script>

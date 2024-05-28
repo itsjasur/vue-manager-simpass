@@ -12,14 +12,15 @@
   },
   "dependencies": {
     "ant-design-vue": "^4.2.1",
+    "cleave.js": "^1.6.0",
     "pinia": "^2.1.7",
-    "primeicons": "^7.0.0",
-    "primevue": "^3.52.0",
+    "v-mask": "^2.3.0",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.8.0",
+    "@types/vue-the-mask": "^0.11.5",
     "@vitejs/plugin-vue": "^5.0.4",
     "@vue/eslint-config-prettier": "^9.0.0",
     "eslint": "^8.57.0",
