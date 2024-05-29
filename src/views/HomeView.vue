@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="card" @click="router.push('/registration')">
+    <div class="card" @click="router.push('/registration-forms')">
       <div class="img">
         <img src="../assets/icons/sim.png" alt="" />
       </div>

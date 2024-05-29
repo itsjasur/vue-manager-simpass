@@ -243,6 +243,13 @@ onUnmounted(() => {
   overflow: auto;
 }
 
+@media (min-width: 1400px) {
+  .popup-content {
+    height: 100%;
+    width: 1400px;
+  }
+}
+
 .innerHeader {
   position: sticky;
   top: 0;

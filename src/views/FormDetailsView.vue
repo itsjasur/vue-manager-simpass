@@ -161,7 +161,7 @@
           </a-select>
         </div>
 
-        <div v-if="true" class="groups" style="width: 10%">
+        <div v-if="true" class="groups" style="width: 20%">
           <label>해외데이터로밍</label>
           <a-select
             v-model:key="DATASAMPLE.data_roming_block_cd.label"
@@ -273,6 +273,8 @@ const data = ref(DATASAMPLE)
 
 function showContact() {}
 
+console.log(window.innerWidth)
+
 function isFormAvailable(formId) {
   return (
     PLANSINFO.find((item) => item.code === selectedType.value) // which type (postpaid or prepaid)
@@ -282,19 +284,25 @@ function isFormAvailable(formId) {
   )
 }
 
-const addressSelected = (data) => {
-  address.value = data
-  console.log('Data received from child:', data)
+const addressSelected = (selectedAddress, buildingName) => {
+  address.value = selectedAddress
+  addressAdditions.value = buildingName
 }
 </script>
 
 <style scoped>
 .container {
-  /* width: 80%; */
-  /* min-width: 800px; */
-  max-width: 1200px;
+  max-width: 1400px;
   padding: 0 15px;
   box-sizing: border-box;
+  /* background-color: yellow; */
+}
+
+@media (max-width: 1200px) {
+  .container {
+    width: 100%;
+    max-width: none;
+  }
 }
 
 .title {
@@ -323,7 +331,7 @@ const addressSelected = (data) => {
 
 .groups {
   /* width: 100%; */
-  /* background-color: yellow; */
+  /* background-color: green; */
 }
 
 @media (max-width: 768px) {

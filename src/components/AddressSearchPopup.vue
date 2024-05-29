@@ -37,11 +37,12 @@ onMounted(async () => {
       let selectedType = data.userSelectedType
       let roadAddr = data.roadAddress
       let jibunAddr = data.jibunAddress
+      let buildingName = data.buildingName
 
       // console.log('jubunaddress' + jibunAddr)
       // console.log('roadaddress' + roadAddr)
 
-      emit('selectAddress', selectedType === 'R' ? roadAddr : jibunAddr)
+      emit('selectAddress', selectedType === 'R' ? roadAddr : jibunAddr, buildingName)
       emit('closePopup')
     },
   }).embed(embed.value)
