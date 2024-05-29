@@ -9,6 +9,7 @@
         borderRadius: 4, //all border radius
         lineWidth: 1, //border line width
         controlOutline: 'none', //focus outline
+        fontSize: 15,
       },
     }"
   >

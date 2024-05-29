@@ -134,7 +134,7 @@ export const PLANSINFO = [
         mvnos: [
           {
             code: 'COM',
-            userInfoForms: [
+            availableForms: [
               'cust_type_cd',
               'contact',
               'applicant_name',
@@ -143,8 +143,7 @@ export const PLANSINFO = [
               'country',
               'address',
               'address_additions',
-            ],
-            planInfoForms: [
+
               //
               'usim_plan_nm',
               'usim_model_no',
@@ -159,7 +158,7 @@ export const PLANSINFO = [
         mvnos: [
           {
             code: 'HPM',
-            userInfoForms: [
+            availableForms: [
               'cust_type_cd',
               'contact',
               'applicant_name',
@@ -168,8 +167,8 @@ export const PLANSINFO = [
               'country',
               'address',
               'address_additions',
-            ],
-            planInfoForms: [
+
+              //
               'usim_plan_nm',
               'usim_model_no',
               'usim_no',
@@ -190,15 +189,15 @@ export const PLANSINFO = [
         mvnos: [
           {
             code: 'SVM',
-            userInfoForms: [
+            availableForms: [
               'cust_type_cd',
               'contact',
               'applicant_name',
               'application_birthday',
               'address',
               'address_additions',
-            ],
-            planInfoForms: [
+
+              //
               'usim_plan_nm',
               'usim_model_no',
               'usim_no',
@@ -215,7 +214,7 @@ export const PLANSINFO = [
         mvnos: [
           {
             code: 'KTM',
-            userInfoForms: [
+            availableForms: [
               'cust_type_cd',
               'contact',
               'applicant_name',
@@ -223,8 +222,8 @@ export const PLANSINFO = [
               'gender',
               'address',
               'address_additions',
-            ],
-            planInfoForms: [
+
+              //
               'usim_plan_nm',
               'usim_model_no',
               'usim_no',
@@ -237,15 +236,15 @@ export const PLANSINFO = [
           },
           {
             code: 'KTS',
-            userInfoForms: [
+            availableForms: [
               'cust_type_cd',
               'contact',
               'applicant_name',
               'application_birthday',
               'address',
               'address_additions',
-            ],
-            planInfoForms: [
+
+              //
               'usim_plan_nm',
               'usim_model_no',
               'usim_no',
@@ -261,7 +260,7 @@ export const PLANSINFO = [
         mvnos: [
           {
             code: 'HPM',
-            userInfoForms: [
+            availableForms: [
               'cust_type_cd',
               'contact',
               'applicant_name',
@@ -270,8 +269,8 @@ export const PLANSINFO = [
               'country',
               'address',
               'address_additions',
-            ],
-            planInfoForms: [
+
+              //
               'usim_plan_nm',
               'usim_model_no',
               'usim_no',
@@ -281,16 +280,15 @@ export const PLANSINFO = [
           },
           {
             code: 'HVS',
-            userInfoForms: [
+            availableForms: [
               'cust_type_cd',
               'contact',
               'applicant_name',
               'application_birthday',
               'address',
               'address_additions',
-            ],
 
-            planInfoForms: [
+              //
               'usim_plan_nm',
               'usim_model_no',
               'usim_no',
@@ -303,15 +301,15 @@ export const PLANSINFO = [
           },
           {
             code: 'UPM',
-            userInfoForms: [
+            availableForms: [
               'cust_type_cd',
               'contact',
               'applicant_name',
               'application_birthday',
               'address',
               'address_additions',
-            ],
-            planInfoForms: [
+
+              //
               'usim_plan_nm',
               'usim_model_no',
               'usim_no',
@@ -329,7 +327,20 @@ export const PLANSINFO = [
 
 export const DATASAMPLE = {
   extra_service_cd: [],
-  usim_fee_cd: [],
+  usim_fee_cd: [
+    {
+      cd: 'NP',
+      value: '미청구',
+    },
+    {
+      cd: 'PP',
+      value: '일반후납',
+    },
+    {
+      cd: 'PN',
+      value: 'NFC후납',
+    },
+  ],
   plan_fee_cd: [],
   chk_partner_sign: 'Y',
   paid_transfer_cd: [
@@ -342,7 +353,16 @@ export const DATASAMPLE = {
       value: '신용카드 ',
     },
   ],
-  gender_cd: [],
+  gender_cd: [
+    {
+      cd: 'M',
+      value: '남',
+    },
+    {
+      cd: 'W',
+      value: '여',
+    },
+  ],
   mnp_carrier_type: [
     {
       cd: 'PR',
@@ -353,7 +373,32 @@ export const DATASAMPLE = {
       value: '후불',
     },
   ],
-  usim_model_list: [],
+  usim_model_list: [
+    {
+      cd: 'KE-V2315',
+      value: 'KE-V2315',
+    },
+    {
+      cd: 'SC-V2317',
+      value: 'SC-V2317',
+    },
+    {
+      cd: 'SC-V3005',
+      value: 'SC-V3005',
+    },
+    {
+      cd: 'GE-V2205',
+      value: 'GE-V2205',
+    },
+    {
+      cd: 'MV-L1600',
+      value: 'MV-L1600',
+    },
+    {
+      cd: 'KE-L2105',
+      value: 'KE-L2105',
+    },
+  ],
   relationship_cd: [
     {
       cd: 'F',

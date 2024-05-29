@@ -106,6 +106,7 @@ const props = defineProps(['selectedType', 'mvnoInfo'])
 const selectedType = ref('')
 const searchText = ref('')
 const dataList = ref([])
+
 const emit = defineEmits(['closePopup'])
 
 selectedType.value = props.selectedType ?? 'PO'

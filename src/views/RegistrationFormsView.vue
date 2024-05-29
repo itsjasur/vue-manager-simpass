@@ -1,5 +1,5 @@
 <template>
-  <div class="mypopup" v-if="showPopup">
+  <div v-if="showPopup">
     <SelectPlanPopup
       :selectedType="selectedType"
       :mvnoInfo="selectedMvno"

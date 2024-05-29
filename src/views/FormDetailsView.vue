@@ -1,21 +1,33 @@
 <template>
-  <AddressSearchPopup ref="addressSearchPopupRef" />
+  <div v-if="isSearchAddressOpen">
+    <AddressSearchPopup
+      @closePopup="isSearchAddressOpen = false"
+      @selectAddress="addressSelected"
+    />
+  </div>
+
+  <div v-if="isPlansPopupOpen">
+    <SelectPlanPopup
+      :selectedType="selectedType"
+      :mvnoInfo="selectedMvno"
+      @closePopup="isPlansPopupOpen = false"
+    />
+  </div>
+
   <div class="container">
     <p class="title">고객정보</p>
-    <div class="mainInfo">
+    <div class="infoContainer">
       <div class="row">
-        <div id="plan-type" class="groups" style="width: 25%">
+        <div v-if="isFormAvailable('cust_type_cd')" class="groups" style="width: 25%">
           <label>고객유형</label>
-          <!-- <input v-model="cust_type_cd" placeholder="" /> -->
           <a-select
             v-model:key="DATASAMPLE.cust_type_cd.label"
             v-model:value="customerType"
             :style="{ width: '100%' }"
-            placeholder="Please select"
+            placeholder="고객유형을 선택하세요"
             :options="
               DATASAMPLE.cust_type_cd.map((item) => ({ value: item?.cd, label: item?.value }))
             "
-            :onChange="console.log(customerType)"
           >
           </a-select>
         </div>
@@ -25,15 +37,20 @@
           <input v-model="contact" placeholder="010-0000-0000" />
         </div>
 
-        <div id="name" class="groups" style="width: 50%">
-          <label>가입자명</label>
-          <input v-model="applicant_name" placeholder="홍길동" />
+        <div v-if="true" class="groups" style="width: 20%">
+          <label>신분증번호/여권번호 </label>
+          <input v-model="idPassportNumber" placeholder="910131-0000000" />
         </div>
       </div>
 
       <div class="row">
-        <div id="birthdate" class="groups" style="width: 20%">
-          <label for="birthdate">생년월일</label>
+        <div class="groups" style="width: 45%">
+          <label>가입자명</label>
+          <input v-model="applicantName" placeholder="홍길동" />
+        </div>
+
+        <div v-if="true" class="groups" style="width: 20%">
+          <label>생년월일</label>
 
           <input
             name="text"
@@ -47,56 +64,210 @@
           />
         </div>
 
-        <div id="address" class="groups" style="width: 50%">
-          <label>주소</label>
-          <input v-model="contact" placeholder="우림이비지센터 1차 1210호" />
-        </div>
+        <div v-if="true" class="groups" style="width: 10%">
+          <label>성별 </label>
 
-        <div id="address-details" class="groups" style="width: 30%">
-          <label>상세주소</label>
-          <input v-model="applicant_name" placeholder="" />
+          <a-select
+            v-model:key="DATASAMPLE.gender_cd.label"
+            v-model:value="gender"
+            :style="{ width: '100%' }"
+            placeholder="남"
+            :options="DATASAMPLE.gender_cd.map((item) => ({ value: item?.cd, label: item?.value }))"
+          >
+          </a-select>
         </div>
       </div>
-      <button @click="openPop">click me for address</button>
+
+      <div class="row">
+        <div v-if="isFormAvailable('address')" class="groups" style="width: 45%">
+          <label>주소</label>
+          <input
+            v-model="address"
+            @click="isSearchAddressOpen = true"
+            readonly
+            placeholder="우림이비지센터 1차 1210호"
+          />
+        </div>
+
+        <div v-if="isFormAvailable('address_additions')" class="groups" style="width: 30%">
+          <label>상세주소</label>
+          <input v-model="addressAdditions" placeholder="우림이비지센터 1차 1210호" />
+        </div>
+      </div>
+    </div>
+
+    <p class="title">고객정보</p>
+    <div class="infoContainer">
+      <div class="row">
+        <div v-if="true" class="groups" style="width: 45%">
+          <label>요금제</label>
+
+          <input
+            v-model="usimPlanName"
+            @click="isPlansPopupOpen = true"
+            readonly
+            placeholder="요금제을 선택하세요"
+          />
+        </div>
+      </div>
+
+      <div class="row">
+        <div v-if="true" class="groups" style="width: 25%">
+          <label>USIM 모델명</label>
+
+          <a-select
+            v-model:key="DATASAMPLE.usim_model_list.label"
+            v-model:value="usimNo"
+            :style="{ width: '100%' }"
+            placeholder="모델명을 선택하세요"
+            :options="
+              DATASAMPLE.usim_model_list.map((item) => ({ value: item?.cd, label: item?.value }))
+            "
+          >
+          </a-select>
+        </div>
+
+        <div v-if="isFormAvailable('address')" class="groups" style="width: 25%">
+          <label>일련번호</label>
+          <input v-model="usimModelNo" placeholder="00000000" />
+        </div>
+        <div v-if="true" class="groups" style="width: 20%">
+          <label>유심비용청구</label>
+          <a-select
+            v-model:key="DATASAMPLE.usim_fee_cd.label"
+            v-model:value="usimFeeCd"
+            :style="{ width: '100%' }"
+            placeholder="유심비용청구을 선택하세요"
+            :options="
+              DATASAMPLE.usim_fee_cd.map((item) => ({ value: item?.cd, label: item?.value }))
+            "
+          >
+          </a-select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div v-if="true" class="groups" style="width: 25%">
+          <label>부가서비스</label>
+          <a-select
+            v-model:key="DATASAMPLE.extra_service_cd.label"
+            v-model:value="extraEervice"
+            :style="{ width: '100%' }"
+            placeholder="부가서비스을 선택하세요"
+            :options="
+              DATASAMPLE.extra_service_cd.map((item) => ({ value: item?.cd, label: item?.value }))
+            "
+          >
+          </a-select>
+        </div>
+
+        <div v-if="true" class="groups" style="width: 10%">
+          <label>해외데이터로밍</label>
+          <a-select
+            v-model:key="DATASAMPLE.data_roming_block_cd.label"
+            v-model:value="dataBlockCd"
+            :style="{ width: '100%' }"
+            placeholder="해외데이터로밍을 선택하세요"
+            :options="
+              DATASAMPLE.data_roming_block_cd.map((item) => ({
+                value: item?.cd,
+                label: item?.value,
+              }))
+            "
+          >
+          </a-select>
+        </div>
+
+        <div v-if="true" class="groups" style="width: 25%">
+          <label>가입비</label>
+          <a-select
+            v-model:key="DATASAMPLE.plan_fee_cd.label"
+            v-model:value="planFeeCd"
+            :style="{ width: '100%' }"
+            placeholder="가입비을 선택하세요"
+            :options="
+              DATASAMPLE.plan_fee_cd.map((item) => ({
+                value: item?.cd,
+                label: item?.value,
+              }))
+            "
+          >
+          </a-select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div v-if="true" class="groups" style="width: 25%">
+          <label>휴대폰결제</label>
+          <a-select
+            v-model:key="DATASAMPLE.phone_bill_block_cd.label"
+            v-model:value="phoneBillBlockCd"
+            :style="{ width: '100%' }"
+            placeholder="휴대폰결제을 선택하세요"
+            :options="
+              DATASAMPLE.phone_bill_block_cd.map((item) => ({
+                value: item?.cd,
+                label: item?.value,
+              }))
+            "
+          >
+          </a-select>
+        </div>
+
+        <div v-if="true" class="groups" style="width: 25%">
+          <label>개통구분</label>
+          <a-select
+            v-model:key="DATASAMPLE.usim_act_cd.label"
+            v-model:value="usimActCd"
+            :style="{ width: '100%' }"
+            placeholder="개통구분을 선택하세요"
+            :options="
+              DATASAMPLE.usim_act_cd.map((item) => ({
+                value: item?.cd,
+                label: item?.value,
+              }))
+            "
+          >
+          </a-select>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
+import AddressSearchPopup from '../components/AddressSearchPopup.vue'
+import SelectPlanPopup from '../components/SelectPlanPopup.vue'
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { FORMLABELS } from '../assets/constants.js'
 import { DATASAMPLE, PLANSINFO } from '../assets/constants.js'
-import AddressSearchPopup from '../components/AddressSearchPopup.vue'
 
-function openPop() {
-  addressSearchPopupRef.value.openMe()
-}
-
-const addressSearchPopupRef = ref(null)
+const isSearchAddressOpen = ref(false)
+const isPlansPopupOpen = ref(false)
 
 const selectedType = ref('PO')
 const selectedCarrier = ref('KT')
-const selectedMvnoCode = ref('KTM')
+const selectedMvno = ref('KTM')
 
-const customerType = ref('')
+const customerType = ref()
 const birthdate = ref('')
 const contact = ref('')
-const address = ref('')
-const address_additions = ref('')
-
-const applicant_name = ref('')
-const id_passport_number = ref('')
+const applicantName = ref('')
 const country = ref('')
-const gender = ref('')
-const usim_plan_nm = ref('')
-const usim_model_no = ref('')
-const usim_no = ref('')
-const usim_fee_cd = ref('')
-const extra_service = ref('')
-const usim_act_cd = ref('')
-const plan_fee_cd = ref('')
-const data_block_cd = ref('')
-const phone_bill_block_cd = ref('')
+const gender = ref(DATASAMPLE?.gender_cd[0]?.cd ?? '')
+const idPassportNumber = ref('')
+const address = ref('')
+const addressAdditions = ref('')
+
+const usimPlanName = ref()
+const usimNo = ref()
+const usimModelNo = ref('')
+const usimFeeCd = ref(DATASAMPLE?.usim_fee_cd[0]?.cd ?? '')
+const extraEervice = ref(DATASAMPLE?.extra_service_cd[0]?.cd ?? '')
+const dataBlockCd = ref(DATASAMPLE?.data_roming_block_cd[0]?.cd ?? '')
+const planFeeCd = ref(DATASAMPLE?.plan_fee_cd[0]?.cd ?? '')
+const phoneBillBlockCd = ref(DATASAMPLE?.phone_bill_block_cd[0]?.cd ?? '')
+const usimActCd = ref(DATASAMPLE?.usim_act_cd[0]?.cd ?? '')
 
 const data = ref(DATASAMPLE)
 
@@ -106,9 +277,14 @@ function isFormAvailable(formId) {
   return (
     PLANSINFO.find((item) => item.code === selectedType.value) // which type (postpaid or prepaid)
       ?.carriers.find((carrier) => carrier.code === selectedCarrier.value) // which carrier
-      ?.mvnos.find((mvno) => mvno.code === selectedMvnoCode.value) //which mvno
-      ?.userInfoForms.some((form) => form === formId) || false //if available returns true
+      ?.mvnos.find((mvno) => mvno.code === selectedMvno.value) //which mvno
+      ?.availableForms.some((form) => form === formId) || false //if available returns true
   )
+}
+
+const addressSelected = (data) => {
+  address.value = data
+  console.log('Data received from child:', data)
 }
 </script>
 
@@ -117,24 +293,23 @@ function isFormAvailable(formId) {
   /* width: 80%; */
   /* min-width: 800px; */
   max-width: 1200px;
-  margin-top: 20px;
   padding: 0 15px;
   box-sizing: border-box;
 }
 
 .title {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
   line-height: 1;
   padding: 0;
-  margin-bottom: 20px;
-  /* background-color: aqua; */
+  margin-top: 30px;
+  margin-bottom: 15px;
 }
 
-.mainInfo {
+.infoContainer {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 25px;
 }
 
 .row {
@@ -147,7 +322,8 @@ function isFormAvailable(formId) {
 }
 
 .groups {
-  width: 100%;
+  /* width: 100%; */
+  /* background-color: yellow; */
 }
 
 @media (max-width: 768px) {

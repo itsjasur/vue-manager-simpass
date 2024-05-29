@@ -1,35 +1,50 @@
 <template>
-  <div v-if="iAmOpen" class="overlay">
+  <div class="overlay">
     <div class="popup-content">
       <div class="innerHeader">
-        <h3 class="title">요금제선택</h3>
-        <span @click="iAmOpen = false" class="material-symbols-outlined close-button">
+        <h3 class="title">주소 검색</h3>
+
+        <span @click="$emit('closePopup')" class="material-symbols-outlined close-button">
           cancel
         </span>
       </div>
+
+      <div style="margin-top: 10px; width: 100%; height: 100%" ref="embed"></div>
     </div>
   </div>
 </template>
 
 <script setup>
 import { onMounted, onUnmounted, ref, watch } from 'vue'
+const emit = defineEmits(['closePopup', 'selectAddress'])
 
-const iAmOpen = ref(false)
+const embed = ref(null)
 
 //this handles keyboard actions
 function keydownHandle(event) {
   if (event.key === 'Escape') {
-    iAmOpen.value = false
+    emit('selectAddress')
   }
 }
 
-function openMe() {
-  iAmOpen = true
-  console.log('i am opened!!!!!!!!')
-}
-
-onMounted(() => {
+onMounted(async () => {
   document.addEventListener('keydown', keydownHandle)
+
+  new window.daum.Postcode({
+    width: '100%', //width of the iframe
+    height: '100%',
+    oncomplete: (data) => {
+      let selectedType = data.userSelectedType
+      let roadAddr = data.roadAddress
+      let jibunAddr = data.jibunAddress
+
+      // console.log('jubunaddress' + jibunAddr)
+      // console.log('roadaddress' + roadAddr)
+
+      emit('selectAddress', selectedType === 'R' ? roadAddr : jibunAddr)
+      emit('closePopup')
+    },
+  }).embed(embed.value)
 })
 
 onUnmounted(() => {
@@ -57,7 +72,7 @@ onUnmounted(() => {
   background-color: white;
   border-radius: 8px;
   height: 800px;
-  width: 800px;
+  width: 600px;
   overflow: auto;
 }
 
