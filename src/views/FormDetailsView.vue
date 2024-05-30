@@ -8,85 +8,7 @@
   />
 
   <div class="container">
-    <p class="title">고객정보</p>
-    <div class="infoContainer">
-      <div v-if="fetchedDataContainsList('cust_type_cd')" class="groups" style="max-width: 200px">
-        <label>고객유형</label>
-        <a-select
-          v-model:value="customerType"
-          :style="{ width: '100%' }"
-          placeholder="고객유형을 선택하세요"
-          :options="fetchedData?.cust_type_cd.map((item) => ({ value: item?.cd, label: item?.value }))"
-        >
-        </a-select>
-
-        <p v-if="!customerType && formSubmitted" class="input-error-message">고객유형 선택하세요.</p>
-      </div>
-
-      <div v-if="isFormAvailable('contact')" class="groups" style="max-width: 200px">
-        <label>개통번호외 연락번호</label>
-        <input v-model="contact" placeholder="010-0000-0000" />
-        <p v-if="!contact && formSubmitted" class="input-error-message">연락처 입력하세요.</p>
-      </div>
-
-      <div v-if="isFormAvailable('id_passport_number')" class="groups" style="max-width: 200px">
-        <label>신분증번호/여권번호 </label>
-        <input v-model="idPassportNumber" placeholder="910131-0000000" />
-        <p v-if="!idPassportNumber && formSubmitted" class="input-error-message">신분증번호/여권번호 입력하세요.</p>
-      </div>
-
-      <div v-if="isFormAvailable('applicant_name')" class="groups" style="max-width: 500px">
-        <label>가입자명</label>
-        <input v-model="applicantName" placeholder="홍길동" />
-        <p v-if="!applicantName && formSubmitted" class="input-error-message">가입자명 입력하세요.</p>
-      </div>
-
-      <div v-if="isFormAvailable('application_birthday')" class="groups" style="max-width: 200px">
-        <label>생년월일</label>
-
-        <input
-          name="text"
-          v-model="birthdate"
-          placeholder="1991-01-31"
-          v-cleave="{
-            date: true,
-            delimiter: '-',
-            datePattern: ['Y', 'm', 'd'],
-          }"
-        />
-
-        <p v-if="!birthdate && formSubmitted" class="input-error-message">생년월일 입력하세요.</p>
-      </div>
-
-      <div v-if="fetchedDataContainsList('gender')" class="groups" style="max-width: 100px">
-        <label>성별 </label>
-
-        <a-select
-          v-model:value="gender"
-          :style="{ width: '100%' }"
-          placeholder="남"
-          :options="fetchedData?.gender_cd.map((item) => ({ value: item?.cd, label: item?.value }))"
-        >
-        </a-select>
-
-        <p v-if="!gender && formSubmitted" class="input-error-message">성별 입력하세요.</p>
-      </div>
-
-      <div v-if="isFormAvailable('address')" class="groups" style="max-width: 500px">
-        <label>주소</label>
-        <input v-model="address" @click="isSearchAddressOpen = true" readonly placeholder="우림이비지센터 1차 1210호" />
-
-        <p v-if="!address && formSubmitted" class="input-error-message">주소 입력하세요.</p>
-      </div>
-
-      <div v-if="isFormAvailable('address_additions')" class="groups" style="max-width: 300px">
-        <label>상세주소</label>
-        <input v-model="addressAdditions" placeholder="우림이비지센터 1차 1210호" />
-        <p v-if="!addressAdditions && formSubmitted" class="input-error-message">상세주소 입력하세요.</p>
-      </div>
-    </div>
-
-    <p class="title">고객정보</p>
+    <p class="title">요금제 정보</p>
     <div class="infoContainer">
       <div v-if="isFormAvailable('usim_plan_nm')" class="groups" style="max-width: 400px">
         <label>요금제</label>
@@ -212,7 +134,139 @@
       </div>
       <!-- <button @click="formSubmitted = true">Submit me</button> -->
     </div>
+    <p class="title">고객 정보</p>
+    <div class="infoContainer">
+      <div v-if="fetchedDataContainsList('cust_type_cd')" class="groups" style="max-width: 200px">
+        <label>고객유형</label>
+        <a-select
+          v-model:value="customerType"
+          :style="{ width: '100%' }"
+          placeholder="고객유형을 선택하세요"
+          :options="fetchedData?.cust_type_cd.map((item) => ({ value: item?.cd, label: item?.value }))"
+        >
+        </a-select>
+
+        <p v-if="!customerType && formSubmitted" class="input-error-message">고객유형 선택하세요.</p>
+      </div>
+
+      <div v-if="isFormAvailable('contact')" class="groups" style="max-width: 200px">
+        <label>개통번호외 연락번호</label>
+        <input v-model="contact" placeholder="010-0000-0000" />
+        <p v-if="!contact && formSubmitted" class="input-error-message">연락처 입력하세요.</p>
+      </div>
+
+      <div v-if="isFormAvailable('id_passport_number')" class="groups" style="max-width: 200px">
+        <label>신분증번호/여권번호 </label>
+        <input v-model="idPassportNumber" placeholder="910131-0000000" />
+        <p v-if="!idPassportNumber && formSubmitted" class="input-error-message">신분증번호/여권번호 입력하세요.</p>
+      </div>
+
+      <div v-if="isFormAvailable('applicant_name')" class="groups" style="max-width: 500px">
+        <label>가입자명</label>
+        <input v-model="applicantName" placeholder="홍길동" />
+        <p v-if="!applicantName && formSubmitted" class="input-error-message">가입자명 입력하세요.</p>
+      </div>
+      <div v-if="isFormAvailable('application_birthday')" class="groups" style="max-width: 200px">
+        <label>생년월일</label>
+        <input
+          name="text"
+          v-model="birthdate"
+          placeholder="1991-01-31"
+          v-cleave="{
+            date: true,
+            delimiter: '-',
+            datePattern: ['Y', 'm', 'd'],
+          }"
+        />
+
+        <p v-if="!birthdate && formSubmitted" class="input-error-message">생년월일 입력하세요.</p>
+      </div>
+
+      <div v-if="fetchedDataContainsList('gender')" class="groups" style="max-width: 100px">
+        <label>성별 </label>
+
+        <a-select
+          v-model:value="gender"
+          :style="{ width: '100%' }"
+          placeholder="남"
+          :options="fetchedData?.gender_cd.map((item) => ({ value: item?.cd, label: item?.value }))"
+        >
+        </a-select>
+
+        <p v-if="!gender && formSubmitted" class="input-error-message">성별 입력하세요.</p>
+      </div>
+
+      <div v-if="isFormAvailable('address')" class="groups" style="max-width: 500px">
+        <label>주소</label>
+        <input v-model="address" @click="isSearchAddressOpen = true" readonly placeholder="우림이비지센터 1차 1210호" />
+
+        <p v-if="!address && formSubmitted" class="input-error-message">주소 입력하세요.</p>
+      </div>
+
+      <div v-if="isFormAvailable('address_additions')" class="groups" style="max-width: 300px">
+        <label>상세주소</label>
+        <input v-model="addressAdditions" placeholder="우림이비지센터 1차 1210호" />
+        <p v-if="!addressAdditions && formSubmitted" class="input-error-message">상세주소 입력하세요.</p>
+      </div>
+    </div>
+
+    <p class="title">요금제 정보</p>
+    <div class="infoContainer">
+      <div class="groups" style="max-width: 300px">
+        <label>성별 </label>
+
+        <a-select
+          v-model:value="paidTransferCd"
+          :style="{ width: '100%' }"
+          placeholder="결제구분 선택하세요"
+          :options="fetchedData?.paid_transfer_cd.map((item) => ({ value: item?.cd, label: item?.value }))"
+        >
+        </a-select>
+
+        <p v-if="!gender && formSubmitted" class="input-error-message">결제구분 선택하세요.</p>
+      </div>
+
+      <div class="groups" style="max-width: 300px">
+        <label>예금주명</label>
+        <input v-model="accountOwnerName" placeholder="홍길동" />
+        <p v-if="!accountOwnerName && formSubmitted" class="input-error-message">예금주명 입력하세요.</p>
+      </div>
+
+      <div v-if="isFormAvailable('application_birthday')" class="groups" style="max-width: 200px">
+        <label>예금주 생년월일</label>
+        <input
+          name="text"
+          v-model="accountOwnerBirthday"
+          placeholder="1991-01-31"
+          v-cleave="{
+            date: true,
+            delimiter: '-',
+            datePattern: ['Y', 'm', 'd'],
+          }"
+        />
+        <p v-if="!accountOwnerBirthday && formSubmitted" class="input-error-message">생년월일 입력하세요.</p>
+      </div>
+
+      <div class="groups" style="max-width: 300px">
+        <label>은행(카드사)명</label>
+        <input v-model="bankOrCardProvider" placeholder="하나은행" />
+        <p v-if="!bankOrCardProvider && formSubmitted" class="input-error-message">은행(카드사)명 입력하세요.</p>
+      </div>
+
+      <div class="groups" style="max-width: 300px">
+        <label>계좌번호(카드번호)</label>
+        <input
+          type="text"
+          @input="accountNumber = accountNumber.replace(/[^0-9]/g, '')"
+          v-model="accountNumber"
+          placeholder="1234567890"
+        />
+        <p v-if="!accountNumber && formSubmitted" class="input-error-message">은행(카드사)명 입력하세요.</p>
+      </div>
+    </div>
   </div>
+
+  <div style="height: 400px"></div>
 </template>
 
 <script setup>
@@ -250,23 +304,22 @@ const addressAdditions = ref('')
 const usimNo = ref()
 const usimModelList = ref()
 const usimModelListRequired = ref(false)
-const usimFeeCd = ref(fetchedData.value?.usim_fee_cd[0]?.cd ?? '')
-const extraServiceCd = ref(fetchedData.value?.extra_service_cd[0]?.cd ?? '')
-const dataRomingBlockCd = ref(fetchedData.value?.data_roming_block_cd[0]?.cd ?? '')
-const planFeeCd = ref(fetchedData.value?.plan_fee_cd[0]?.cd ?? '')
-const phoneBillBlockCd = ref(fetchedData.value?.phone_bill_block_cd[0]?.cd ?? '')
-const usimActCd = ref(fetchedData.value?.usim_act_cd[0]?.cd ?? '')
+const usimFeeCd = ref()
+const extraServiceCd = ref()
+const dataRomingBlockCd = ref()
+const planFeeCd = ref()
+const phoneBillBlockCd = ref()
+const usimActCd = ref()
+
+const paidTransferCd = ref(fetchedData.value?.paid_transfer_cd[0]?.cd ?? '')
+const accountOwnerName = ref()
+const accountOwnerBirthday = ref()
+const bankOrCardProvider = ref()
+const accountNumber = ref()
 
 const formSubmitted = ref(false)
 const isSearchAddressOpen = ref(false)
 const isPlansPopupOpen = ref(false)
-
-//pop emit mvnoInfo and this catches it
-// function planSelected(mvnoInfo) {
-//   selectedTypeCd.value = mvnoInfo?.carrier_type
-//   selectedMvnoCd.value = mvnoInfo?.mvno_cd
-//   usimPlanName.value = mvnoInfo?.usim_plan_nm
-// }
 
 function isFormAvailable(formId) {
   // return (
@@ -323,6 +376,8 @@ async function fetchData() {
         phoneBillBlockCd.value = fetchedData.value?.phone_bill_block_cd[0]?.cd ?? ''
         usimActCd.value = fetchedData.value?.usim_act_cd[0]?.cd ?? ''
 
+        paidTransferCd.value = fetchedData.value?.paid_transfer_cd[0]?.cd ?? ''
+
         // console.log('this is response data', info)
       }
     } else {
@@ -356,7 +411,7 @@ onMounted(fetchData)
   font-weight: 600;
   line-height: 1;
   padding: 0;
-  margin-top: 30px;
+  margin-top: 40px;
   margin-bottom: 15px;
 }
 
