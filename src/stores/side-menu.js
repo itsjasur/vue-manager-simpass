@@ -2,12 +2,12 @@ import { defineStore } from 'pinia'
 
 export const useSideMenuStore = defineStore('sidemenu', {
   state: () => ({
-    isSideMenuOpen: true
+    isSideMenuOpen: true,
   }),
 
   actions: {
     toggle() {
-      console.log('toggled')
+      // console.log('toggled')
       this.isSideMenuOpen = !this.isSideMenuOpen
     },
     close() {
@@ -16,6 +16,6 @@ export const useSideMenuStore = defineStore('sidemenu', {
 
     open() {
       this.isSideMenuOpen = true
-    }
-  }
+    },
+  },
 })

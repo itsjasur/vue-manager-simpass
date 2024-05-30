@@ -1,10 +1,6 @@
 <template>
   <div class="container">
-    <div
-      v-if="useSideMenuStore().isSideMenuOpen"
-      class="overlay"
-      @click="useSideMenuStore().close()"
-    />
+    <div v-if="useSideMenuStore().isSideMenuOpen" class="overlay" @click="useSideMenuStore().close()" />
     <div
       v-if="useSideMenuStore().isSideMenuOpen"
       class="side-menu"

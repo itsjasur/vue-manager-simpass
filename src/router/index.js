@@ -17,8 +17,8 @@ const router = createRouter({
       name: 'login',
       component: LoginView,
       meta: {
-        requiresAuth: false // No authentication required
-      }
+        requiresAuth: false, // No authentication required
+      },
     },
 
     {
@@ -28,7 +28,7 @@ const router = createRouter({
 
       component: DashBaordView,
       meta: {
-        requiresAuth: true
+        requiresAuth: true,
       },
       children: [
         {
@@ -36,24 +36,24 @@ const router = createRouter({
           name: 'home',
           component: HomeView,
           meta: {
-            requiresAuth: true
-          }
+            requiresAuth: true,
+          },
         },
         {
           path: '/profile',
           name: 'profile',
           component: ProfileView,
           meta: {
-            requiresAuth: true
-          }
+            requiresAuth: true,
+          },
         },
         {
           path: '/registration-forms',
           name: 'registration-forms',
           component: RegistrationFormsView,
           meta: {
-            requiresAuth: true
-          }
+            requiresAuth: true,
+          },
         },
 
         {
@@ -62,10 +62,10 @@ const router = createRouter({
           // component: RentalRegistrationView,
           component: FormDetailsView,
           meta: {
-            requiresAuth: true
-          }
-        }
-      ]
+            requiresAuth: true,
+          },
+        },
+      ],
     },
 
     // this catchs any route
@@ -73,8 +73,8 @@ const router = createRouter({
       // path: '/:pathMatch(.*)*',
       path: '/:catchAll(.*)',
       name: 'NotFound',
-      component: NotFoundView
-    }
+      component: NotFoundView,
+    },
 
     // {
     //   path: '/about',
@@ -84,7 +84,7 @@ const router = createRouter({
     //   // which is lazy-loaded when the route is visited.
     //   component: () => import('../views/AboutView.vue')
     // }
-  ]
+  ],
 })
 
 router.beforeEach((to, from, next) => {

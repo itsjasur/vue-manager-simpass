@@ -2,17 +2,19 @@ import { defineStore } from 'pinia'
 
 export const useSnackbarStore = defineStore('snackbar', {
   state: () => ({
+    active: false,
     message: '',
-    show: false,
-    timeout: null
+    timeout: null,
   }),
 
   actions: {
     showSnackbar(message) {
+      // console.log('show snackbr called')
       //if text is empty, no need to show snackbar
       if (message) {
         this.message = message
-        this.show = true
+
+        this.active = true
 
         // clearing any existing timeout
         if (this.timeout) {
@@ -28,9 +30,10 @@ export const useSnackbarStore = defineStore('snackbar', {
 
     //this hides snackbar
     hideSnackbar() {
-      this.show = false
       this.message = ''
       this.timeout = null
-    }
-  }
+
+      this.active = false
+    },
+  },
 })

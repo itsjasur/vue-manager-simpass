@@ -1,5 +1,4 @@
 <template>
-  <Snackbar />
   <div class="main">
     <div class="login-container">
       <h2>로그인</h2>
@@ -36,7 +35,6 @@
 <script setup>
 import { ref } from 'vue'
 import LoadingSpinner from '../components/Loader.vue'
-import Snackbar from '../components/Snackbar.vue'
 import { useSnackbarStore } from '../stores/snackbar'
 import { useAuthenticationStore } from '../stores/authentication'
 import { BASEURL } from '../assets/constants'
@@ -49,7 +47,7 @@ const passwordErr = ref('')
 const isLoading = ref(false)
 
 async function login(event) {
-  console.log('button clicked')
+  // console.log('button clicked')
   isLoading.value = true
 
   // Check if input fields are empty
@@ -79,8 +77,6 @@ async function login(event) {
       const data = await response.json()
 
       useAuthenticationStore().login(data['accessToken'], data['refreshToken'], data['id'], data['username'])
-
-      // Handle successful login
     } else {
       useSnackbarStore().showSnackbar('Invalid credentials') // show snackbar with a success message
     }

@@ -33,7 +33,7 @@ export const FORMLABELS = {
   usim_plan_id: '요금제 ID',
   usim_plan_nm: '요금제 명',
   carrier_cd: '통신사',
-  usim_model_no: 'USIM 모델명',
+  usim_model_list: 'USIM 모델명',
   usim_no: 'USIM 일련번호',
   usim_fee_cd: 'USIM 비용청구',
   phone_number: '가입/이동 전화번호',
@@ -91,7 +91,7 @@ export const FORMNAMES = {
   address_additions: '상세주소',
   gender: '성별',
   usim_plan_nm: '요금제명',
-  usim_model_no: 'USIM 모델명',
+  usim_model_list: 'USIM 모델명',
   usim_no: 'USIM 일련번호',
   usim_fee_cd: '유심비용청구',
   extra_service: '부가서비스',
@@ -115,7 +115,7 @@ export const FORMNAMES = {
 
 //   //PLAN,
 //   { usim_plan_nm: '요금제명', type: 'select' },
-//   { usim_model_no: 'USIM 모델명', type: 'select' },
+//   { usim_model_list: 'USIM 모델명', type: 'select' },
 //   { usim_no: 'USIM 일련번호', type: 'select' },
 //   { usim_fee_cd: '유심비용청구', type: 'select' },
 //   { extra_service: '부가서비스', type: 'select' },
@@ -146,7 +146,7 @@ export const PLANSINFO = [
 
               //
               'usim_plan_nm',
-              'usim_model_no',
+              'usim_model_list',
               'usim_no',
               'usim_fee_cd',
             ],
@@ -170,7 +170,7 @@ export const PLANSINFO = [
 
               //
               'usim_plan_nm',
-              'usim_model_no',
+              'usim_model_list',
               'usim_no',
               'plan_fee_cd',
               'usim_fee_cd',
@@ -199,10 +199,10 @@ export const PLANSINFO = [
 
               //
               'usim_plan_nm',
-              'usim_model_no',
+              'usim_model_list',
               'usim_no',
               'usim_fee_cd',
-              'data_block_cd',
+              'data_roming_block_cd',
               'phone_bill_block_cd',
               'usim_act_cd',
             ],
@@ -225,10 +225,10 @@ export const PLANSINFO = [
 
               //
               'usim_plan_nm',
-              'usim_model_no',
+              'usim_model_list',
               'usim_no',
               'usim_fee_cd',
-              'data_block_cd',
+              'data_roming_block_cd',
               'phone_bill_block_cd',
               'plan_fee_cd',
               'usim_act_cd',
@@ -246,9 +246,9 @@ export const PLANSINFO = [
 
               //
               'usim_plan_nm',
-              'usim_model_no',
+              'usim_model_list',
               'usim_no',
-              'data_block_cd',
+              'data_roming_block_cd',
               'phone_bill_block_cd',
               'usim_act_cd',
             ],
@@ -272,7 +272,7 @@ export const PLANSINFO = [
 
               //
               'usim_plan_nm',
-              'usim_model_no',
+              'usim_model_list',
               'usim_no',
               'usim_fee_cd',
               'usim_act_cd',
@@ -290,11 +290,11 @@ export const PLANSINFO = [
 
               //
               'usim_plan_nm',
-              'usim_model_no',
+              'usim_model_list',
               'usim_no',
               'usim_fee_cd',
-              'extra_service',
-              'data_block_cd',
+              'extra_service_cd',
+              'data_roming_block_cd',
               'plan_fee_cd',
               'usim_act_cd',
             ],
@@ -311,11 +311,11 @@ export const PLANSINFO = [
 
               //
               'usim_plan_nm',
-              'usim_model_no',
+              'usim_model_list',
               'usim_no',
               'usim_fee_cd',
-              'extra_service',
-              'data_block_cd',
+              'extra_service_cd',
+              'data_roming_block_cd',
               'usim_act_cd',
             ],
           },
@@ -491,4 +491,39 @@ export const DATASAMPLE = {
       value: '번호이동',
     },
   ],
+}
+
+export const MVNOINFO = {
+  num: null,
+  id: 206,
+  usim_plan_nm: '5G 스페셜 유심 180GB',
+  carrier_cd: 'LG',
+  carrier_nm: null,
+  mvno_cd: 'HVS',
+  mvno_nm: null,
+  agent_cd: 'SP',
+  agent_nm: null,
+  basic_fee: 66000,
+  sales_fee: 66000,
+  discount_fee: 0,
+  voice: ' 무제한',
+  message: '무제한',
+  cell_data: '180GB',
+  video_etc: '',
+  qos: '10Mbps',
+  carrier_plan_type: 'P',
+  carrier_plan_type_nm: null,
+  carrier_type: 'PO',
+  carrier_type_nm: null,
+  usim_fee: 0,
+  plan_fee: 0,
+  priority: 100,
+  from_date: '2024-03-19 10:20:16.0',
+  expire_date: '9999-12-31 23:59:59.0',
+  status: 'Y',
+  status_nm: null,
+  reg_by: 0,
+  reg_time: '2024-03-19 10:20:16.0',
+  update_by: 0,
+  update_time: '2024-03-19 10:20:16.0',
 }

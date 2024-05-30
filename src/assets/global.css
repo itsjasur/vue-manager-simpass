@@ -102,9 +102,15 @@ input:focus {
 }
 
 .input-error-message {
+  margin: 0;
+  padding: 0;
   margin-top: 5px;
-  color: red;
+  color: #ff4c4c;
+  margin-top: 5px;
   font-size: 14px;
+  line-height: 1;
+  max-lines: 2;
+  white-space: pre-line; /* breaks into lines */
 }
 
 .material-symbols-outlined {

@@ -6,7 +6,7 @@ export const useAuthenticationStore = defineStore('status', {
     isLoggedIn: true,
     // role: [],
     id: '',
-    userName: ''
+    userName: '',
   }),
 
   actions: {
@@ -27,12 +27,12 @@ export const useAuthenticationStore = defineStore('status', {
 
       router.push('/home')
       // window.location.href = '/home'
-    }
+    },
 
     // retrieveFromStorage() {
     //   const token = localStorage.getItem('token')
     //   const refreshToken = localStorage.getItem('refreshToken')
     //   const roleJSON = localStorage.getItem('role')
     // }
-  }
+  },
 })

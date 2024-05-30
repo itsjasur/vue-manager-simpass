@@ -1,11 +1,9 @@
 <template>
-  <div class="overlay">
+  <div v-if="popup.active" class="overlay">
     <div class="popup-content">
       <div class="innerHeader">
         <h3 class="title">요금제선택</h3>
-        <span @click="$emit('closePopup')" class="material-symbols-outlined close-button">
-          cancel
-        </span>
+        <span @click="popup.close" class="material-symbols-outlined close-button"> cancel </span>
       </div>
 
       <div class="scroll-content">
@@ -14,9 +12,9 @@
         <div class="types">
           <div
             class="button"
-            v-for="(item, index) in types"
+            v-for="(item, index) in PLANTYPES"
             :key="index"
-            :class="{ selected: selectedType === item.cd }"
+            :class="{ selected: popup.carrierType === item.cd }"
             @click="changeType(item.cd)"
           >
             {{ item.label }}
@@ -32,9 +30,7 @@
             placeholder="검색할 요금제명을 입력해주세요"
             v-model="searchText"
           />
-          <span v-if="searchText" @click="searchText = ''" class="icon material-symbols-outlined">
-            close
-          </span>
+          <span v-if="searchText" @click="searchText = ''" class="icon material-symbols-outlined"> close </span>
         </div>
         <div style="height: 30px"></div>
 
@@ -46,13 +42,13 @@
           :pagination="false"
           @onchange="onChange"
         >
-          <template #bodyCell="{ column, text }">
+          <template #bodyCell="{ column, text, record }">
             <template v-if="column.dataIndex === 'basic_fee' || column.dataIndex === 'sales_fee'">
               <div>{{ text.toLocaleString() }}</div>
             </template>
 
             <template v-if="column.dataIndex === 'usim_plan_nm'">
-              <span class="linkText">
+              <span class="linkText" @click="goToPlanDetailsPage(record)">
                 {{ text }}
               </span>
             </template>
@@ -61,15 +57,14 @@
 
         <div class="card" v-for="(item, index) in dataList" :key="index">
           <div class="title">
-            <span>{{ item.usim_plan_nm }}</span>
+            <span @click="goToPlanDetailsPage(item)">{{ item.usim_plan_nm }}</span>
+
             <span class="icon material-symbols-outlined"> arrow_forward_ios </span>
           </div>
 
           <div class="body">
             <div class="data">
-              <span @click="searchText = ''" class="icon material-symbols-outlined">
-                swap_vert
-              </span>
+              <span @click="searchText = ''" class="icon material-symbols-outlined"> swap_vert </span>
               <span> {{ item.cell_data }}{{ item.qos }} </span>
             </div>
 
@@ -98,18 +93,25 @@
 
 <script setup>
 import { useSnackbarStore } from '../stores/snackbar'
-import { onMounted, onUnmounted, ref, watch } from 'vue'
+import { useSelectPlansPopup } from '../stores/select-plans-popup'
+import { onActivated, onMounted, onUnmounted, ref, watch } from 'vue'
 import { fetchWithTokenRefresh } from '../utils/tokenUtils'
 import { PLANTYPES } from '../assets/constants'
 
-const props = defineProps(['selectedType', 'mvnoInfo'])
-const selectedType = ref('')
+import { useRouter } from 'vue-router'
+const router = useRouter()
+
+const popup = useSelectPlansPopup()
 const searchText = ref('')
 const dataList = ref([])
 
-const emit = defineEmits(['closePopup'])
-
-selectedType.value = props.selectedType ?? 'PO'
+const goToPlanDetailsPage = (selectedPlan) => {
+  popup.selectItem(selectedPlan)
+  popup.close()
+  router.push({
+    name: 'rental-forms',
+  })
+}
 
 const columns = ref([
   {
@@ -159,24 +161,20 @@ const columns = ref([
   },
 ])
 
-const types = ref(PLANTYPES)
-
 function changeType(cd) {
-  selectedType.value = cd
+  popup.carrierType = cd
   fetchData()
 }
 
 async function fetchData() {
-  console.log('fetch data called')
+  // console.log('fetch data called')
   try {
-    console.log('this is search value' + searchText.value)
-
     const response = await fetchWithTokenRefresh('agent/planlist', {
       method: 'POST',
       body: {
-        carrier_cd: props.mvnoInfo.carrier_cd, // SKT : SK ,KT : KT,LG U+ : LG
-        mvno_cd: props.mvnoInfo.mvno_cd,
-        carrier_type: selectedType.value, // 선불:PR ,후불:PO
+        carrier_cd: popup.carrierCd, // SKT : SK ,KT : KT,LG U+ : LG
+        mvno_cd: popup.mvnoCd,
+        carrier_type: popup.carrierType, // 선불:PR ,후불:PO
         usim_plan_nm: searchText.value,
       },
     })
@@ -195,13 +193,13 @@ async function fetchData() {
 }
 
 const onChange = (pagination, filters, sorter) => {
-  console.log('params', pagination, filters, sorter)
+  // console.log('params', pagination, filters, sorter)
 }
 
 //this handles keyboard actions
 function keydownHandle(event) {
   if (event.key === 'Escape') {
-    emit('closePopup')
+    popup.close()
   }
 }
 
@@ -209,8 +207,15 @@ watch(searchText, (newValue, oldValue) => {
   fetchData()
 })
 
+watch(
+  () => popup.active,
+  (newValue) => {
+    // selectedType.value = popup.popup.carrierType
+    if (newValue) fetchData() // fetch when the popup becomes active
+  }
+)
+
 onMounted(() => {
-  fetchData()
   document.addEventListener('keydown', keydownHandle)
 })
 

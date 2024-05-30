@@ -4,9 +4,7 @@
       <div class="innerHeader">
         <h3 class="title">주소 검색</h3>
 
-        <span @click="$emit('closePopup')" class="material-symbols-outlined close-button">
-          cancel
-        </span>
+        <span @click="$emit('closePopup')" class="material-symbols-outlined close-button"> cancel </span>
       </div>
 
       <div style="margin-top: 10px; width: 100%; height: 100%" ref="embed"></div>
@@ -23,7 +21,7 @@ const embed = ref(null)
 //this handles keyboard actions
 function keydownHandle(event) {
   if (event.key === 'Escape') {
-    emit('selectAddress')
+    emit('closePopup')
   }
 }
 

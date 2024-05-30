@@ -1,11 +1,6 @@
 <template>
-  <div v-if="showPopup">
-    <SelectPlanPopup
-      :selectedType="selectedType"
-      :mvnoInfo="selectedMvno"
-      @closePopup="showPopup = false"
-    />
-  </div>
+  <SelectPlanPopup />
+
   <div class="container">
     <div class="types">
       <div
@@ -42,6 +37,7 @@
 
 <script setup>
 import { useSnackbarStore } from '../stores/snackbar'
+import { useSelectPlansPopup } from '../stores/select-plans-popup'
 import { fetchWithTokenRefresh } from '../utils/tokenUtils'
 import { logoFinder } from '../utils/logoFinder'
 import { onMounted, ref } from 'vue'
@@ -50,9 +46,7 @@ import { CARRIERS, PLANTYPES } from '../assets/constants'
 
 const selectedType = ref('PO')
 const selectedCarrierCd = ref('')
-const selectedMvno = ref('')
-
-const showPopup = ref(false)
+const selectedMvnoCd = ref('')
 
 const types = ref(PLANTYPES)
 const carriers = ref(CARRIERS)
@@ -70,8 +64,10 @@ function changeCarrier(cd) {
 }
 
 function selectMvno(item) {
-  selectedMvno.value = item
-  showPopup.value = true
+  selectedCarrierCd.value = item.carrier_cd
+  selectedMvnoCd.value = item.mvno_cd
+
+  useSelectPlansPopup().open(selectedCarrierCd.value, selectedMvnoCd.value, selectedType.value)
 }
 
 async function fetchData() {

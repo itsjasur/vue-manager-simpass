@@ -12,12 +12,12 @@ export async function refreshToken() {
     const response = await fetch(BASEURL + 'auth/refresh-token', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
         // any other necessary headers?
       },
       body: JSON.stringify({
-        refreshToken: currentRefreshToken
-      })
+        refreshToken: currentRefreshToken,
+      }),
     })
     if (response.ok) {
       const data = await response.json()
@@ -32,7 +32,7 @@ export async function refreshToken() {
       throw new Error('Token refresh failed')
     }
   } catch (error) {
-    console.error('Token refresh failed:', error)
+    // console.error('Token refresh failed:', error)
     localStorage.removeItem('accessToken')
     localStorage.removeItem('refreshToken')
     window.location.href = '/login'
@@ -48,7 +48,7 @@ export async function fetchWithTokenRefresh(url, options) {
   let accessToken = localStorage.getItem('accessToken')
   options.headers = {
     'Content-Type': 'application/json',
-    Authorization: `Bearer ${accessToken}`
+    Authorization: `Bearer ${accessToken}`,
   }
 
   console.log(options.body)

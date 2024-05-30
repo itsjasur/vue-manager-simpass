@@ -1,5 +1,5 @@
 <template>
-  <div v-if="snackbarStore.show" class="snackbar" :class="snackbarStore.type">
+  <div v-if="snackbarStore.active" class="snackbar" :class="snackbarStore.type">
     <div class="snackbar-content">
       <span>{{ snackbarStore.message }}</span>
     </div>
@@ -19,7 +19,7 @@ const snackbarStore = useSnackbarStore()
   top: 20px;
   left: 50%;
   transform: translateX(-50%); /* this takes the snackbar width into account*/
-  background-color: #5b5b5b;
+  background-color: #212121;
   color: #fff;
   padding: 10px 15px;
   border-radius: 4px;

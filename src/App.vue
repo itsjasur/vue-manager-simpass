@@ -15,9 +15,13 @@
   >
   </a-config-provider>
   <router-view />
+
+  <Snackbar />
 </template>
 
-<script setup></script>
+<script setup>
+import Snackbar from './components/Snackbar.vue'
+</script>
 
 <style>
 body {
