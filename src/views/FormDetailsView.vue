@@ -7,6 +7,8 @@
     @selectAddress="addressSelected"
   />
 
+  <SignPadPopup v-if="isDrawPadOpen" :type="drawType" @savePads="savePads" @closePopup="isDrawPadOpen = false" />
+
   <div class="container">
     <p class="title">요금제 정보</p>
     <div class="infoContainer">
@@ -210,59 +212,100 @@
       </div>
     </div>
 
-    <p class="title">요금제 정보</p>
-    <div class="infoContainer">
-      <div class="groups" style="max-width: 300px">
-        <label>성별 </label>
+    <div v-if="selectedTypeCd === 'PO'">
+      <p class="title">요금제 정보</p>
+      <div class="infoContainer">
+        <div class="groups" style="max-width: 300px">
+          <label>성별 </label>
 
-        <a-select
-          v-model:value="paidTransferCd"
-          :style="{ width: '100%' }"
-          placeholder="결제구분 선택하세요"
-          :options="fetchedData?.paid_transfer_cd.map((item) => ({ value: item?.cd, label: item?.value }))"
-        >
-        </a-select>
+          <a-select
+            v-model:value="paidTransferCd"
+            :style="{ width: '100%' }"
+            placeholder="결제구분 선택하세요"
+            :options="fetchedData?.paid_transfer_cd.map((item) => ({ value: item?.cd, label: item?.value }))"
+          >
+          </a-select>
 
-        <p v-if="!gender && formSubmitted" class="input-error-message">결제구분 선택하세요.</p>
+          <p v-if="!gender && formSubmitted" class="input-error-message">결제구분 선택하세요.</p>
+        </div>
+
+        <div class="groups" style="max-width: 300px">
+          <label>예금주명</label>
+          <input v-model="accountOwnerName" placeholder="홍길동" />
+          <p v-if="!accountOwnerName && formSubmitted" class="input-error-message">예금주명 입력하세요.</p>
+        </div>
+
+        <div v-if="isFormAvailable('application_birthday')" class="groups" style="max-width: 200px">
+          <label>예금주 생년월일</label>
+          <input
+            name="text"
+            v-model="accountOwnerBirthday"
+            placeholder="1991-01-31"
+            v-cleave="{
+              date: true,
+              delimiter: '-',
+              datePattern: ['Y', 'm', 'd'],
+            }"
+          />
+          <p v-if="!accountOwnerBirthday && formSubmitted" class="input-error-message">생년월일 입력하세요.</p>
+        </div>
+
+        <div class="groups" style="max-width: 300px">
+          <label>은행(카드사)명</label>
+          <input v-model="bankOrCardProvider" placeholder="하나은행" />
+          <p v-if="!bankOrCardProvider && formSubmitted" class="input-error-message">은행(카드사)명 입력하세요.</p>
+        </div>
+
+        <div class="groups" style="max-width: 300px">
+          <label>계좌번호(카드번호)</label>
+          <input
+            type="text"
+            @input="accountNumber = accountNumber.replace(/[^0-9]/g, '')"
+            v-model="accountNumber"
+            placeholder="1234567890"
+          />
+          <p v-if="!accountNumber && formSubmitted" class="input-error-message">은행(카드사)명 입력하세요.</p>
+        </div>
       </div>
+    </div>
 
-      <div class="groups" style="max-width: 300px">
-        <label>예금주명</label>
-        <input v-model="accountOwnerName" placeholder="홍길동" />
-        <p v-if="!accountOwnerName && formSubmitted" class="input-error-message">예금주명 입력하세요.</p>
-      </div>
+    <div class="checkboxContainer">
+      <a-checkbox class="checkbox" v-model:checked="supportDocsChecked">증빙자료첨부(선택사항)</a-checkbox>
+      <a-checkbox class="checkbox" v-model:checked="signAfterPrintChecked"
+        >신청서 프린트 인쇄후 서명/사인 자필</a-checkbox
+      >
+    </div>
 
-      <div v-if="isFormAvailable('application_birthday')" class="groups" style="max-width: 200px">
-        <label>예금주 생년월일</label>
-        <input
-          name="text"
-          v-model="accountOwnerBirthday"
-          placeholder="1991-01-31"
-          v-cleave="{
-            date: true,
-            delimiter: '-',
-            datePattern: ['Y', 'm', 'd'],
-          }"
-        />
-        <p v-if="!accountOwnerBirthday && formSubmitted" class="input-error-message">생년월일 입력하세요.</p>
+    <div v-if="!signAfterPrintChecked" class="signContainer">
+      <p class="sign-title">가입자 서명</p>
+      <div v-if="!nameImageData && !signImageData" @click="addSigns('forms')" class="singImagesBox">
+        <span class="draw-icon material-symbols-outlined"> stylus_note </span>
       </div>
+      <div v-else class="singImagesBox">
+        <span @click="deletePads('forms')" class="delete-icon material-symbols-outlined"> delete </span>
+        <div class="images-row">
+          <img class="image" :src="nameImageData" alt="Signature" />
+          <img class="image" :src="signImageData" alt="Signature" />
+        </div>
+      </div>
+      <p v-if="!nameImageData && !signImageData && formSubmitted" class="input-error-message">
+        가입자서명을 하지 않았습니다.
+      </p>
 
-      <div class="groups" style="max-width: 300px">
-        <label>은행(카드사)명</label>
-        <input v-model="bankOrCardProvider" placeholder="하나은행" />
-        <p v-if="!bankOrCardProvider && formSubmitted" class="input-error-message">은행(카드사)명 입력하세요.</p>
+      <p class="sign-title">자동이체 서명</p>
+      <div v-if="!paymentNameImageData && !paymentSignImageData" @click="addSigns('payment')" class="singImagesBox">
+        <span class="draw-icon material-symbols-outlined"> stylus_note </span>
       </div>
-
-      <div class="groups" style="max-width: 300px">
-        <label>계좌번호(카드번호)</label>
-        <input
-          type="text"
-          @input="accountNumber = accountNumber.replace(/[^0-9]/g, '')"
-          v-model="accountNumber"
-          placeholder="1234567890"
-        />
-        <p v-if="!accountNumber && formSubmitted" class="input-error-message">은행(카드사)명 입력하세요.</p>
+      <div v-else class="singImagesBox">
+        <span @click="deletePads('payment')" class="delete-icon material-symbols-outlined"> delete </span>
+        <div class="images-row">
+          <img class="image" :src="paymentNameImageData" alt="Signature" />
+          <img class="image" :src="paymentSignImageData" alt="Signature" />
+        </div>
       </div>
+      <p v-if="!nameImageData && !signImageData && formSubmitted" class="input-error-message">
+        후불이체동의 서명을 하지 않았습니다.
+      </p>
     </div>
   </div>
 
@@ -272,16 +315,59 @@
 <script setup>
 import AddressSearchPopup from '../components/AddressSearchPopup.vue'
 import SelectPlanPopup from '../components/SelectPlanPopup.vue'
+import SignPadPopup from '../components/SignPadPopup.vue'
+
 import { computed, onMounted, reactive, ref, watch } from 'vue'
-import { FORMLABELS } from '../assets/constants.js'
-// import { MVNOINFO, DATASAMPLE, PLANSINFO } from '../assets/constants.js'
+import { useSelectPlansPopup } from '../stores/select-plans-popup'
 import { useSnackbarStore } from '../stores/snackbar'
 import { fetchWithTokenRefresh } from '../utils/tokenUtils'
-import { useSelectPlansPopup } from '../stores/select-plans-popup'
 
+onMounted(fetchData)
+
+//signs image data
+const nameImageData = ref(null)
+const signImageData = ref(null)
+const paymentNameImageData = ref(null)
+const paymentSignImageData = ref(null)
+
+//draw popup
+const isDrawPadOpen = ref(false)
+const drawType = ref('')
+
+const addSigns = (type) => {
+  drawType.value = type
+  isDrawPadOpen.value = true
+}
+
+const deletePads = (type) => {
+  if (type === 'forms') {
+    nameImageData.value = null
+    signImageData.value = null
+  } else {
+    paymentNameImageData.value = null
+    paymentSignImageData.value = null
+  }
+}
+
+const savePads = (type, nameData, signData) => {
+  if (type === 'forms') {
+    nameImageData.value = nameData
+    signImageData.value = signData
+  } else {
+    paymentNameImageData.value = nameData
+    paymentSignImageData.value = signData
+  }
+}
+
+//checkboxes
+const supportDocsChecked = ref(false)
+const signAfterPrintChecked = ref(false)
+
+//select plans popup
 const popup = useSelectPlansPopup()
 
-console.log(popup)
+//fetched data
+const fetchedData = ref()
 
 // getting info from popup value
 const selectedTypeCd = ref(popup.carrierType ?? '')
@@ -289,18 +375,18 @@ const selectedCarrierCd = ref(popup.carrierCd ?? '')
 const selectedMvnoCd = ref(popup.mvnoCd ?? '')
 const usimPlanName = ref(popup.planName ?? '')
 
-const fetchedData = ref()
-
+//forms user info
 const customerType = ref()
 const birthdate = ref('')
 const contact = ref('')
 const applicantName = ref('')
 const country = ref('')
-const gender = ref(fetchedData.value?.gender_cd[0]?.cd ?? '')
+const gender = ref()
 const idPassportNumber = ref('')
 const address = ref('')
 const addressAdditions = ref('')
 
+// forms usim info
 const usimNo = ref()
 const usimModelList = ref()
 const usimModelListRequired = ref(false)
@@ -311,15 +397,35 @@ const planFeeCd = ref()
 const phoneBillBlockCd = ref()
 const usimActCd = ref()
 
-const paidTransferCd = ref(fetchedData.value?.paid_transfer_cd[0]?.cd ?? '')
+//forms payment info
+const paidTransferCd = ref()
 const accountOwnerName = ref()
 const accountOwnerBirthday = ref()
 const bankOrCardProvider = ref()
 const accountNumber = ref()
 
-const formSubmitted = ref(false)
+//address popup
 const isSearchAddressOpen = ref(false)
+const addressSelected = (selectedAddress, buildingName) => {
+  address.value = selectedAddress
+  addressAdditions.value = buildingName
+}
+
+//plans popup
 const isPlansPopupOpen = ref(false)
+watch(
+  () => [popup.planName, popup.carrierType, popup.carrierCd, popup.mvnoCd],
+  ([planName, carrierType, carrierCd, mvnoCd]) => {
+    usimPlanName.value = planName
+    selectedTypeCd.value = carrierType
+    selectedCarrierCd.value = carrierCd
+    selectedMvnoCd.value = mvnoCd
+    fetchData()
+  }
+)
+
+//submit form
+const formSubmitted = ref(false)
 
 function isFormAvailable(formId) {
   // return (
@@ -344,12 +450,8 @@ function fetchedDataContainsList(formName) {
   return true
 }
 
-const addressSelected = (selectedAddress, buildingName) => {
-  address.value = selectedAddress
-  addressAdditions.value = buildingName
-}
-
 async function fetchData() {
+  console.log('fetch data called')
   try {
     const response = await fetchWithTokenRefresh('agent/applyInit', {
       method: 'POST',
@@ -375,7 +477,6 @@ async function fetchData() {
         planFeeCd.value = fetchedData.value?.plan_fee_cd[0]?.cd ?? ''
         phoneBillBlockCd.value = fetchedData.value?.phone_bill_block_cd[0]?.cd ?? ''
         usimActCd.value = fetchedData.value?.usim_act_cd[0]?.cd ?? ''
-
         paidTransferCd.value = fetchedData.value?.paid_transfer_cd[0]?.cd ?? ''
 
         // console.log('this is response data', info)
@@ -387,8 +488,6 @@ async function fetchData() {
     useSnackbarStore().showSnackbar(error.toString())
   }
 }
-
-onMounted(fetchData)
 </script>
 
 <style scoped>
@@ -435,6 +534,69 @@ onMounted(fetchData)
   width: 100%;
 }
 
+.checkboxContainer {
+  display: flex;
+  flex-flow: column;
+  gap: 20px;
+  margin-top: 40px;
+  font-weight: 600;
+}
+
+.singImagesBox {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 400px;
+  width: 100%;
+  height: 100px;
+  border-radius: 5px;
+  border: 1px dashed var(--main-color);
+  cursor: pointer;
+  position: relative;
+}
+
+.delete-icon {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  color: #ff3535;
+  font-size: 25px;
+  cursor: pointer;
+}
+
+.draw-icon {
+  font-size: 30px;
+  color: var(--main-color);
+}
+
+.images-row {
+  display: flex;
+  flex-flow: row;
+  height: 100%;
+  width: 100%;
+  gap: 5px;
+  box-sizing: border-box;
+  padding: 5px;
+}
+
+.image {
+  width: 100%;
+  height: auto;
+  min-width: 100px;
+  max-height: 100px; /* Set a maximum height limit if needed */
+  object-fit: contain; /* Maintain aspect ratio and fit within the container */
+  background-color: #fbfbfb;
+}
+
+.sign-title {
+  /* font-size: 15px; */
+  font-weight: 600;
+  line-height: 1;
+  padding: 0;
+  margin-top: 30px;
+  margin-bottom: 10px;
+}
+
 @media (max-width: 768px) {
   .groups {
     max-width: none !important; /* Ignore max-width */
@@ -453,5 +615,10 @@ onMounted(fetchData)
   .groups {
     width: 100% !important;
   }
+
+  /* .signboxContainer .group {
+    max-width: none;
+    width: 100%;
+  } */
 }
 </style>

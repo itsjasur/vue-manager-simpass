@@ -34,14 +34,7 @@
         </div>
         <div style="height: 30px"></div>
 
-        <a-table
-          class="table"
-          :columns="columns"
-          :data-source="dataList"
-          bordered
-          :pagination="false"
-          @onchange="onChange"
-        >
+        <a-table class="table" :columns="columns" :data-source="dataList" bordered :pagination="false">
           <template #bodyCell="{ column, text, record }">
             <template v-if="column.dataIndex === 'basic_fee' || column.dataIndex === 'sales_fee'">
               <div>{{ text.toLocaleString() }}</div>
@@ -106,6 +99,7 @@ const searchText = ref('')
 const dataList = ref([])
 
 const goToPlanDetailsPage = (selectedPlan) => {
+  console.log(selectedPlan)
   popup.selectItem(selectedPlan)
   popup.close()
   router.push({
@@ -167,7 +161,6 @@ function changeType(cd) {
 }
 
 async function fetchData() {
-  // console.log('fetch data called')
   try {
     const response = await fetchWithTokenRefresh('agent/planlist', {
       method: 'POST',
@@ -190,10 +183,6 @@ async function fetchData() {
   } catch (error) {
     useSnackbarStore().showSnackbar(error.toString())
   }
-}
-
-const onChange = (pagination, filters, sorter) => {
-  // console.log('params', pagination, filters, sorter)
 }
 
 //this handles keyboard actions

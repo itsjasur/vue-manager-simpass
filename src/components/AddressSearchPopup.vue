@@ -70,8 +70,9 @@ onUnmounted(() => {
 .popup-content {
   background-color: white;
   border-radius: 8px;
-  height: 800px;
   width: 600px;
+  height: 100%;
+  max-height: 600px;
   overflow: auto;
 }
 
