@@ -270,13 +270,32 @@
     </div>
 
     <div class="checkboxContainer">
-      <a-checkbox class="checkbox" v-model:checked="supportDocsChecked">증빙자료첨부(선택사항)</a-checkbox>
+      <div class="supportDocsCheckbox">
+        <a-checkbox class="checkbox" v-model:checked="supportDocsChecked">증빙자료첨부(선택사항)</a-checkbox>
+        <!-- uploads images -->
+        <input id="file-input" @change="handleFileUpload" type="file" class="file-input" accept="image/*" multiple />
+        <div v-if="supportDocsChecked" class="uploadedImagesRow">
+          <label for="file-input" class="uploadImageBox">
+            <span class="add-icon material-symbols-outlined"> add </span>
+            <p>이미지 업로드</p>
+          </label>
+
+          <div v-for="(image, index) in uploadedDocs" :key="index" class="uploadImageBox">
+            <img :src="image" :alt="index" />
+            <span @click="deleteDocImages(index)" class="delete-icon material-symbols-outlined"> delete </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- checks and enablessing container -->
       <a-checkbox class="checkbox" v-model:checked="signAfterPrintChecked"
         >신청서 프린트 인쇄후 서명/사인 자필</a-checkbox
       >
     </div>
 
+    <!-- sign container -->
     <div v-if="!signAfterPrintChecked" class="signContainer">
+      <!-- form sign container -->
       <p class="sign-title">가입자 서명</p>
       <div v-if="!nameImageData && !signImageData" @click="addSigns('forms')" class="singImagesBox">
         <span class="draw-icon material-symbols-outlined"> stylus_note </span>
@@ -292,6 +311,7 @@
         가입자서명을 하지 않았습니다.
       </p>
 
+      <!-- payment sign container -->
       <p class="sign-title">자동이체 서명</p>
       <div v-if="!paymentNameImageData && !paymentSignImageData" @click="addSigns('payment')" class="singImagesBox">
         <span class="draw-icon material-symbols-outlined"> stylus_note </span>
@@ -323,6 +343,38 @@ import { useSnackbarStore } from '../stores/snackbar'
 import { fetchWithTokenRefresh } from '../utils/tokenUtils'
 
 onMounted(fetchData)
+
+//file upload handler
+const uploadedDocs = ref([])
+
+const deleteDocImages = (index) => {
+  console.log(index)
+  uploadedDocs.value.splice(index, 1)
+}
+
+const handleFileUpload = async (event) => {
+  const selectedFiles = event.target.files
+  const base64Strings = []
+
+  for (let i = 0; i < selectedFiles.length; i++) {
+    const file = selectedFiles[i]
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = () => {
+      const base64String = reader.result
+      base64Strings.push(base64String)
+      // Check if all selectedFiles have been processed
+      if (base64Strings.length === selectedFiles.length) {
+        // All selectedFiles have been converted to base64, you can use them here
+        uploadedDocs.value = [...uploadedDocs.value, ...base64Strings] //adding new images to the list
+      }
+    }
+
+    reader.onerror = (error) => {
+      console.error('Error reading file:', error)
+    }
+  }
+}
 
 //signs image data
 const nameImageData = ref(null)
@@ -360,7 +412,7 @@ const savePads = (type, nameData, signData) => {
 }
 
 //checkboxes
-const supportDocsChecked = ref(false)
+const supportDocsChecked = ref(true)
 const signAfterPrintChecked = ref(false)
 
 //select plans popup
@@ -491,6 +543,9 @@ async function fetchData() {
 </script>
 
 <style scoped>
+/*  */
+/*  */
+/*  */
 .container {
   max-width: 1400px;
   padding: 0 15px;
@@ -542,6 +597,53 @@ async function fetchData() {
   font-weight: 600;
 }
 
+.supportDocsCheckbox {
+  display: flex;
+  gap: 15px;
+  flex-flow: column;
+}
+
+.uploadImageBox {
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+  align-items: center;
+  width: 150px;
+  height: 100px;
+  border-radius: 5px;
+  border: 1px dashed var(--main-color);
+  cursor: pointer;
+  position: relative;
+}
+
+.uploadImageBox p {
+  font-size: 14px;
+  color: rgb(189, 189, 189);
+  font-weight: normal;
+  margin: 0;
+}
+
+.uploadImageBox .add-icon {
+  color: var(--main-color);
+}
+
+.uploadImageBox img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  box-sizing: border-box;
+}
+
+img:hover {
+  opacity: 0.2;
+}
+
+.uploadedImagesRow {
+  display: flex;
+  flex-flow: wrap;
+  gap: 20px;
+}
+
 .singImagesBox {
   display: inline-flex;
   justify-content: center;
@@ -559,9 +661,11 @@ async function fetchData() {
   position: absolute;
   top: 3px;
   right: 3px;
-  color: #ff3535;
-  font-size: 25px;
-  cursor: pointer;
+  color: #ff3535 !important;
+  cursor: pointer !important;
+  background-color: #ffffff;
+  padding: 2px;
+  border-radius: 20px;
 }
 
 .draw-icon {
@@ -569,7 +673,7 @@ async function fetchData() {
   color: var(--main-color);
 }
 
-.images-row {
+.singImagesBox .images-row {
   display: flex;
   flex-flow: row;
   height: 100%;
@@ -579,7 +683,7 @@ async function fetchData() {
   padding: 5px;
 }
 
-.image {
+.singImagesBox .image {
   width: 100%;
   height: auto;
   min-width: 100px;
@@ -595,6 +699,10 @@ async function fetchData() {
   padding: 0;
   margin-top: 30px;
   margin-bottom: 10px;
+}
+
+.file-input {
+  display: none;
 }
 
 @media (max-width: 768px) {
