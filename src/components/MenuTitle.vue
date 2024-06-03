@@ -30,4 +30,4 @@ const title = computed(() => {
 })
 </script>
 
-<style></style>
+<style scoped></style>
