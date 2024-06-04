@@ -28,8 +28,8 @@
             id="search"
             name="password"
             placeholder="검색할 요금제명을 입력해주세요"
-            v-model="popup.searchText"
-            @input="popup.open()"
+            v-model="searchText"
+            @input="searchTextChange()"
           />
           <span v-if="popup.searchText" @click="popup.searchText = ''" class="icon material-symbols-outlined">
             close
@@ -37,7 +37,7 @@
         </div>
         <div style="height: 30px"></div>
 
-        <a-table class="table" :columns="columns" :data-source="popup.planList" bordered :pagination="false">
+        <a-table class="table" :columns="columns" :data-source="dataList" bordered :pagination="false">
           <template #bodyCell="{ column, text, record }">
             <template v-if="column.dataIndex === 'basic_fee' || column.dataIndex === 'sales_fee'">
               <div>{{ text.toLocaleString() }}</div>
@@ -51,7 +51,7 @@
           </template>
         </a-table>
 
-        <div class="card" v-for="(item, index) in popup.planList" :key="index">
+        <div class="card" v-for="(item, index) in dataList" :key="index">
           <div class="title">
             <span>{{ item.usim_plan_nm }}</span>
 
@@ -92,19 +92,31 @@ import { useSnackbarStore } from '../stores/snackbar'
 import { useSelectPlansPopup } from '../stores/select-plans-popup'
 import { onMounted, onUnmounted, ref } from 'vue'
 import { PLANTYPES } from '../assets/constants'
-
+import { fetchWithTokenRefresh } from '../utils/tokenUtils'
 import { useRouter } from 'vue-router'
-const router = useRouter()
 
+const router = useRouter()
 const popup = useSelectPlansPopup()
 
-const updateType = (type) => {
-  popup.carrierType = type
-  popup.open()
+const dataList = ref([])
+
+const selectedType = ref(popup.carrierType)
+const searchText = ref(popup.searchText)
+
+const updateType = (newType) => {
+  selectedType.value = newType
+  fetchData()
+}
+
+const searchTextChange = () => {
+  fetchData()
 }
 
 const selectPlan = (selectedPlan) => {
+  popup.carrierType = selectedType.value
+  popup.searchText = searchText.value
   popup.selectedPlanInfo = selectedPlan
+
   popup.close()
   router.push({
     name: 'rental-forms',
@@ -159,6 +171,33 @@ const columns = ref([
   },
 ])
 
+const fetchData = async () => {
+  try {
+    const response = await fetchWithTokenRefresh('agent/planlist', {
+      method: 'POST',
+      body: {
+        carrier_cd: popup.carrierCd, // SKT : SK ,KT : KT,LG U+ : LG
+        mvno_cd: popup.mvnoCd,
+        carrier_type: selectedType.value, // 선불:PR ,후불:PO
+        usim_plan_nm: searchText.value,
+      },
+    })
+    if (response.ok) {
+      const decodedResponse = await response.json()
+
+      if (decodedResponse.data && decodedResponse.data.info) {
+        let list = decodedResponse.data.info
+        // this.planList = info
+        dataList.value = list
+      }
+    } else {
+      throw new Error('Fetch data error')
+    }
+  } catch (error) {
+    useSnackbarStore().showSnackbar(error.toString())
+  }
+}
+
 //this handles keyboard actions
 function keydownHandle(event) {
   if (event.key === 'Escape') {
@@ -168,6 +207,7 @@ function keydownHandle(event) {
 
 onMounted(() => {
   document.addEventListener('keydown', keydownHandle)
+  fetchData()
 })
 
 onUnmounted(() => {

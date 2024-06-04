@@ -109,7 +109,7 @@ export const PLANSINFO = [
               'usim_model_list',
               'usim_no',
               'usim_fee_cd',
-              'data_roming_block_cd',
+              'data_block_cd',
               'phone_bill_block_cd',
               'usim_act_cd',
             ],
@@ -128,7 +128,7 @@ export const PLANSINFO = [
               'usim_model_list',
               'usim_no',
               'usim_fee_cd',
-              'data_roming_block_cd',
+              'data_block_cd',
               'phone_bill_block_cd',
               'plan_fee_cd',
               'usim_act_cd',
@@ -151,7 +151,7 @@ export const PLANSINFO = [
               'usim_plan_nm',
               'usim_model_list',
               'usim_no',
-              'data_roming_block_cd',
+              'data_block_cd',
               'phone_bill_block_cd',
               'usim_act_cd',
             ],
@@ -201,7 +201,7 @@ export const PLANSINFO = [
               'usim_no',
               'usim_fee_cd',
               'extra_service_cd',
-              'data_roming_block_cd',
+              'data_block_cd',
               'plan_fee_cd',
               'usim_act_cd',
             ],
@@ -223,7 +223,7 @@ export const PLANSINFO = [
               'usim_no',
               'usim_fee_cd',
               'extra_service_cd',
-              'data_roming_block_cd',
+              'data_block_cd',
               'usim_act_cd',
             ],
             customerForms: [
@@ -269,7 +269,7 @@ export const USIM_FORM_DETAILS = {
 
   usim_no: {
     value: null,
-    type: 'select',
+    type: 'input',
     width: '300px',
     error: '일련번호 입력하세요.',
     placeholder: '00000000',
@@ -299,7 +299,7 @@ export const USIM_FORM_DETAILS = {
     partitionType: 'usim',
   },
 
-  data_roming_block_cd: {
+  data_block_cd: {
     label: '해외데이터로밍',
     value: null,
     type: 'select',

@@ -6,73 +6,104 @@
   <div class="container">
     <div class="partition">
       <div class="title">요금제 정보</div>
-      <template v-for="(item, index) in findForms('usimForms')" :key="index">
-        <template v-if="usimForms[item]">
-          <div class="group" :style="{ maxWidth: usimForms[item].width }">
-            <label>{{ usimForms[item].label }}</label>
-            <template v-if="usimForms[item]['type'] === 'select'">
-              <a-select
-                v-model:value="usimForms[item].value"
-                :style="{ width: '100%' }"
-                :placeholder="usimForms[item].placeholder"
-                v-bind="inputBindings(item)"
-                :options="fetchedData[item]?.map((i) => ({ value: i.cd, label: i.value })) ?? null"
-              >
-              </a-select>
-            </template>
+      <template v-for="(item, index) in usimForms" :key="index">
+        <div class="group" :style="{ maxWidth: item.width }">
+          <label>{{ item.label }}</label>
+          <template v-if="item['type'] === 'select'">
+            <a-select
+              v-model:value="item.value"
+              :style="{ width: '100%' }"
+              :placeholder="item.placeholder"
+              v-bind="inputBindings(index)"
+              :options="fetchedData[index]?.map((i) => ({ value: i.cd, label: i.value })) ?? null"
+            >
+            </a-select>
+          </template>
 
-            <template v-if="usimForms[item].type === 'input'">
-              <input
-                v-model="usimForms[item].value"
-                :placeholder="usimForms[item].placeholder"
-                v-bind="inputBindings(item)"
-              />
-            </template>
+          <template v-if="item.type === 'input'">
+            <input v-model="item.value" :placeholder="item.placeholder" v-bind="inputBindings(index)" />
+          </template>
 
-            <template v-if="usimForms[item].type === 'cleave-birthday-input'">
-              <input
-                v-model="usimForms[item].value"
-                :placeholder="usimForms[item].placeholder"
-                v-cleave="{
-                  date: true,
-                  delimiter: '-',
-                  datePattern: ['Y', 'm', 'd'],
-                }"
-              />
-            </template>
-          </div>
-        </template>
+          <template v-if="item.type === 'cleave-birthday-input'">
+            <input
+              v-model="item.value"
+              :placeholder="item.placeholder"
+              v-cleave="{
+                date: true,
+                delimiter: '-',
+                datePattern: ['Y', 'm', 'd'],
+              }"
+            />
+          </template>
+          <p v-if="!item.value && formSubmitted" class="input-error-message">
+            {{ item.error }}
+          </p>
+        </div>
       </template>
 
       <div class="title">고객 정보</div>
-      <template v-for="(item, index) in findForms('customerForms')" :key="index">
-        <template v-if="customerForms[item]">
-          <div class="group" :style="{ maxWidth: customerForms[item].width }">
-            <label>{{ customerForms[item].label }}</label>
+      <template v-for="(item, index) in customerForms" :key="index">
+        <div class="group" :style="{ maxWidth: item.width }">
+          <label>{{ item.label }}</label>
 
-            <template v-if="customerForms[item]['type'] === 'select'">
+          <template v-if="item['type'] === 'select'">
+            <a-select
+              v-model:value="item.value"
+              :style="{ width: '100%' }"
+              :placeholder="item.placeholder"
+              v-bind="inputBindings(index)"
+              :options="fetchedData[index]?.map((i) => ({ value: i.cd, label: i.value })) ?? null"
+            >
+            </a-select>
+          </template>
+
+          <template v-if="item.type === 'input'">
+            <input v-model="item.value" :placeholder="item.placeholder" v-bind="inputBindings(index)" />
+          </template>
+
+          <template v-if="item.type === 'cleave-birthday-input'">
+            <input
+              v-model="item.value"
+              :placeholder="item.placeholder"
+              v-cleave="{
+                date: true,
+                delimiter: '-',
+                datePattern: ['Y', 'm', 'd'],
+              }"
+            />
+          </template>
+
+          <p v-if="!item.value && formSubmitted" class="input-error-message">
+            {{ item.error }}
+          </p>
+        </div>
+      </template>
+
+      <template>
+        <div class="title">자동이체</div>
+        <template v-for="(item, index) in customerForms" :key="index">
+          <div class="group" :style="{ maxWidth: item.width }">
+            <label>{{ item.label }}</label>
+
+            <template v-if="item['type'] === 'select'">
               <a-select
-                v-model:value="customerForms[item].value"
+                v-model:value="item.value"
                 :style="{ width: '100%' }"
-                :placeholder="customerForms[item].placeholder"
-                v-bind="inputBindings(item)"
-                :options="fetchedData[item]?.map((i) => ({ value: i.cd, label: i.value })) ?? null"
+                :placeholder="item.placeholder"
+                v-bind="inputBindings(index)"
+                :options="fetchedData[index]?.map((i) => ({ value: i.cd, label: i.value })) ?? null"
               >
               </a-select>
             </template>
 
-            <template v-if="customerForms[item].type === 'input'">
-              <input
-                v-model="customerForms[item].value"
-                :placeholder="customerForms[item].placeholder"
-                v-bind="inputBindings(item)"
-              />
+            <template v-if="item.type === 'input'">
+              <input v-model="item.value" :placeholder="item.placeholder" v-bind="inputBindings(index)" />
             </template>
 
-            <template v-if="customerForms[item].type === 'cleave-birthday-input'">
+            <template v-if="item.type === 'cleave-birthday-input'">
               <input
-                v-model="customerForms[item].value"
-                :placeholder="customerForms[item].placeholder"
+                v-model="item.value"
+                :placeholder="item.placeholder"
                 v-cleave="{
                   date: true,
                   delimiter: '-',
@@ -80,6 +111,10 @@
                 }"
               />
             </template>
+
+            <p v-if="!item.value && formSubmitted" class="input-error-message">
+              {{ item.error }}
+            </p>
           </div>
         </template>
       </template>
@@ -107,37 +142,41 @@
       >신청서 프린트 인쇄후 서명/사인 자필</a-checkbox
     >
     <div v-if="!signAfterPrintChecked" class="signs-container">
-      <!-- form sign container -->
-      <p class="sign-title">가입자 서명</p>
-      <div v-if="!nameImageData && !signImageData" @click="addSigns('forms')" class="singImagesBox">
-        <span class="inner-icon material-symbols-outlined"> stylus_note </span>
-      </div>
-      <div v-else class="singImagesBox">
-        <span @click="deletePads('forms')" class="delete-icon material-symbols-outlined"> delete </span>
-        <div class="images-row">
-          <img class="image" :src="nameImageData" alt="Signature" />
-          <img class="image" :src="signImageData" alt="Signature" />
+      <div class="sign-container">
+        <!-- form sign container -->
+        <p class="sign-title">가입자 서명</p>
+        <div v-if="!nameImageData && !signImageData" @click="addSigns('forms')" class="singImagesBox">
+          <span class="inner-icon material-symbols-outlined"> stylus_note </span>
         </div>
+        <div v-else class="singImagesBox">
+          <span @click="deletePads('forms')" class="delete-icon material-symbols-outlined"> delete </span>
+          <div class="images-row">
+            <img class="image" :src="nameImageData" alt="Signature" />
+            <img class="image" :src="signImageData" alt="Signature" />
+          </div>
+        </div>
+        <p v-if="!nameImageData && !signImageData && formSubmitted" class="input-error-message">
+          가입자서명을 하지 않았습니다.
+        </p>
       </div>
-      <p v-if="!nameImageData && !signImageData && formSubmitted" class="input-error-message">
-        가입자서명을 하지 않았습니다.
-      </p>
 
-      <!-- payment sign container -->
-      <p class="sign-title">자동이체 서명</p>
-      <div v-if="!paymentNameImageData && !paymentSignImageData" @click="addSigns('payment')" class="singImagesBox">
-        <span class="inner-icon material-symbols-outlined"> stylus_note </span>
-      </div>
-      <div v-else class="singImagesBox">
-        <span @click="deletePads('payment')" class="delete-icon material-symbols-outlined"> delete </span>
-        <div class="images-row">
-          <img class="image" :src="paymentNameImageData" alt="Signature" />
-          <img class="image" :src="paymentSignImageData" alt="Signature" />
+      <div class="sign-container">
+        <!-- payment sign container -->
+        <p class="sign-title">자동이체 서명</p>
+        <div v-if="!paymentNameImageData && !paymentSignImageData" @click="addSigns('payment')" class="singImagesBox">
+          <span class="inner-icon material-symbols-outlined"> stylus_note </span>
         </div>
+        <div v-else class="singImagesBox">
+          <span @click="deletePads('payment')" class="delete-icon material-symbols-outlined"> delete </span>
+          <div class="images-row">
+            <img class="image" :src="paymentNameImageData" alt="Signature" />
+            <img class="image" :src="paymentSignImageData" alt="Signature" />
+          </div>
+        </div>
+        <p v-if="!paymentNameImageData && !paymentSignImageData && formSubmitted" class="input-error-message">
+          후불이체동의 서명을 하지 않았습니다.
+        </p>
       </div>
-      <p v-if="!nameImageData && !signImageData && formSubmitted" class="input-error-message">
-        후불이체동의 서명을 하지 않았습니다.
-      </p>
     </div>
 
     <div class="submit">
@@ -158,8 +197,12 @@ import SelectPlanPopup from '../components/SelectPlanPopup.vue'
 import SearchAddressPopup from '../components/SearchAddressPopup.vue'
 import SignPadPopup from '../components/SignPadPopup.vue'
 
+//popup init
+const selectPlansPopup = useSelectPlansPopup()
+const searchAddressPopup = useSearchaddressStore()
+
 //signAfterPrintChecked
-const signAfterPrintChecked = ref(false)
+const signAfterPrintChecked = ref(true)
 //signs image data
 const nameImageData = ref(null)
 const signImageData = ref(null)
@@ -195,20 +238,11 @@ const savePads = (type, nameData, signData) => {
   }
 }
 
-//submit form
-const formSubmitted = ref(false)
-const submit = () => {
-  formSubmitted.value = true
-  const formKeysSet = new Set(Object.keys(forms.value))
-  for (let item of formKeysSet) {
-    console.log(isFormAvailable(item))
-  }
-}
-
 //supported docs checkbox and handler
 const supportDocsChecked = ref(true)
 // this handles file upload
 const uploadedDocs = ref([])
+
 const handleFileUpload = async (event) => {
   const selectedFiles = event.target.files
   const base64Strings = []
@@ -232,60 +266,76 @@ const handleFileUpload = async (event) => {
     }
   }
 }
+const deleteDocImages = (index) => {
+  console.log(index)
+  uploadedDocs.value.splice(index, 1)
+}
 
-//popup init
-const selectPlansPopup = useSelectPlansPopup()
-const searchAddressPopup = useSearchaddressStore()
+//forms
+const usimForms = ref({})
+const customerForms = ref({})
+const paymentForms = ref()
 
-//froms are created from const lists
-const usimForms = ref(USIM_FORM_DETAILS)
-const customerForms = ref(CUSTOMER_FORM_DETAILS)
+//this generates forms
+function generateForms() {
+  const result = PLANSINFO.find((item) => item.code === selectPlansPopup.carrierType) // which type (postpaid or prepaid)
+    ?.carriers.find((carrier) => carrier.code === selectPlansPopup.carrierCd) // which carrier
+    ?.mvnos.find((mvno) => mvno.code === selectPlansPopup.mvnoCd) //which mvno
+  for (const item of result.usimForms) {
+    usimForms.value[item] = USIM_FORM_DETAILS[item]
+  }
+  for (const item of result.customerForms) {
+    customerForms.value[item] = CUSTOMER_FORM_DETAILS[item]
+  }
+}
 
 //fetched data ref
 const fetchedData = ref({})
-
-//initial mount fetches data
-onMounted(fetchData)
-
-//finds forms from PLANS info constant
-const findForms = (type) => {
-  const result =
-    PLANSINFO.find((item) => item.code === selectPlansPopup.carrierType) // which type (postpaid or prepaid)
-      ?.carriers.find((carrier) => carrier.code === selectPlansPopup.carrierCd) // which carrier
-      ?.mvnos.find((mvno) => mvno.code === selectPlansPopup.mvnoCd) || [] //which mvno
-
-  return result[type]
-}
 
 // Iterating over usimForms/customerforms to set default values based on fetchData
 const defaultSetter = (data) => {
   for (const key in usimForms.value) {
     if (usimForms.value[key].type === 'select' && usimForms.value[key].hasDefault) {
-      const defaultValue = data?.[key]?.[0]?.cd ?? null
-      usimForms.value[key].value = defaultValue
+      usimForms.value[key].value = data?.[key]?.[0]?.cd ?? null
     }
   }
 
   for (const key in customerForms.value) {
     if (customerForms.value[key].type === 'select' && customerForms.value[key].hasDefault) {
-      const defaultValue = data?.[key]?.[0]?.cd ?? null
-      customerForms.value[key].value = defaultValue
+      customerForms.value[key].value = data?.[key]?.[0]?.cd ?? null
     }
   }
 }
 
+//initial mount fetches data
+onMounted(() => {
+  fetchData()
+  generateForms()
+})
+
 //this check if anything updating in the address store and updates address fields
 watch(
-  () => searchAddressPopup.buildingName,
+  () => searchAddressPopup.address,
+
   (newValue) => {
-    for (const key in customerForms.value) {
-      if (key === 'address_additions') {
-        customerForms.value[key].value = searchAddressPopup.buildingName
-      }
-      if (key === 'address') {
-        customerForms.value[key].value = searchAddressPopup.address
-      }
-    }
+    customerForms.value['address'].value = searchAddressPopup.address
+    customerForms.value['address_additions'].value = searchAddressPopup.buildingName
+  }
+)
+
+//this sets usim plan name when the store selectedPlanInfo changes
+watch(
+  () => selectPlansPopup.selectedPlanInfo,
+  (newValue) => {
+    usimForms.value['usim_plan_nm'].value = selectPlansPopup.selectedPlanInfo['usim_plan_nm']
+  }
+)
+
+// whenever type cahnges (PO, PR) fetchdata should be called
+watch(
+  () => [selectPlansPopup.carrierType, selectPlansPopup.mvnoCd, selectPlansPopup.carrierCd],
+  ([newValue]) => {
+    fetchData()
   }
 )
 
@@ -293,19 +343,13 @@ watch(
 const inputBindings = (item) => {
   if (item === 'usim_plan_nm')
     return {
-      value: selectPlansPopup.selectedPlanInfo.usim_plan_nm,
-      onClick: (event) => {
-        selectPlansPopup.open()
-      },
+      onClick: (event) => selectPlansPopup.open(),
       readonly: true,
     }
 
   if (item === 'address')
     return {
-      value: searchAddressPopup.address,
-      onClick: (event) => {
-        searchAddressPopup.open()
-      },
+      onClick: (event) => searchAddressPopup.open(),
       readonly: true,
     }
 }
@@ -337,6 +381,30 @@ async function fetchData() {
     // useSnackbarStore().showSnackbar(error.toString())
   }
 }
+
+//submit form
+const formSubmitted = ref(false)
+const submit = () => {
+  formSubmitted.value = true
+
+  const usimFormsNotEmpty = Object.values(usimForms.value).every((field) => field.value)
+  const customerFormsNotEmpty = Object.values(customerForms.value).every((field) => field.value)
+
+  //checks if all values are filled
+  const checklist = [usimFormsNotEmpty, customerFormsNotEmpty]
+
+  //if sign after print checked
+  if (!signAfterPrintChecked.value) {
+    checklist.push(
+      [nameImageData.value && signImageData.value && paymentNameImageData.value && paymentSignImageData.value].every(
+        Boolean
+      )
+    )
+  }
+
+  console.log(checklist)
+  console.log(checklist.every((item) => item === true))
+}
 </script>
 
 <style scoped>
@@ -352,6 +420,7 @@ async function fetchData() {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
+  margin-bottom: 30px;
 }
 
 .group {
@@ -370,7 +439,7 @@ async function fetchData() {
 .checkbox {
   font-size: 16px;
   font-weight: 600;
-  margin-top: 40px;
+  margin-top: 30px;
 }
 
 .file-input {
@@ -425,7 +494,11 @@ async function fetchData() {
 }
 
 .signs-container {
-  margin-top: 20px;
+  margin-top: 30px;
+}
+
+.sign-container {
+  margin-bottom: 30px;
 }
 
 .singImagesBox {
@@ -439,7 +512,6 @@ async function fetchData() {
   border: 1px dashed var(--main-color);
   cursor: pointer;
   position: relative;
-  margin-bottom: 10px;
 }
 
 .singImagesBox .images-row {
@@ -469,7 +541,7 @@ async function fetchData() {
 }
 
 .submit {
-  margin-top: 40px;
+  margin-top: 30px;
   max-width: 200px;
   margin-bottom: 400px;
 }
