@@ -4,7 +4,7 @@
       <div class="innerHeader">
         <h3 class="title">주소 검색</h3>
 
-        <span @click="$emit('closePopup')" class="material-symbols-outlined close-button"> cancel </span>
+        <span @click="popup.close()" class="material-symbols-outlined close-button"> cancel </span>
       </div>
 
       <div style="margin-top: 10px; width: 100%; height: 100%" ref="embed"></div>
@@ -13,15 +13,20 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref, watch } from 'vue'
-const emit = defineEmits(['closePopup', 'selectAddress'])
+import { onMounted, onUnmounted, ref } from 'vue'
+import { useSearchaddressStore } from '../stores/select-address-popup'
+
+const popup = useSearchaddressStore()
+
+// const emit = defineEmits(['closePopup', 'selectAddress'])
 
 const embed = ref(null)
 
 //this handles keyboard actions
 function keydownHandle(event) {
   if (event.key === 'Escape') {
-    emit('closePopup')
+    // emit('closePopup')
+    popup.close()
   }
 }
 
@@ -40,8 +45,13 @@ onMounted(async () => {
       // console.log('jubunaddress' + jibunAddr)
       // console.log('roadaddress' + roadAddr)
 
-      emit('selectAddress', selectedType === 'R' ? roadAddr : jibunAddr, buildingName)
-      emit('closePopup')
+      // emit('selectAddress', selectedType === 'R' ? roadAddr : jibunAddr, buildingName)
+
+      popup.address = selectedType === 'R' ? roadAddr : jibunAddr
+      popup.buildingName = buildingName
+      popup.close()
+
+      // emit('closePopup')
     },
   }).embed(embed.value)
 })

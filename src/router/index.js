@@ -1,12 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import DashBaordView from '../views/DashBoardView.vue'
+import LoginView from '../views/LoginView.vue'
 import HomeView from '../views/HomeView.vue'
 import RegistrationFormsView from '../views/RegistrationFormsView.vue'
 import ProfileView from '../views/ProfileView.vue'
-// import RentalFormsView from '../views/RentalFormsView.vue'
 import FormDetailsView from '../views/FormDetailsView.vue'
-
-import LoginView from '../views/LoginView.vue'
 import NotFoundView from '../views/NotFoundView.vue'
 
 const router = createRouter({

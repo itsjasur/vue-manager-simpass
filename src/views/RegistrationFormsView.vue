@@ -44,6 +44,8 @@ import { onMounted, ref } from 'vue'
 import SelectPlanPopup from '../components/SelectPlanPopup.vue'
 import { CARRIERS, PLANTYPES } from '../assets/constants'
 
+const selectPlansPopup = useSelectPlansPopup()
+
 const selectedType = ref('PO')
 const selectedCarrierCd = ref('')
 const selectedMvnoCd = ref('')
@@ -64,10 +66,11 @@ function changeCarrier(cd) {
 }
 
 function selectMvno(item) {
-  selectedCarrierCd.value = item.carrier_cd
-  selectedMvnoCd.value = item.mvno_cd
+  selectPlansPopup.carrierType = selectedType.value
+  selectPlansPopup.carrierCd = item.carrier_cd
+  selectPlansPopup.mvnoCd = item.mvno_cd
 
-  useSelectPlansPopup().open(selectedCarrierCd.value, selectedMvnoCd.value, selectedType.value)
+  selectPlansPopup.open()
 }
 
 async function fetchData() {

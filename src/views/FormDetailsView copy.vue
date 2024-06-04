@@ -356,12 +356,12 @@
 </template>
 
 <script setup>
-import AddressSearchPopup from '../components/AddressSearchPopup.vue'
+import AddressSearchPopup from '../components/SearchAddressPopup.vue'
 import SelectPlanPopup from '../components/SelectPlanPopup.vue'
 import SignPadPopup from '../components/SignPadPopup.vue'
 
 import { computed, onMounted, reactive, ref, watch } from 'vue'
-import { useSelectPlansPopup } from '../stores/select-plans-popup'
+import { useSelectPlansPopup } from '../stores/select-plans-popup copyy'
 import { useSnackbarStore } from '../stores/snackbar'
 import { fetchWithTokenRefresh } from '../utils/tokenUtils'
 import { PLANSINFO } from '@/assets/constants'
@@ -484,13 +484,13 @@ const paymentForms = ref({
 })
 
 function isFormAvailable(formId) {
-  return (
-    PLANSINFO.find((item) => item.code === selectedTypeCd.value) // which type (postpaid or prepaid)
-      ?.carriers.find((carrier) => carrier.code === selectedCarrierCd.value) // which carrier
-      ?.mvnos.find((mvno) => mvno.code === selectedMvnoCd.value) //which mvno
-      ?.availableForms.some((form) => form === formId) || false //if available returns true
-  )
-  // return true
+  // return (
+  //   PLANSINFO.find((item) => item.code === selectedTypeCd.value) // which type (postpaid or prepaid)
+  //     ?.carriers.find((carrier) => carrier.code === selectedCarrierCd.value) // which carrier
+  //     ?.mvnos.find((mvno) => mvno.code === selectedMvnoCd.value) //which mvno
+  //     ?.availableForms.some((form) => form === formId) || false //if available returns true
+  // )
+  return true
 }
 
 //  check if any key contains the form

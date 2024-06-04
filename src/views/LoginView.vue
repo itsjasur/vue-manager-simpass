@@ -34,10 +34,10 @@
 
 <script setup>
 import { ref } from 'vue'
-import LoadingSpinner from '../components/Loader.vue'
-import { useSnackbarStore } from '../stores/snackbar'
-import { useAuthenticationStore } from '../stores/authentication'
 import { BASEURL } from '../assets/constants'
+import { useAuthenticationStore } from '../stores/authentication'
+import { useSnackbarStore } from '../stores/snackbar'
+import LoadingSpinner from '../components/Loader.vue'
 
 const username = ref('')
 const password = ref('')

@@ -32,7 +32,6 @@ export const useSnackbarStore = defineStore('snackbar', {
     hideSnackbar() {
       this.message = ''
       this.timeout = null
-
       this.active = false
     },
   },

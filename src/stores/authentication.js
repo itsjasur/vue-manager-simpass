@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia'
-import router from '../router/'
 
 export const useAuthenticationStore = defineStore('status', {
   state: () => ({
@@ -14,8 +13,7 @@ export const useAuthenticationStore = defineStore('status', {
       this.isLoggedIn = false
       localStorage.removeItem('accessToken')
       localStorage.removeItem('refreshToken')
-      // window.location.href = '/login'
-      router.push('/login')
+      window.location.href = '/login'
     },
 
     login(token, refreshToken, id, userName) {
@@ -25,8 +23,8 @@ export const useAuthenticationStore = defineStore('status', {
       localStorage.setItem('id', id)
       localStorage.setItem('userName', userName)
 
-      router.push('/home')
-      // window.location.href = '/home'
+      window.location.href = '/home'
+      // router.push('/home')
     },
 
     // retrieveFromStorage() {
