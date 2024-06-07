@@ -53,15 +53,25 @@ const router = createRouter({
             requiresAuth: true,
           },
         },
+        {
+          path: '/form-details/:id',
+          name: 'form-details',
+          component: FormDetailsView,
+          meta: {
+            requiresAuth: true,
+          },
+          props: true,
+        },
 
         {
-          path: '/rental-forms',
+          path: '/rental-forms/:id',
           name: 'rental-forms',
           // component: RentalRegistrationView,
           component: FormDetailsView,
           meta: {
             requiresAuth: true,
           },
+          props: true,
         },
       ],
     },

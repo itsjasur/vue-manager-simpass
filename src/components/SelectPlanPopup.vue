@@ -14,7 +14,7 @@
             class="button"
             v-for="(item, index) in PLANTYPES"
             :key="index"
-            :class="{ selected: popup.carrierType === item.cd }"
+            :class="{ selected: popup.type === item.cd }"
             @click="updateType(item.cd)"
           >
             {{ item.label }}
@@ -100,7 +100,7 @@ const popup = useSelectPlansPopup()
 
 const dataList = ref([])
 
-const selectedType = ref(popup.carrierType)
+const selectedType = ref(popup.type)
 const searchText = ref(popup.searchText)
 
 const updateType = (newType) => {
@@ -113,13 +113,13 @@ const searchTextChange = () => {
 }
 
 const selectPlan = (selectedPlan) => {
-  popup.carrierType = selectedType.value
+  popup.type = selectedType.value
   popup.searchText = searchText.value
-  popup.selectedPlanInfo = selectedPlan
-
   popup.close()
+
   router.push({
-    name: 'rental-forms',
+    name: 'form-details',
+    params: { id: selectedPlan.id },
   })
 }
 
@@ -187,7 +187,6 @@ const fetchData = async () => {
 
       if (decodedResponse.data && decodedResponse.data.info) {
         let list = decodedResponse.data.info
-        // this.planList = info
         dataList.value = list
       }
     } else {

@@ -46,12 +46,13 @@ export async function fetchWithTokenRefresh(url, options) {
   let response
   let fullUrl = BASEURL + url
   let accessToken = localStorage.getItem('accessToken')
+
   options.headers = {
-    'Content-Type': 'application/json',
+    // 'Content-Type': type === 'formData' ? 'multipart/form-data' : 'application/json',
     Authorization: `Bearer ${accessToken}`,
   }
 
-  // console.log(options.body)
+  console.log('request body', options.body)
 
   if (options.method === 'POST' && options.body) {
     options.body = JSON.stringify(options.body)
@@ -59,6 +60,8 @@ export async function fetchWithTokenRefresh(url, options) {
 
   try {
     response = await fetch(fullUrl, options)
+
+    console.log(response.code)
 
     if (response.status === 401 && !options._retry) {
       options._retry = true

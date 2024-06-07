@@ -1,5 +1,6 @@
 // cleaveDirective.js
 import Cleave from 'cleave.js'
+import 'cleave.js/dist/addons/cleave-phone.kr'
 
 export default {
   mounted: (el, binding) => {

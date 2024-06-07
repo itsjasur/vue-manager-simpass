@@ -1,5 +1,5 @@
 <template>
-  <SelectPlanPopup />
+  <SelectPlanPopup v-if="selectPlansPopup.active" />
 
   <div class="container">
     <div class="types">
@@ -66,10 +66,9 @@ function changeCarrier(cd) {
 }
 
 function selectMvno(item) {
-  selectPlansPopup.carrierType = selectedType.value
+  selectPlansPopup.type = selectedType.value
   selectPlansPopup.carrierCd = item.carrier_cd
   selectPlansPopup.mvnoCd = item.mvno_cd
-
   selectPlansPopup.open()
 }
 

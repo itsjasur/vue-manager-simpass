@@ -7,7 +7,7 @@
         <span @click="popup.close()" class="material-symbols-outlined close-button"> cancel </span>
       </div>
 
-      <div style="margin-top: 10px; width: 100%; height: 100%" ref="embed"></div>
+      <div style="margin-top: 10px; width: 100%; height: calc(100% - 70px)" ref="embed"></div>
     </div>
   </div>
 </template>
@@ -17,9 +17,6 @@ import { onMounted, onUnmounted, ref } from 'vue'
 import { useSearchaddressStore } from '../stores/select-address-popup'
 
 const popup = useSearchaddressStore()
-
-// const emit = defineEmits(['closePopup', 'selectAddress'])
-
 const embed = ref(null)
 
 //this handles keyboard actions

@@ -6,12 +6,10 @@ export const useSelectPlansPopup = defineStore('selectPlansPopup', {
   state: () => ({
     active: false,
 
-    carrierType: 'PO',
-    carrierCd: 'LG',
-    mvnoCd: 'HPM',
+    type: '',
+    carrierCd: '',
+    mvnoCd: '',
     searchText: '',
-
-    selectedPlanInfo: {},
   }),
 
   actions: {
