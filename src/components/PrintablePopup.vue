@@ -7,15 +7,10 @@
       </div>
 
       <div class="scrollable-content">
-        <img
-          class="image"
-          src="https://assets-global.website-files.com/62c67bbf65af229e9075fedf/65e723708e6199ee3a9b35a8_Software-Design-Documentation.png"
-          alt=""
-        />
-        <img class="image" src="https://i.pinimg.com/736x/0f/a3/96/0fa39678dcc01176d67d9d951aae8362.jpg" alt="" />
+        <img v-for="(image, index) in props.base64Images" :key="index" class="image" :src="base64Images[0]" alt="" />
       </div>
 
-      <button class="print-button">
+      <button @click="convertToPdfAndPrint" class="print-button">
         <span class="material-symbols-outlined print-icon"> print </span>
         <span>출력</span>
       </button>
@@ -23,8 +18,60 @@
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+import { ref, defineProps } from 'vue'
+import jsPDF from 'jspdf'
+import { TESTBASE64 } from '../assets/test.js'
+import { usePrintablePopup } from '../stores/printable-popup'
 
+const popup = usePrintablePopup()
+
+const props = defineProps({ base64Images: { type: Array, required: true } })
+
+//this converts base64 images to pdf and then prints pdf
+// using iframe by converting pdf to url
+const convertToPdfAndPrint = () => {
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' })
+
+  const pdfWidth = doc.internal.pageSize.getWidth()
+  const pdfHeight = doc.internal.pageSize.getHeight()
+
+  props.base64Images.forEach((imgData, index) => {
+    const imgProps = doc.getImageProperties(imgData)
+    let imgWidth = pdfWidth
+    let imgHeight = (imgProps.height * pdfWidth) / imgProps.width
+
+    if (imgHeight > pdfHeight) {
+      imgHeight = pdfHeight
+      imgWidth = (imgProps.width * pdfHeight) / imgProps.height
+    }
+
+    const x = (pdfWidth - imgWidth) / 2 // centers the image horizontally
+    const y = (pdfHeight - imgHeight) / 2 // centers the image vertically
+
+    doc.addImage(imgData, 'PNG', x, y, imgWidth, imgHeight)
+
+    if (index < props.base64Images.length - 1) doc.addPage()
+  })
+
+  const pdfBlob = doc.output('blob')
+  const pdfUrl = URL.createObjectURL(pdfBlob)
+
+  const iframe = document.createElement('iframe')
+  iframe.style.display = 'none'
+  document.body.appendChild(iframe)
+
+  //  focus listener handles if focus is back and then cleans up iframe
+  window.addEventListener('focus', handleFocus)
+  function handleFocus() {
+    document.body.removeChild(iframe)
+    window.removeEventListener('focus', handleFocus)
+  }
+
+  iframe.onload = () => iframe.contentWindow.print()
+  iframe.src = pdfUrl
+}
+</script>
 <style scoped>
 .overlay {
   display: flex;
@@ -49,7 +96,7 @@
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-  background-color: #fbfbfb;
+  background-color: #efefef;
   position: relative;
 }
 
@@ -67,19 +114,19 @@
 
 .scrollable-content {
   overflow-y: auto;
-
   display: flex;
   flex-direction: column;
   gap: 30px;
+  padding: 0 20px;
 }
 
 .close-button {
   font-size: 30px;
 }
 
-.image {
+/* .image {
   width: 100%;
-}
+} */
 
 .print-button {
   position: absolute; /* Add this line */
@@ -92,9 +139,9 @@
   align-items: center;
   justify-content: center;
   /* box-sizing: border-box; */
-  padding: 0 20px;
+  padding: 0 30px;
   font-size: 16px;
-  box-shadow: 0 0 5px var(--main-color);
+  box-shadow: 0 0 10px #00000025; /* Bottom shadow */
 }
 
 .print-icon {

@@ -7,8 +7,8 @@ export const SIDEMENUNAMES = [
   '신청서양식 다운로드',
 ]
 
-export const BASEURL = 'http://192.168.0.251:8091/api/'
-// export const BASEURL = 'https://ta.simpass.co.kr/api/'
+// export const BASEURL = 'http://192.168.0.251:8091/api/'
+export const BASEURL = 'https://ta.simpass.co.kr/api/'
 
 export const PLANTYPES = [
   { cd: 'PO', label: '후불' },

@@ -2,7 +2,7 @@
   <SelectPlanPopup v-if="selectPlansPopup.active" />
   <SearchAddressPopup v-if="searchAddressPopup.active" />
   <SignPadPopup v-if="isDrawPadOpen" :type="drawType" @savePads="savePads" @closePopup="isDrawPadOpen = false" />
-  <PrintablePopup />
+  <!-- <PrintablePopup v-if="usePrintablePopup().active" :base64Images="[TESTBASE64, TESTBASE64]" /> -->
 
   <div v-if="isPlanAvailable" class="container">
     <div class="partition">
@@ -196,18 +196,20 @@ import { ref, onMounted, watch, reactive } from 'vue'
 
 import { Select } from 'ant-design-vue'
 import { fetchWithTokenRefresh } from '../utils/tokenUtils'
-import { USIM_FORM_DETAILS, CUSTOMER_FORM_DETAILS, PLANSINFO, PAYMENT_FORM_DETAILS } from '../assets/constants'
+import { USIM_FORM_DETAILS, CUSTOMER_FORM_DETAILS, PLANSINFO, PAYMENT_FORM_DETAILS, BASEURL } from '../assets/constants'
 import { useSelectPlansPopup } from '../stores/select-plans-popup'
+import { usePrintablePopup } from '../stores/printable-popup'
+
 import { useSearchaddressStore } from '../stores/select-address-popup'
 import SelectPlanPopup from '../components/SelectPlanPopup.vue'
 import SearchAddressPopup from '../components/SearchAddressPopup.vue'
 import SignPadPopup from '../components/SignPadPopup.vue'
 import PrintablePopup from '..//components/PrintablePopup.vue'
 
+import { TESTBASE64 } from '../assets/test.js'
+
 //props
-const props = defineProps({
-  id: String,
-})
+const props = defineProps({ id: String })
 
 //if plan with id not found
 const isPlanAvailable = ref(false)
@@ -435,7 +437,7 @@ async function fetchData() {
 
     if (response.ok) {
       const decodedResponse = await response.json()
-      // console.log(decodedResponse)
+      console.log(decodedResponse)
       if (decodedResponse.data) {
         let info = decodedResponse.data
         fetchedData.value = info
@@ -462,6 +464,7 @@ async function fetchData() {
 
 //submit form
 const formSubmitted = ref(false)
+
 const submit = () => {
   formSubmitted.value = true
 
@@ -543,18 +546,23 @@ async function uploadData() {
   fetchForms()
 }
 
+//base64 images come after form is submitted successfully
+const base64Images = ref([])
+
 async function fetchForms() {
   // console.log('fetch forms called')
   // const response = await fetchWithTokenRefresh('agent/actApply', { method: 'POST', body: formData })
   let accessToken = localStorage.getItem('accessToken')
 
-  const response = await fetch('http://192.168.0.251:8091/api/agent/actApply', {
+  const response = await fetch(BASEURL + 'agent/actApply', {
     method: 'POST',
     body: formData,
     headers: { Authorization: `Bearer ${accessToken}` },
   })
-
-  const decodedResponse = await response.json()
+  if (response.ok) {
+    const decodedResponse = await response.json()
+    console.log('response success')
+  }
 
   console.log(decodedResponse)
 }
