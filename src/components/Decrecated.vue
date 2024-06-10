@@ -8,32 +8,26 @@
 
       <div class="scrollable-content">
         <img v-for="(image, index) in imageUrls" :key="index" class="image" :src="image" alt="" loading="lazy" />
+        <!-- below is used to display pdf in the browser -->
+        <!-- <iframe :src="imagePdfUrl" width="100%" height="100%"></iframe> -->
       </div>
-      <button @click="printContent" :disabled="isPrinting" class="print-button">
-        <template v-if="isPrinting">
-          <LoadingSpinner height="20px" color="#ffffff" />
-        </template>
 
-        <template v-else>
-          <span class="material-symbols-outlined print-icon"> print </span>
-          <span>출력</span>
-        </template>
+      <button @click="convertToPdfAndPrint" class="print-button">
+        <span class="material-symbols-outlined print-icon"> print </span>
+        <span>출력</span>
       </button>
     </div>
   </div>
-  <iframe ref="printIframe" style="display: none"></iframe>
 </template>
 
 <script setup>
+import jsPDF from 'jspdf'
 import { onMounted, onUnmounted, ref } from 'vue'
 import { usePrintablePopup } from '../stores/printable-popup'
-import LoadingSpinner from '../components/Loader.vue'
 
 const popup = usePrintablePopup()
+const imagePdfUrl = ref(null)
 const imageUrls = ref([])
-const printIframe = ref(null)
-
-const isPrinting = ref(false)
 
 function base64ToBlob(base64Data) {
   let contentType = 'application/octet-stream' // Default content type
@@ -64,86 +58,64 @@ function blobToURL(blob) {
 // converts base64 to Blob URL
 onMounted(() => {
   imageUrls.value = popup.images.map((image) => blobToURL(base64ToBlob(image)))
-  document.addEventListener('keydown', keydownHandle)
+  convertToPdfAndPrint()
 })
 
-//this handles keyboard actions
-function keydownHandle(event) {
-  if (event.key === 'Escape') {
-    popup.close()
+// // cleans up the Blob URL to avoid memory leaks
+// onUnmounted(() => {
+//   imageUrls.value.forEach((url) => {
+//     URL.revokeObjectURL(url)
+//   })
+//   imageUrls.value = []
+// })
+
+//this converts base64 images to pdf and then prints pdf
+// using iframe by converting pdf to url
+const convertToPdfAndPrint = () => {
+  window.print()
+
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' })
+
+  const pdfWidth = doc.internal.pageSize.getWidth()
+  const pdfHeight = doc.internal.pageSize.getHeight()
+
+  popup.images.forEach((imgData, index) => {
+    const img = doc.getImageProperties(imgData)
+    let imgWidth = pdfWidth
+    let imgHeight = (img.height * pdfWidth) / img.width
+
+    if (imgHeight > pdfHeight) {
+      imgHeight = pdfHeight
+      imgWidth = (img.width * pdfHeight) / img.height
+    }
+
+    const x = (pdfWidth - imgWidth) / 2 // centers the image horizontally
+    const y = (pdfHeight - imgHeight) / 2 // centers the image vertically
+
+    doc.addImage(imgData, 'PNG', x, y, imgWidth, imgHeight)
+
+    if (index < popup.images.length - 1) doc.addPage()
+  })
+
+  const pdfBlob = doc.output('blob')
+  const pdfUrl = URL.createObjectURL(pdfBlob)
+
+  console.log(pdfUrl)
+  imagePdfUrl.value = pdfUrl
+
+  const iframe = document.createElement('iframe')
+  iframe.style.display = 'none'
+  document.body.appendChild(iframe)
+
+  //  focus listener handles if focus is back and then cleans up iframe
+  window.addEventListener('focus', handleFocus)
+  function handleFocus() {
+    document.body.removeChild(iframe)
+    window.removeEventListener('focus', handleFocus)
   }
-}
 
-onUnmounted(() => {
-  popup.close()
-  document.removeEventListener('keydown', keydownHandle)
-})
-
-// Function to print the content
-function printContent() {
-  isPrinting.value = true
-
-  if (!printIframe.value) return
-  const doc = printIframe.value.contentDocument
-  doc.open()
-  doc.write(`
-    <html>
-      <head>
-        <style>
-          @page {
-            size: A4;
-            margin: 0;
-            padding: 0;
-          }
-          body { 
-            margin: 0; 
-            padding: 0; 
-          }
-          .page {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            page-break-after: always;
-          }
-
-          .image-container {
-            max-width: 100%;
-            max-height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-          }
-          img { 
-            max-width: 100%; 
-            max-height: 100%; 
-            object-fit: contain; 
-            display: block;
-          }
-        </style>
-      </head>
-      <body>
-        ${imageUrls.value
-          .map(
-            (url) => `
-          <div class="page">
-            <div class="image-container">
-              <img src="${url}" />
-            </div>
-          </div>
-        `
-          )
-          .join('')}
-      </body>
-    </html>
-  
-  `)
-  doc.close()
-
-  // Wait for images to load before printing
-  printIframe.value.onload = () => {
-    printIframe.value.contentWindow.print()
-  }
-  isPrinting.value = false
+  iframe.onload = () => iframe.contentWindow.print()
+  iframe.src = pdfUrl
 }
 </script>
 <style scoped>
@@ -201,16 +173,15 @@ function printContent() {
 
 .print-button {
   position: absolute; /* Add this line */
-
   bottom: 20px; /* Add this line */
   right: 20px; /* Add this line */
   width: auto;
-  min-width: 150px;
   height: 50px;
   text-align: center;
   display: flex;
   align-items: center;
   justify-content: center;
+  /* box-sizing: border-box; */
   padding: 0 30px;
   font-size: 16px;
   box-shadow: 0 0 10px #00000025; /* Bottom shadow */

@@ -16,10 +16,10 @@
         </div>
         <div style="height: 20px"></div>
         <button type="submit" :disabled="isLoading">
-          <div v-if="isLoading">
+          <span v-if="isLoading">
             <LoadingSpinner height="20px" color="#ffffff" />
-          </div>
-          <div v-else>Login</div>
+          </span>
+          <span v-else>Login</span>
         </button>
       </form>
     </div>
@@ -124,6 +124,8 @@ async function login(event) {
   width: 80%;
   color: #4b4b4b;
   line-height: 1.6;
+  font-size: 14px;
+  text-align: center;
 }
 
 @media (min-width: 768px) {

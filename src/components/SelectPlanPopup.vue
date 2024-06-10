@@ -52,9 +52,8 @@
         </a-table>
 
         <div class="card" v-for="(item, index) in dataList" :key="index">
-          <div class="title">
+          <div class="title" @click="selectPlan(item)">
             <span>{{ item.usim_plan_nm }}</span>
-
             <span class="icon material-symbols-outlined"> arrow_forward_ios </span>
           </div>
 

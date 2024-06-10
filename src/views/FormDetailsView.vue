@@ -2,14 +2,14 @@
   <SelectPlanPopup v-if="selectPlansPopup.active" />
   <SearchAddressPopup v-if="searchAddressPopup.active" />
   <SignPadPopup v-if="isDrawPadOpen" :type="drawType" @savePads="savePads" @closePopup="isDrawPadOpen = false" />
-  <!-- <PrintablePopup v-if="usePrintablePopup().active" :base64Images="[TESTBASE64, TESTBASE64]" /> -->
+  <PrintablePopup v-if="usePrintablePopup().active" />
 
   <div v-if="isPlanAvailable" class="container">
     <div class="partition">
       <template v-if="Object.keys(usimForms).length > 0">
         <div class="title">요금제 정보</div>
         <template v-for="(item, index) in usimForms" :key="index">
-          <div class="group" :style="{ maxWidth: item.width }">
+          <div class="group" :style="{ maxWidth: item.maxwidth }">
             <label>{{ item.label }}</label>
 
             <template v-if="item['type'] === 'select'">
@@ -47,7 +47,43 @@
       <template v-if="Object.keys(customerForms).length > 0">
         <div class="title">고객 정보</div>
         <template v-for="(item, index) in customerForms" :key="index">
-          <div class="group" :style="{ maxWidth: item.width }">
+          <div class="group" :style="{ maxWidth: item.maxwidth }">
+            <label>{{ item.label }}</label>
+
+            <template v-if="item['type'] === 'select'">
+              <a-select
+                v-model:value="item.value"
+                :style="{ width: '100%' }"
+                @change="generateAdditionalForms"
+                :placeholder="item.placeholder"
+                v-bind="inputBindings(index)"
+                :options="
+                  fetchedData[index]?.map((i) => ({ value: i.cd, label: i.value })) ?? [{ value: 'N/A', label: 'N/A' }]
+                "
+              >
+              </a-select>
+            </template>
+
+            <template v-if="item.type === 'input'">
+              <input v-model="item.value" :placeholder="item.placeholder" v-bind="inputBindings(index)" />
+            </template>
+
+            <template v-if="item.type === 'cleave'">
+              <input v-model="item.value" :placeholder="item.placeholder" v-cleave="item.pattern" />
+            </template>
+
+            <p v-if="!item.value && formSubmitted" class="input-error-message">
+              {{ item.error }}
+            </p>
+          </div>
+        </template>
+      </template>
+
+      <!-- Deputy forms -->
+      <template v-if="Object.keys(deputyForms).length > 0">
+        <div class="title">법정대리인</div>
+        <template v-for="(item, index) in deputyForms" :key="index">
+          <div class="group" :style="{ maxWidth: item.maxwidth }">
             <label>{{ item.label }}</label>
 
             <template v-if="item['type'] === 'select'">
@@ -87,7 +123,7 @@
         </div>
 
         <template v-for="(item, index) in paymentForms" :key="index">
-          <div class="group" :style="{ maxWidth: item.width }">
+          <div class="group" :style="{ maxWidth: item.maxwidth }">
             <label>{{ item.label }}</label>
 
             <template v-if="item['type'] === 'select'">
@@ -178,9 +214,12 @@
         </div>
       </template>
 
-      <div class="submit">
-        <button @click="submit">개통 신청/서식출력</button>
-      </div>
+      <button class="submit" @click="submit" :disabled="isSubmitLoading">
+        <span v-if="isSubmitLoading">
+          <LoadingSpinner height="20px" color="#ffffff" />
+        </span>
+        <span v-else> 개통 신청/서식출력</span>
+      </button>
     </div>
   </div>
 
@@ -196,7 +235,14 @@ import { ref, onMounted, watch, reactive } from 'vue'
 
 import { Select } from 'ant-design-vue'
 import { fetchWithTokenRefresh } from '../utils/tokenUtils'
-import { USIM_FORM_DETAILS, CUSTOMER_FORM_DETAILS, PLANSINFO, PAYMENT_FORM_DETAILS, BASEURL } from '../assets/constants'
+import {
+  USIM_FORM_DETAILS,
+  CUSTOMER_FORM_DETAILS,
+  PLANSINFO,
+  PAYMENT_FORM_DETAILS,
+  BASEURL,
+  DEPUTY_FORM_DETAILS,
+} from '../assets/constants'
 import { useSelectPlansPopup } from '../stores/select-plans-popup'
 import { usePrintablePopup } from '../stores/printable-popup'
 
@@ -204,9 +250,10 @@ import { useSearchaddressStore } from '../stores/select-address-popup'
 import SelectPlanPopup from '../components/SelectPlanPopup.vue'
 import SearchAddressPopup from '../components/SearchAddressPopup.vue'
 import SignPadPopup from '../components/SignPadPopup.vue'
-import PrintablePopup from '..//components/PrintablePopup.vue'
-
-import { TESTBASE64 } from '../assets/test.js'
+import PrintablePopup from '../components/PrintablePopup.vue'
+import { convertToPdfAndGetUrl } from '../utils/helpers'
+import LoadingSpinner from '../components/Loader.vue'
+import { useSnackbarStore } from '../stores/snackbar'
 
 //props
 const props = defineProps({ id: String })
@@ -298,6 +345,7 @@ const deleteDocImages = (index) => {
 const usimForms = ref({})
 const customerForms = ref({})
 const paymentForms = ref({})
+const deputyForms = ref({})
 
 //find current plan info
 const currentPlanInfo = () =>
@@ -311,6 +359,7 @@ function generateForms() {
   usimForms.value = {}
   customerForms.value = {}
   paymentForms.value = {}
+  deputyForms.value = {}
 
   for (const item of currentPlanInfo().usimForms) {
     usimForms.value[item] = USIM_FORM_DETAILS[item]
@@ -331,6 +380,9 @@ function generateForms() {
 }
 
 const generateAdditionalForms = () => {
+  //adding deputy forms
+  deputyForms.value = customerForms?.value?.cust_type_cd?.value === 'COL' ? DEPUTY_FORM_DETAILS : {}
+
   //deleting and resetting forms
   delete usimForms.value.mnp_carrier_type
   delete usimForms.value.phone_number
@@ -390,6 +442,11 @@ const defaultSetter = () => {
   for (const key in customerForms.value) {
     if (customerForms.value[key].type === 'select' && customerForms.value[key].hasDefault) {
       customerForms.value[key].value = fetchedData.value?.[key]?.[0]?.cd ?? null
+    }
+    for (const key in deputyForms.value) {
+      if (deputyForms?.value?.key?.type === 'select' && deputyForms.value[key].hasDefault) {
+        deputyForms.value[key].value = fetchedData.value?.[key]?.[0]?.cd ?? null
+      }
     }
   }
 
@@ -457,16 +514,17 @@ async function fetchData() {
       throw new Error('Fetch data error')
     }
   } catch (error) {
-    console.log(error)
-    // useSnackbarStore().showSnackbar(error.toString())
+    useSnackbarStore().showSnackbar(error.toString())
   }
 }
 
 //submit form
 const formSubmitted = ref(false)
+const isSubmitLoading = ref(false)
 
-const submit = () => {
+const submit = async () => {
   formSubmitted.value = true
+  isSubmitLoading.value = true
 
   const usimFormsNotEmpty = Object.entries(usimForms.value).every(([key, field]) => {
     if (key === 'usim_model_list' && !usimModelRequired.value) return true //return true if usimModelRequired is flase
@@ -476,31 +534,45 @@ const submit = () => {
 
   const customerFormsNotEmpty = Object.values(customerForms.value).every((field) => field.value)
   const paymentFormsNotEmpty = Object.values(paymentForms.value).every((field) => field.value)
+  const deputyFormsNotEmpty = Object.values(deputyForms.value).every((field) => field.value)
 
   // //checks if all values are filled
-  const checklist = [usimFormsNotEmpty, customerFormsNotEmpty, paymentFormsNotEmpty]
+  const checklist = [usimFormsNotEmpty, customerFormsNotEmpty, paymentFormsNotEmpty, deputyFormsNotEmpty]
 
-  //if sign after print checked
   if (!signAfterPrintChecked.value) {
-    checklist.push([nameImageData.value && signImageData.value].every(Boolean))
+    //form signs
+    checklist.push([nameImageData.value, signImageData.value].every(Boolean))
 
-    if (!selfRegisterChecked) {
-      checklist.push([paymentNameImageData.value && paymentSignImageData.value].every(Boolean))
+    if (!selfRegisterChecked.value) {
+      //payment signs
+      checklist.push([paymentNameImageData.value, paymentSignImageData.value].every(Boolean))
     }
   }
 
-  // console.log(checklist.every((item) => item === true))
-  uploadData()
+  console.log(checklist.every((item) => item === true))
+
+  if (checklist.every((item) => item === true)) {
+    await fetchForms()
+  } else {
+    useSnackbarStore().showSnackbar('채워지지 않은 필드가 있습니다.')
+  }
+
+  isSubmitLoading.value = false
 }
 
 //FORM DATA REQUEST
 const formData = new FormData()
 
-async function uploadData() {
+async function dataConfigure() {
   //adding files
   for (const file of fileObjects.value) {
     formData.set('attach_files[]', file)
   }
+
+  formData.set('bill_sign', paymentNameImageData.value)
+  formData.set('bill_seal', paymentSignImageData.value)
+  formData.set('apply_sign', nameImageData.value)
+  formData.set('apply_seal', signImageData.value)
 
   formData.set('carrier_type', fetchedData?.value?.usim_plan_info?.carrier_type)
   formData.set('carrier_cd', fetchedData?.value?.usim_plan_info?.carrier_cd)
@@ -542,16 +614,15 @@ async function uploadData() {
   // for (const [key, value] of formData.entries()) {
   //   console.log(key, value)
   // }
-
-  fetchForms()
 }
 
 //base64 images come after form is submitted successfully
 const base64Images = ref([])
+const pdfUrl = ref([])
 
 async function fetchForms() {
-  // console.log('fetch forms called')
-  // const response = await fetchWithTokenRefresh('agent/actApply', { method: 'POST', body: formData })
+  await dataConfigure()
+
   let accessToken = localStorage.getItem('accessToken')
 
   const response = await fetch(BASEURL + 'agent/actApply', {
@@ -559,19 +630,23 @@ async function fetchForms() {
     body: formData,
     headers: { Authorization: `Bearer ${accessToken}` },
   })
+  // console.log(await response.json())
+
   if (response.ok) {
     const decodedResponse = await response.json()
-    console.log('response success')
+    base64Images.value = decodedResponse.data.apply_forms_list
+    // console.log(base64Images.value.length)
+    usePrintablePopup().open(base64Images.value)
+    if (base64Images.value.length > 0) {
+    }
   }
-
-  console.log(decodedResponse)
 }
 </script>
 
 <style scoped>
 .container {
   max-width: 1400px;
-  width: 80%;
+  width: 100%;
   padding: 0 15px;
   box-sizing: border-box;
   display: flex;
@@ -707,6 +782,7 @@ async function fetchForms() {
 }
 
 .submit {
+  height: 45px;
   margin-top: 30px;
   max-width: 200px;
   margin-bottom: 400px;
@@ -719,5 +795,20 @@ async function fetchForms() {
   align-items: center;
 
   height: 100%;
+}
+
+@media (max-width: 768px) {
+  .container {
+    width: 100%;
+  }
+
+  .group {
+    width: auto;
+    /* max-width: 100% !important; */
+  }
+
+  .submit {
+    max-width: 100%;
+  }
 }
 </style>

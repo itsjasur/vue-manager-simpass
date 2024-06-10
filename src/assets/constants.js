@@ -7,8 +7,8 @@ export const SIDEMENUNAMES = [
   '신청서양식 다운로드',
 ]
 
-// export const BASEURL = 'http://192.168.0.251:8091/api/'
-export const BASEURL = 'https://ta.simpass.co.kr/api/'
+export const BASEURL = 'http://192.168.0.251:8091/api/'
+// export const BASEURL = 'https://ta.simpass.co.kr/api/'
 
 export const PLANTYPES = [
   { cd: 'PO', label: '후불' },
@@ -103,6 +103,14 @@ export const PLANSINFO = [
       'account_agency',
       'account_number',
     ],
+
+    // deputyForms: [
+    //   //
+    //   'deputy_name',
+    //   'deputy_birthday',
+    //   'relationship_cd',
+    //   'deputy_contact',
+    // ],
     carriers: [
       {
         code: 'SK',
@@ -160,7 +168,7 @@ export const PLANSINFO = [
               'contact',
               'name',
               'birthday',
-              'gender',
+              'gender_cd',
               'address',
               'addressdetail',
             ],
@@ -279,7 +287,7 @@ export const PAYMENT_FORM_DETAILS = {
   paid_transfer_cd: {
     value: null,
     type: 'select',
-    width: '300px',
+    maxwidth: '300px',
     error: '결제구분 선택하세요.',
     placeholder: '결제구분 선택하세요',
     label: '결제구분',
@@ -287,9 +295,9 @@ export const PAYMENT_FORM_DETAILS = {
   },
 
   account_name: {
-    value: null,
+    value: 'test name',
     type: 'input',
-    width: '300px',
+    maxwidth: '300px',
     error: '예금주명 입력하세요.',
     placeholder: '홍길동',
     label: '예금주명',
@@ -297,14 +305,14 @@ export const PAYMENT_FORM_DETAILS = {
   },
 
   account_birthday: {
-    value: null,
+    value: '99-01-31',
     type: 'cleave',
     pattern: {
       date: true,
       delimiter: '-',
       datePattern: ['y', 'm', 'd'],
     },
-    width: '200px',
+    maxwidth: '200px',
     error: '생년월일 입력하세요.',
     placeholder: '91-01-31',
     label: '예금주 생년월일',
@@ -312,9 +320,9 @@ export const PAYMENT_FORM_DETAILS = {
   },
 
   account_agency: {
-    value: null,
+    value: 'Hana bank',
     type: 'input',
-    width: '300px',
+    maxwidth: '300px',
     error: '은행(카드사)명 입력하세요.',
     placeholder: '하나은행',
     label: '은행(카드사)명',
@@ -322,9 +330,9 @@ export const PAYMENT_FORM_DETAILS = {
   },
 
   account_number: {
-    value: null,
+    value: '1231240293432',
     type: 'input',
-    width: '300px',
+    maxwidth: '300px',
     error: '계좌번호(카드번호) 입력하세요.',
     placeholder: '1234567890',
     label: '계좌번호(카드번호)',
@@ -332,13 +340,13 @@ export const PAYMENT_FORM_DETAILS = {
   },
 
   card_yy_mm: {
-    value: null,
+    value: '11/29',
     type: 'cleave',
     pattern: {
       date: true,
       datePattern: ['m', 'y'],
     },
-    width: '200px',
+    maxwidth: '200px',
     error: '카드유효기간을 정확하게 입력하세요.',
     placeholder: '11/29',
     label: '카드유효기간',
@@ -353,7 +361,7 @@ export const USIM_FORM_DETAILS = {
     //
     value: null,
     type: 'input',
-    width: '400px',
+    maxwidth: '400px',
     error: '요금제을 선택하세요.',
     placeholder: '요금제 선택하세요.',
     label: '요금제',
@@ -363,7 +371,7 @@ export const USIM_FORM_DETAILS = {
   usim_model_list: {
     value: null,
     type: 'select',
-    width: '300px',
+    maxwidth: '300px',
     error: 'USIM 모델명을 선택하세요.',
     placeholder: '모델명을 선택하세요',
     hasDefault: false,
@@ -371,9 +379,9 @@ export const USIM_FORM_DETAILS = {
   },
 
   usim_no: {
-    value: null,
+    value: '1092312983712',
     type: 'input',
-    width: '300px',
+    maxwidth: '300px',
     error: '일련번호 입력하세요.',
     placeholder: '00000000',
     hasDefault: false,
@@ -382,7 +390,7 @@ export const USIM_FORM_DETAILS = {
   usim_fee_cd: {
     value: null,
     type: 'select',
-    width: '300px',
+    maxwidth: '300px',
     error: '유심비용청구을 선택하세요',
     placeholder: '유심비용청구을 선택하세요',
     hasDefault: true,
@@ -392,7 +400,7 @@ export const USIM_FORM_DETAILS = {
   extra_service_cd: {
     value: null,
     type: 'select',
-    width: '300px',
+    maxwidth: '300px',
     error: '부가서비스 선택하세요',
     placeholder: '부가서비스을 선택하세요',
     hasDefault: true,
@@ -403,7 +411,7 @@ export const USIM_FORM_DETAILS = {
     label: '해외데이터로밍',
     value: null,
     type: 'select',
-    width: '300px',
+    maxwidth: '300px',
     error: '해외데이터로밍을 선택하세요.',
     placeholder: '해외데이터로밍을 선택하세요',
     hasDefault: true,
@@ -413,7 +421,7 @@ export const USIM_FORM_DETAILS = {
     label: '해외데이터로밍',
     value: null,
     type: 'select',
-    width: '300px',
+    maxwidth: '300px',
     error: '해외데이터로밍을 선택하세요.',
     placeholder: '해외데이터로밍을 선택하세요',
     hasDefault: true,
@@ -423,7 +431,7 @@ export const USIM_FORM_DETAILS = {
     label: '가입비',
     value: null,
     type: 'select',
-    width: '300px',
+    maxwidth: '300px',
     error: '가입비을 선택하세요.',
     placeholder: '가입비을 선택하세요',
     hasDefault: true,
@@ -432,7 +440,7 @@ export const USIM_FORM_DETAILS = {
     label: '휴대폰결제',
     value: null,
     type: 'select',
-    width: '300px',
+    maxwidth: '300px',
     error: '휴대폰결제을 선택하세요.',
     placeholder: '휴대폰결제을 선택하세요',
     hasDefault: true,
@@ -441,17 +449,17 @@ export const USIM_FORM_DETAILS = {
     label: '개통구분',
     value: null,
     type: 'select',
-    width: '300px',
+    maxwidth: '300px',
     error: '개통구분을 선택하세요.',
     placeholder: '개통구분을 선택하세요',
-    hasDefault: false,
+    hasDefault: true,
   },
 
   wish_number: {
     label: '희망번호',
     value: null,
     type: 'cleave',
-    width: '300px',
+    maxwidth: '300px',
     error: null,
     placeholder: '희망번호',
     hasDefault: false,
@@ -461,14 +469,14 @@ export const USIM_FORM_DETAILS = {
     label: '이동 유형',
     value: null,
     type: 'select',
-    width: '300px',
+    maxwidth: '300px',
     error: '이동 유형을 선택하세요.',
     placeholder: '선불',
     hasDefault: true,
   },
 
   phone_number: {
-    value: null,
+    value: '010-1234-1234',
     type: 'cleave',
     pattern: {
       prefix: '010-',
@@ -476,7 +484,7 @@ export const USIM_FORM_DETAILS = {
       phoneRegionCode: 'KR',
       delimiter: '-',
     },
-    width: '300px',
+    maxwidth: '300px',
     error: '가입/이동 전화번호을 입력하세요.',
     placeholder: '010-0000-0000',
     label: '가입/이동 전화번호',
@@ -487,7 +495,7 @@ export const USIM_FORM_DETAILS = {
     label: '이전통신사',
     value: null,
     type: 'select',
-    width: '300px',
+    maxwidth: '300px',
     error: '이전통신사을 선택하세요.',
     placeholder: '선불',
     hasDefault: false,
@@ -496,7 +504,7 @@ export const USIM_FORM_DETAILS = {
   mnp_pre_carrier_nm: {
     value: null,
     type: 'input',
-    width: '300px',
+    maxwidth: '300px',
     error: '이전 통신사 기타명을 입력하세요.',
     placeholder: '이전 통신사 기타명',
     label: '이전 통신사 기타명',
@@ -509,47 +517,47 @@ export const USIM_FORM_DETAILS = {
 ///
 export const CUSTOMER_FORM_DETAILS = {
   cust_type_cd: {
+    value: null,
     type: 'select',
-    width: '200px',
+    maxwidth: '200px',
     error: '고객유형 선택하세요.',
     placeholder: '고객유형 선택하세요',
-    value: null,
-    hasDefault: false,
+    hasDefault: true,
     label: '고객유형',
   },
 
   contact: {
+    value: '010-1234-1234',
     type: 'cleave',
     pattern: {
       phone: true,
       phoneRegionCode: 'KR',
       delimiter: '-',
     },
-    width: '200px',
+    maxwidth: '200px',
     error: '연락처 입력하세요.',
     placeholder: '010-0000-0000',
-    value: null,
     label: '개통번호외 연락번호',
     hasDefault: true,
   },
 
   country: {
     type: 'input',
-    width: '300px',
+    maxwidth: '300px',
     error: '국적 선택하세요.',
     placeholder: '대한민국',
     hasDefault: true,
-    value: null,
+    value: 'Korea',
     label: '국적',
   },
 
   id_no: {
     //
     type: 'input',
-    width: '200px',
+    maxwidth: '200px',
     error: '신분증번호/여권번호 입력하세요.',
     placeholder: '910131-0000000',
-    value: null,
+    value: '91239128321s',
     hasDefault: true,
     label: '신분증번호/여권번호',
   },
@@ -557,11 +565,11 @@ export const CUSTOMER_FORM_DETAILS = {
   name: {
     //
     type: 'input',
-    width: '500px',
+    maxwidth: '400px',
     error: '가입자명 입력하세요.',
     placeholder: '홍길동',
     hasDefault: true,
-    value: null,
+    value: 'test name',
     label: '가입자명',
   },
 
@@ -573,19 +581,19 @@ export const CUSTOMER_FORM_DETAILS = {
       delimiter: '-',
       datePattern: ['y', 'm', 'd'],
     },
-    width: '200px',
+    maxwidth: '200px',
     hasDefault: true,
     error: '생년월일 입력하세요.',
     placeholder: '91-01-31',
-    value: null,
+    value: '99-01-31',
     label: '생년월일',
   },
 
-  gender: {
+  gender_cd: {
     //
     value: null,
     type: 'select',
-    width: '100px',
+    maxwidth: '100px',
     error: '성별 입력하세요.',
     placeholder: '남',
     hasDefault: true,
@@ -594,9 +602,9 @@ export const CUSTOMER_FORM_DETAILS = {
 
   address: {
     //
-    value: null,
+    value: 'asdasdsa',
     type: 'input',
-    width: '500px',
+    maxwidth: '400px',
     error: '주소 입력하세요.',
     hasDefault: true,
     placeholder: '서울시 구로구 디지털로33길 28',
@@ -605,12 +613,65 @@ export const CUSTOMER_FORM_DETAILS = {
 
   addressdetail: {
     //
-    value: null,
+    value: 'asdas',
     hasDefault: true,
     type: 'input',
-    width: '300px',
+    maxwidth: '300px',
     error: '상세주소 입력하세요.',
     placeholder: '우림이비지센터 1차 1210호',
     label: '상세주소',
+  },
+}
+
+export const DEPUTY_FORM_DETAILS = {
+  deputy_name: {
+    label: '법정대리인 이름',
+    value: null,
+    type: 'input',
+    maxwidth: '400px',
+    error: '법정대리인 이름 입력하세요.',
+    placeholder: '법정대리인 이름',
+    hasDefault: false,
+  },
+
+  deputy_birthday: {
+    type: 'cleave',
+    pattern: {
+      date: true,
+      delimiter: '-',
+      datePattern: ['y', 'm', 'd'],
+    },
+    maxwidth: '200px',
+    hasDefault: true,
+    error: '법정대리인 생년월일 입력하세요.',
+    placeholder: '91-01-31',
+    value: '99-01-31',
+    label: '법정대리인 생년월일',
+  },
+
+  relationship_cd: {
+    //
+    value: null,
+    type: 'select',
+    maxwidth: '100px',
+    error: '관계 선택하세요.',
+    placeholder: '부',
+    hasDefault: true,
+    label: '관계',
+  },
+
+  deputy_contact: {
+    value: '010-1234-1234',
+    type: 'cleave',
+    pattern: {
+      phone: true,
+      phoneRegionCode: 'KR',
+      delimiter: '-',
+    },
+    maxwidth: '200px',
+    error: '대리인 연락처 입력하세요.',
+    placeholder: '010-0000-0000',
+    label: '대리인 연락처',
+    hasDefault: true,
   },
 }

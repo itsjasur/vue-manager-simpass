@@ -18,7 +18,7 @@
 
       <div class="pen-style">
         <span class="title">펜 잉크 멀미: {{ signPenSickness }} </span>
-        <a-slider v-model:value="signPenSickness" :min="0.5" :max="5" :step="0.25" />
+        <a-slider v-model:value="signPenSickness" :min="1" :max="8" :step="1" />
       </div>
 
       <div class="buttons">
@@ -37,7 +37,7 @@ const emit = defineEmits(['savePads', 'closePopup'])
 const props = defineProps(['type', 'userName'])
 
 //pen sickness
-const signPenSickness = ref(2)
+const signPenSickness = ref(4)
 watch(signPenSickness, (newValue) => {
   // destroys old instances (if they exist)
   if (namePad.value) {
