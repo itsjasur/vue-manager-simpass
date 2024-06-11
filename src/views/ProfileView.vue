@@ -84,7 +84,7 @@ const options = [{ value: 'a' }, { value: 'b' }]
 async function fetchProfileData() {
   try {
     const response = await fetchWithTokenRefresh('agent/partnerInfo', {
-      method: 'GET'
+      method: 'GET',
       // body: JSON.stringify(requestModel)
     })
     if (response.ok) {
@@ -133,7 +133,7 @@ onMounted(fetchProfileData)
   align-items: center;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 600px) {
   .container {
     width: 100%;
   }

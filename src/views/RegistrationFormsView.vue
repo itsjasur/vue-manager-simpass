@@ -145,7 +145,7 @@ onMounted(fetchData)
   height: 10%;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 600px) {
   .container {
     flex-direction: column;
   }

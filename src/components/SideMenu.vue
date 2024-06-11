@@ -1,9 +1,7 @@
 <template>
   <div class="side-menu">
     <div class="logo" @click="handleResize()">
-      <router-link to="/home"
-        ><img src="../assets/logo.png" alt="Logo" style="width: 200px" />
-      </router-link>
+      <router-link to="/home"><img src="../assets/logo.png" alt="Logo" style="width: 200px" /> </router-link>
     </div>
     <ul @click="handleResize()">
       <li>
@@ -18,14 +16,12 @@
       </li>
       <li>
         <router-link to="/registration-forms">
-          <span class="material-symbols-outlined"> description </span
-          >{{ SIDEMENUNAMES[2] }}</router-link
+          <span class="material-symbols-outlined"> description </span>{{ SIDEMENUNAMES[2] }}</router-link
         >
       </li>
       <li>
         <router-link to="/rental-forms">
-          <span class="material-symbols-outlined"> demography </span
-          >{{ SIDEMENUNAMES[3] }}</router-link
+          <span class="material-symbols-outlined"> demography </span>{{ SIDEMENUNAMES[3] }}</router-link
         >
       </li>
     </ul>
@@ -38,7 +34,7 @@ import { SIDEMENUNAMES } from '../assets/constants'
 import { useSideMenuStore } from '../stores/side-menu'
 
 const handleResize = () => {
-  if (window.innerWidth <= 767) {
+  if (window.innerWidth <= 960) {
     useSideMenuStore().close()
   }
 }

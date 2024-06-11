@@ -1,47 +1,20 @@
 <template>
-  <div ref="printAble">
-    <h3>Rental registration page</h3>
+  <div class="container">
+    <div class="title">요금제 정보</div>
   </div>
-
-  <button @click="printMe">Print</button>
 </template>
 
-<script setup>
-import { ref } from 'vue'
-const printAble = ref(null)
+<script setup></script>
 
-function printMe() {
-  if (printAble.value) {
-    const iframe = document.createElement('iframe')
-    iframe.style.position = 'absolute'
-    // iframe.style.width = '0px'
-    // iframe.style.height = '0px'
-    // iframe.style.border = 'none'
-    document.body.appendChild(iframe)
+<style scoped>
+.container {
+  max-width: 1400px;
+  width: 100%;
+  padding: 0 15px;
+  box-sizing: border-box;
+  display: flex;
+  flex-flow: column;
 
-    iframe.onload = () => {
-      const doc = iframe.contentWindow.document
-
-      doc.open()
-      doc.write(`
-          <body>
-            ${printAble.value.innerHTML}
-          </body>
-      `)
-      doc.close()
-
-      // iframe.contentWindow.onafterprint = () => {
-      //   console.log('iframe removed')
-      //   // Remove the iframe when printing is done
-      //   document.body.removeChild(iframe)
-      // }
-
-      iframe.contentWindow.focus()
-      iframe.contentWindow.print()
-    }
-
-    // Trigger iframe onload by setting the iframe's src to an empty document first
-    iframe.src = 'about:blank'
-  }
+  margin: 20px 0;
 }
-</script>
+</style>

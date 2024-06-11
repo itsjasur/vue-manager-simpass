@@ -298,13 +298,13 @@ onUnmounted(() => {
   cursor: pointer;
 }
 
-@media (min-width: 767px) {
+@media (min-width: 600px) {
   .card {
     display: none;
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 599px) {
   .table {
     display: none;
   }

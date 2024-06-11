@@ -249,6 +249,7 @@ export const PLANSINFO = [
               'birthday',
               'address',
               'addressdetail',
+              'gender_cd',
             ],
           },
           {
@@ -305,16 +306,19 @@ export const PAYMENT_FORM_DETAILS = {
   },
 
   account_birthday: {
-    value: '99-01-31',
+    value: '1999-01-31',
     type: 'cleave',
     pattern: {
       date: true,
       delimiter: '-',
-      datePattern: ['y', 'm', 'd'],
+      // datePattern: ['y', 'm', 'd'],
+      datePattern: ['Y', 'm', 'd'],
+      dateMin: '1930-01-01',
+      dateMax: getTodaysDate(),
     },
     maxwidth: '200px',
     error: '생년월일 입력하세요.',
-    placeholder: '91-01-31',
+    placeholder: '1991-01-31',
     label: '예금주 생년월일',
     hasDefault: false,
   },
@@ -345,6 +349,7 @@ export const PAYMENT_FORM_DETAILS = {
     pattern: {
       date: true,
       datePattern: ['m', 'y'],
+      dateMin: '06/24',
     },
     maxwidth: '200px',
     error: '카드유효기간을 정확하게 입력하세요.',
@@ -579,18 +584,19 @@ export const CUSTOMER_FORM_DETAILS = {
     pattern: {
       date: true,
       delimiter: '-',
-      datePattern: ['y', 'm', 'd'],
+      datePattern: ['Y', 'm', 'd'],
+      dateMin: '1930-01-01',
+      dateMax: getTodaysDate(),
     },
     maxwidth: '200px',
     hasDefault: true,
     error: '생년월일 입력하세요.',
-    placeholder: '91-01-31',
-    value: '99-01-31',
+    placeholder: '1991-01-31',
+    value: '1999-01-31',
     label: '생년월일',
   },
 
   gender_cd: {
-    //
     value: null,
     type: 'select',
     maxwidth: '100px',
@@ -613,11 +619,11 @@ export const CUSTOMER_FORM_DETAILS = {
 
   addressdetail: {
     //
-    value: 'asdas',
-    hasDefault: true,
+    value: null,
+    hasDefault: false,
     type: 'input',
     maxwidth: '300px',
-    error: '상세주소 입력하세요.',
+    error: null,
     placeholder: '우림이비지센터 1차 1210호',
     label: '상세주소',
   },
@@ -639,13 +645,15 @@ export const DEPUTY_FORM_DETAILS = {
     pattern: {
       date: true,
       delimiter: '-',
-      datePattern: ['y', 'm', 'd'],
+      datePattern: ['Y', 'm', 'd'],
+      dateMin: '1930-01-01',
+      dateMax: getTodaysDate(),
     },
     maxwidth: '200px',
     hasDefault: true,
     error: '법정대리인 생년월일 입력하세요.',
-    placeholder: '91-01-31',
-    value: '99-01-31',
+    placeholder: '1991-01-31',
+    value: '1999-01-31',
     label: '법정대리인 생년월일',
   },
 
@@ -674,4 +682,12 @@ export const DEPUTY_FORM_DETAILS = {
     label: '대리인 연락처',
     hasDefault: true,
   },
+}
+
+function getTodaysDate() {
+  const today = new Date()
+  const year = today.getFullYear()
+  const month = String(today.getMonth() + 1).padStart(2, '0') // Months are 0-indexed
+  const day = String(today.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
 }

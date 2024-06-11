@@ -2,6 +2,7 @@
   <SelectPlanPopup v-if="selectPlansPopup.active" />
   <SearchAddressPopup v-if="searchAddressPopup.active" />
   <SignPadPopup v-if="isDrawPadOpen" :type="drawType" @savePads="savePads" @closePopup="isDrawPadOpen = false" />
+  <AgreePadPopup v-if="isAgreePadOpen" @savePad="saveAgreePad" @closePopup="isAgreePadOpen = false" />
   <PrintablePopup v-if="usePrintablePopup().active" />
 
   <div v-if="isPlanAvailable" class="container">
@@ -212,6 +213,57 @@
             후불이체동의 서명을 하지 않았습니다.
           </p>
         </div>
+
+        <div class="sign-container">
+          <!-- deputy sign container -->
+          <p class="sign-title">법정대리인 서명</p>
+          <div v-if="!deputyNameImageData && !deputySignImageData" @click="addSigns('deputy')" class="singImagesBox">
+            <span class="inner-icon material-symbols-outlined"> stylus_note </span>
+          </div>
+          <div v-else class="singImagesBox">
+            <span @click="deletePads('deputy')" class="delete-icon material-symbols-outlined"> delete </span>
+            <div class="images-row">
+              <img class="image" :src="deputyNameImageData" alt="Signature" />
+              <img class="image" :src="deputySignImageData" alt="Signature" />
+            </div>
+          </div>
+          <p v-if="!deputyNameImageData && !deputySignImageData && formSubmitted" class="input-error-message">
+            법정대리인서명을 하지 않았습니다.
+          </p>
+        </div>
+
+        <div v-if="partnerNeedsToSign" class="sign-container">
+          <!-- deputy sign container -->
+          <p class="sign-title">판매자 서명</p>
+          <div v-if="!partnerNameImageData && !partnerSignImageData" @click="addSigns('partner')" class="singImagesBox">
+            <span class="inner-icon material-symbols-outlined"> stylus_note </span>
+          </div>
+          <div v-else class="singImagesBox">
+            <span @click="deletePads('partner')" class="delete-icon material-symbols-outlined"> delete </span>
+            <div class="images-row">
+              <img class="image" :src="partnerNameImageData" alt="Signature" />
+              <img class="image" :src="partnerSignImageData" alt="Signature" />
+            </div>
+          </div>
+          <p v-if="!partnerNameImageData && !partnerSignImageData && formSubmitted" class="input-error-message">
+            판매자서명을 하지 않았습니다.
+          </p>
+        </div>
+
+        <div class="sign-container">
+          <!-- deputy sign container -->
+          <p class="sign-title">동의합니다.</p>
+          <div v-if="!agreePadData" @click="isAgreePadOpen = true" class="singImagesBox">
+            <span class="inner-icon material-symbols-outlined"> stylus_note </span>
+          </div>
+          <div v-else class="singImagesBox">
+            <span @click="agreePadData = null" class="delete-icon material-symbols-outlined"> delete </span>
+            <div class="images-row">
+              <img class="image" :src="agreePadData" alt="Signature" />
+            </div>
+          </div>
+          <p v-if="!agreePadData && formSubmitted" class="input-error-message">가입약관에 동의하지 않았습니다.</p>
+        </div>
       </template>
 
       <button class="submit" @click="submit" :disabled="isSubmitLoading">
@@ -235,14 +287,8 @@ import { ref, onMounted, watch, reactive } from 'vue'
 
 import { Select } from 'ant-design-vue'
 import { fetchWithTokenRefresh } from '../utils/tokenUtils'
-import {
-  USIM_FORM_DETAILS,
-  CUSTOMER_FORM_DETAILS,
-  PLANSINFO,
-  PAYMENT_FORM_DETAILS,
-  BASEURL,
-  DEPUTY_FORM_DETAILS,
-} from '../assets/constants'
+import { USIM_FORM_DETAILS, CUSTOMER_FORM_DETAILS, PLANSINFO } from '../assets/constants'
+import { PAYMENT_FORM_DETAILS, BASEURL, DEPUTY_FORM_DETAILS } from '../assets/constants'
 import { useSelectPlansPopup } from '../stores/select-plans-popup'
 import { usePrintablePopup } from '../stores/printable-popup'
 
@@ -250,6 +296,7 @@ import { useSearchaddressStore } from '../stores/select-address-popup'
 import SelectPlanPopup from '../components/SelectPlanPopup.vue'
 import SearchAddressPopup from '../components/SearchAddressPopup.vue'
 import SignPadPopup from '../components/SignPadPopup.vue'
+import AgreePadPopup from '../components/AgreePadPopup.vue'
 import PrintablePopup from '../components/PrintablePopup.vue'
 import { convertToPdfAndGetUrl } from '../utils/helpers'
 import LoadingSpinner from '../components/Loader.vue'
@@ -280,10 +327,21 @@ const nameImageData = ref(null)
 const signImageData = ref(null)
 const paymentNameImageData = ref(null)
 const paymentSignImageData = ref(null)
+const deputyNameImageData = ref(null)
+const deputySignImageData = ref(null)
+
+//shows if partner has no sign in profile
+const partnerNeedsToSign = ref(false)
+const partnerNameImageData = ref(null)
+const partnerSignImageData = ref(null)
 
 //draw popup
 const isDrawPadOpen = ref(false)
 const drawType = ref('')
+
+//agre pad
+const isAgreePadOpen = ref(false)
+const agreePadData = ref(null)
 
 const addSigns = (type) => {
   drawType.value = type
@@ -294,9 +352,20 @@ const deletePads = (type) => {
   if (type === 'forms') {
     nameImageData.value = null
     signImageData.value = null
-  } else {
+  }
+  if ((type = 'deputy')) {
+    deputyNameImageData.value = null
+    deputySignImageData.value = null
+  }
+
+  if ((type = 'payment')) {
     paymentNameImageData.value = null
     paymentSignImageData.value = null
+  }
+
+  if ((type = 'partner')) {
+    partnerNameImageData.value = null
+    partnerSignImageData.value = null
   }
 }
 
@@ -304,10 +373,29 @@ const savePads = (type, nameData, signData) => {
   if (type === 'forms') {
     nameImageData.value = nameData
     signImageData.value = signData
-  } else {
+  }
+  if ((type = 'deputy')) {
+    deputyNameImageData.value = nameData
+    deputySignImageData.value = signData
+  }
+  if ((type = 'payment')) {
     paymentNameImageData.value = nameData
     paymentSignImageData.value = signData
   }
+
+  if ((type = 'partner')) {
+    partnerNameImageData.value = nameData
+    partnerSignImageData.value = signData
+  }
+}
+
+const deleteAgreePad = () => {
+  agreePadData.value = null
+}
+
+const saveAgreePad = (padData) => {
+  console.log('agree pad save called')
+  agreePadData.value = padData
 }
 
 //supported docs checkbox and handler
@@ -354,7 +442,7 @@ const currentPlanInfo = () =>
     ?.mvnos.find((mvno) => mvno.code === selectPlansPopup.mvnoCd) //which mvno
 
 //this generates forms
-function generateForms() {
+async function generateForms() {
   //making sure they are empty whenever generateForms called
   usimForms.value = {}
   customerForms.value = {}
@@ -373,6 +461,9 @@ function generateForms() {
     for (const item of postpaidData.paymentForms) {
       paymentForms.value[item] = PAYMENT_FORM_DETAILS[item]
     }
+
+  //partner sign box shows if not Y
+  partnerNeedsToSign.value = fetchedData?.value?.chk_partner_sign !== 'Y'
 
   //default setter should come after additional form generate
   generateAdditionalForms()
@@ -494,7 +585,7 @@ async function fetchData() {
 
     if (response.ok) {
       const decodedResponse = await response.json()
-      console.log(decodedResponse)
+      // console.log(decodedResponse)
       if (decodedResponse.data) {
         let info = decodedResponse.data
         fetchedData.value = info
@@ -532,9 +623,18 @@ const submit = async () => {
     return field.value
   })
 
-  const customerFormsNotEmpty = Object.values(customerForms.value).every((field) => field.value)
-  const paymentFormsNotEmpty = Object.values(paymentForms.value).every((field) => field.value)
-  const deputyFormsNotEmpty = Object.values(deputyForms.value).every((field) => field.value)
+  const customerFormsNotEmpty = Object.values(customerForms.value).every((field) => {
+    if (!field.error) return true // return true if error is not given
+    return field.value
+  })
+  const paymentFormsNotEmpty = Object.values(paymentForms.value).every((field) => {
+    if (!field.error) return true // return true if error is not given
+    return field.value
+  })
+  const deputyFormsNotEmpty = Object.values(deputyForms.value).every((field) => {
+    if (!field.error) return true // return true if error is not given
+    return field.value
+  })
 
   // //checks if all values are filled
   const checklist = [usimFormsNotEmpty, customerFormsNotEmpty, paymentFormsNotEmpty, deputyFormsNotEmpty]
@@ -571,8 +671,12 @@ async function dataConfigure() {
 
   formData.set('bill_sign', paymentNameImageData.value)
   formData.set('bill_seal', paymentSignImageData.value)
+
   formData.set('apply_sign', nameImageData.value)
   formData.set('apply_seal', signImageData.value)
+
+  formData.set('deputy_sign', deputyNameImageData.value)
+  formData.set('deputy_seal', deputySignImageData.value)
 
   formData.set('carrier_type', fetchedData?.value?.usim_plan_info?.carrier_type)
   formData.set('carrier_cd', fetchedData?.value?.usim_plan_info?.carrier_cd)
@@ -586,7 +690,7 @@ async function dataConfigure() {
   //adding customer infos
   for (const key in customerForms.value) {
     if (key == 'birthday') {
-      formData.set(key, customerForms?.value?.[key]?.value?.replace(/-/g, ''))
+      formData.set(key, customerForms?.value?.[key]?.value?.replace(/-/g, '').substring(2))
       continue
     }
 
@@ -596,13 +700,23 @@ async function dataConfigure() {
   //adding payment infos
   for (const key in paymentForms.value) {
     if (key == 'account_birthday') {
-      formData.set(key, paymentForms?.value?.[key]?.value?.replace(/-/g, ''))
+      formData.set(key, paymentForms?.value?.[key]?.value?.replace(/-/g, '').substring(2))
       continue
     }
 
     formData.set(key, paymentForms.value?.[key]?.value)
   }
 
+  //adding deputy infos
+  for (const key in deputyForms.value) {
+    if (key == 'deputy_birthday') {
+      formData.set(key, deputyForms?.value?.[key]?.value?.replace(/-/g, '').substring(2))
+      continue
+    }
+    formData.set(key, deputyForms.value?.[key]?.value)
+  }
+
+  //adding usim infos
   if (usimForms.value?.wish_number && usimForms.value?.wish_number.value) {
     const wishList = usimForms.value?.wish_number?.value?.split(' / ')
     wishList.forEach((item, index) => {
@@ -797,7 +911,7 @@ async function fetchForms() {
   height: 100%;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 600px) {
   .container {
     width: 100%;
   }

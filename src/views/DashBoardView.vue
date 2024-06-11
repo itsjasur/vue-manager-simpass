@@ -29,7 +29,7 @@ import Header from '../components/Header.vue'
 import { useSideMenuStore } from '../stores/side-menu'
 
 const handleResize = () => {
-  if (window.innerWidth <= 767) {
+  if (window.innerWidth <= 960) {
     useSideMenuStore().close()
   }
 }
@@ -90,7 +90,7 @@ onMounted(() => {
 }
 
 /* Media query for mobile devices */
-@media (max-width: 767px) {
+@media (max-width: 960px) {
   .main-content.sideMenuOpen {
     margin-left: 0px;
   }

@@ -3,7 +3,7 @@
     <div class="popup-content">
       <span @click="$emit('closePopup')" class="material-symbols-outlined close-button"> cancel </span>
       <div class="group">
-        <p class="title">고객님 서명(Name)란</p>
+        <p class="title">서명(Name)란</p>
         <div class="canvas-container">
           <div class="overlay-text" :style="nameStyle">{{ overlayText }}</div>
           <!-- <div class="overlay-text">SOBIRJONOV JASURBEK ARISLONBEK UGLI</div> -->
@@ -12,7 +12,7 @@
       </div>
 
       <div class="group">
-        <p class="title">고객님 사인(Sign)란</p>
+        <p class="title">사인(Sign)란</p>
         <canvas class="signCanvas" ref="signCanvas" @mousedown="onBeginSign" @mouseup="onEndSign"></canvas>
       </div>
 
@@ -335,7 +335,7 @@ canvas {
   background-color: var(--main-color);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 600px) {
   .signCanvas {
     width: 100%;
   }

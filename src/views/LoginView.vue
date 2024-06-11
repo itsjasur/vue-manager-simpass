@@ -128,7 +128,7 @@ async function login(event) {
   text-align: center;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 600px) {
   .main {
     background-color: #f0f2f5;
   }

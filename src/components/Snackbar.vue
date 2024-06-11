@@ -38,7 +38,7 @@ const snackbarStore = useSnackbarStore()
 }
 
 /* Desktop styles */
-@media (min-width: 768px) {
+@media (min-width: 600px) {
   .snackbar {
     max-width: 400px;
     min-width: 200px;
