@@ -233,7 +233,7 @@
         </div>
 
         <div v-if="partnerNeedsToSign" class="sign-container">
-          <!-- deputy sign container -->
+          <!-- partner sign container -->
           <p class="sign-title">판매자 서명</p>
           <div v-if="!partnerNameImageData && !partnerSignImageData" @click="addSigns('partner')" class="singImagesBox">
             <span class="inner-icon material-symbols-outlined"> stylus_note </span>
@@ -251,7 +251,7 @@
         </div>
 
         <div class="sign-container">
-          <!-- deputy sign container -->
+          <!-- i agree sign container -->
           <p class="sign-title">동의합니다.</p>
           <div v-if="!agreePadData" @click="isAgreePadOpen = true" class="singImagesBox">
             <span class="inner-icon material-symbols-outlined"> stylus_note </span>
@@ -325,8 +325,10 @@ const signAfterPrintChecked = ref(true)
 //signs image data
 const nameImageData = ref(null)
 const signImageData = ref(null)
+
 const paymentNameImageData = ref(null)
 const paymentSignImageData = ref(null)
+
 const deputyNameImageData = ref(null)
 const deputySignImageData = ref(null)
 
@@ -349,43 +351,48 @@ const addSigns = (type) => {
 }
 
 const deletePads = (type) => {
-  if (type === 'forms') {
-    nameImageData.value = null
-    signImageData.value = null
-  }
-  if ((type = 'deputy')) {
-    deputyNameImageData.value = null
-    deputySignImageData.value = null
-  }
-
-  if ((type = 'payment')) {
-    paymentNameImageData.value = null
-    paymentSignImageData.value = null
-  }
-
-  if ((type = 'partner')) {
-    partnerNameImageData.value = null
-    partnerSignImageData.value = null
+  switch (type) {
+    case 'forms':
+      nameImageData.value = null
+      signImageData.value = null
+      break
+    case 'deputy':
+      deputyNameImageData.value = null
+      deputySignImageData.value = null
+      break
+    case 'payment':
+      paymentNameImageData.value = null
+      paymentSignImageData.value = null
+      break
+    case 'partner':
+      partnerNameImageData.value = null
+      partnerSignImageData.value = null
+      break
+    default:
+      console.error('Invalid pad type:', type)
   }
 }
 
 const savePads = (type, nameData, signData) => {
-  if (type === 'forms') {
-    nameImageData.value = nameData
-    signImageData.value = signData
-  }
-  if ((type = 'deputy')) {
-    deputyNameImageData.value = nameData
-    deputySignImageData.value = signData
-  }
-  if ((type = 'payment')) {
-    paymentNameImageData.value = nameData
-    paymentSignImageData.value = signData
-  }
-
-  if ((type = 'partner')) {
-    partnerNameImageData.value = nameData
-    partnerSignImageData.value = signData
+  switch (type) {
+    case 'forms':
+      nameImageData.value = nameData
+      signImageData.value = signData
+      break
+    case 'deputy':
+      deputyNameImageData.value = nameData
+      deputySignImageData.value = signData
+      break
+    case 'payment':
+      paymentNameImageData.value = nameData
+      paymentSignImageData.value = signData
+      break
+    case 'partner':
+      partnerNameImageData.value = nameData
+      partnerSignImageData.value = signData
+      break
+    default:
+      console.error('Invalid pad type:', type)
   }
 }
 
@@ -677,6 +684,8 @@ async function dataConfigure() {
 
   formData.set('deputy_sign', deputyNameImageData.value)
   formData.set('deputy_seal', deputySignImageData.value)
+
+  formData.set('agree_sign', agreePadData.value)
 
   formData.set('carrier_type', fetchedData?.value?.usim_plan_info?.carrier_type)
   formData.set('carrier_cd', fetchedData?.value?.usim_plan_info?.carrier_cd)

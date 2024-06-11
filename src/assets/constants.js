@@ -282,6 +282,8 @@ export const PLANSINFO = [
   },
 ]
 
+import * as cleavePatterns from '../utils/cleavePatterns'
+
 export const PAYMENT_FORM_DETAILS = {
   //USIM INFO
 
@@ -308,14 +310,7 @@ export const PAYMENT_FORM_DETAILS = {
   account_birthday: {
     value: '1999-01-31',
     type: 'cleave',
-    pattern: {
-      date: true,
-      delimiter: '-',
-      // datePattern: ['y', 'm', 'd'],
-      datePattern: ['Y', 'm', 'd'],
-      dateMin: '1930-01-01',
-      dateMax: getTodaysDate(),
-    },
+    pattern: cleavePatterns.birthdayPattern(),
     maxwidth: '200px',
     error: '생년월일 입력하세요.',
     placeholder: '1991-01-31',
@@ -581,13 +576,7 @@ export const CUSTOMER_FORM_DETAILS = {
   birthday: {
     //
     type: 'cleave',
-    pattern: {
-      date: true,
-      delimiter: '-',
-      datePattern: ['Y', 'm', 'd'],
-      dateMin: '1930-01-01',
-      dateMax: getTodaysDate(),
-    },
+    pattern: cleavePatterns.birthdayPattern(),
     maxwidth: '200px',
     hasDefault: true,
     error: '생년월일 입력하세요.',
@@ -642,13 +631,7 @@ export const DEPUTY_FORM_DETAILS = {
 
   deputy_birthday: {
     type: 'cleave',
-    pattern: {
-      date: true,
-      delimiter: '-',
-      datePattern: ['Y', 'm', 'd'],
-      dateMin: '1930-01-01',
-      dateMax: getTodaysDate(),
-    },
+    pattern: cleavePatterns.birthdayPattern(),
     maxwidth: '200px',
     hasDefault: true,
     error: '법정대리인 생년월일 입력하세요.',
@@ -682,12 +665,4 @@ export const DEPUTY_FORM_DETAILS = {
     label: '대리인 연락처',
     hasDefault: true,
   },
-}
-
-function getTodaysDate() {
-  const today = new Date()
-  const year = today.getFullYear()
-  const month = String(today.getMonth() + 1).padStart(2, '0') // Months are 0-indexed
-  const day = String(today.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
 }

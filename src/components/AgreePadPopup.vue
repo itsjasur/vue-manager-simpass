@@ -16,7 +16,7 @@
 
       <div class="pen-style">
         <span class="title">펜 잉크 멀미: {{ signPenSickness }} </span>
-        <a-slider v-model:value="signPenSickness" :min="1" :max="8" :step="1" />
+        <a-slider v-model:value="signPenSickness" :min="1" :max="5" :step="0.5" />
       </div>
 
       <div class="buttons">
