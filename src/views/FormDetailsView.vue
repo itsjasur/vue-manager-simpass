@@ -1,9 +1,16 @@
 <template>
   <SelectPlanPopup v-if="selectPlansPopup.active" />
   <SearchAddressPopup v-if="searchAddressPopup.active" />
-  <SignPadPopup v-if="isDrawPadOpen" :type="drawType" @savePads="savePads" @closePopup="isDrawPadOpen = false" />
   <AgreePadPopup v-if="isAgreePadOpen" @savePad="saveAgreePad" @closePopup="isAgreePadOpen = false" />
   <PrintablePopup v-if="usePrintablePopup().active" />
+
+  <SignPadPopup
+    v-if="isDrawPadOpen"
+    :type="drawType"
+    :userName="nameForPad"
+    @savePads="savePads"
+    @closePopup="isDrawPadOpen = false"
+  />
 
   <div v-if="isPlanAvailable" class="container">
     <div class="partition">
@@ -81,7 +88,7 @@
       </template>
 
       <!-- Deputy forms -->
-      <template v-if="Object.keys(deputyForms).length > 0">
+      <template v-if="deputyAvailable && Object.keys(deputyForms).length > 0">
         <div class="title">법정대리인</div>
         <template v-for="(item, index) in deputyForms" :key="index">
           <div class="group" :style="{ maxWidth: item.maxwidth }">
@@ -178,8 +185,8 @@
         >신청서 프린트 인쇄후 서명/사인 자필</a-checkbox
       >
       <template v-if="!signAfterPrintChecked">
+        <!-- form sign container -->
         <div class="sign-container">
-          <!-- form sign container -->
           <p class="sign-title">가입자 서명</p>
           <div v-if="!nameImageData && !signImageData" @click="addSigns('forms')" class="singImagesBox">
             <span class="inner-icon material-symbols-outlined"> stylus_note </span>
@@ -214,8 +221,8 @@
           </p>
         </div>
 
-        <div class="sign-container">
-          <!-- deputy sign container -->
+        <!-- deputy sign container -->
+        <div v-if="deputyAvailable" class="sign-container">
           <p class="sign-title">법정대리인 서명</p>
           <div v-if="!deputyNameImageData && !deputySignImageData" @click="addSigns('deputy')" class="singImagesBox">
             <span class="inner-icon material-symbols-outlined"> stylus_note </span>
@@ -232,8 +239,8 @@
           </p>
         </div>
 
+        <!-- partner sign container -->
         <div v-if="partnerNeedsToSign" class="sign-container">
-          <!-- partner sign container -->
           <p class="sign-title">판매자 서명</p>
           <div v-if="!partnerNameImageData && !partnerSignImageData" @click="addSigns('partner')" class="singImagesBox">
             <span class="inner-icon material-symbols-outlined"> stylus_note </span>
@@ -250,8 +257,8 @@
           </p>
         </div>
 
-        <div class="sign-container">
-          <!-- i agree sign container -->
+        <!-- i agree sign container -->
+        <div v-if="shouldShowAgreeContent" class="sign-container">
           <p class="sign-title">동의합니다.</p>
           <div v-if="!agreePadData" @click="isAgreePadOpen = true" class="singImagesBox">
             <span class="inner-icon material-symbols-outlined"> stylus_note </span>
@@ -283,7 +290,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, reactive } from 'vue'
+import { ref, onMounted, watch, reactive, nextTick } from 'vue'
 
 import { Select } from 'ant-design-vue'
 import { fetchWithTokenRefresh } from '../utils/tokenUtils'
@@ -310,8 +317,6 @@ const isPlanAvailable = ref(false)
 
 // weather usim model needs to be checked
 const usimModelRequired = ref(false)
-
-// console.log('THIS IS PROPS VALUE: ', props.id)
 
 //popup init
 const selectPlansPopup = useSelectPlansPopup()
@@ -340,14 +345,31 @@ const partnerSignImageData = ref(null)
 //draw popup
 const isDrawPadOpen = ref(false)
 const drawType = ref('')
+const nameForPad = ref('')
 
 //agre pad
+const shouldShowAgreeContent = ref(false)
 const isAgreePadOpen = ref(false)
 const agreePadData = ref(null)
 
 const addSigns = (type) => {
   drawType.value = type
   isDrawPadOpen.value = true
+
+  //which name to show on name pad
+  switch (type) {
+    case 'forms':
+      nameForPad.value = customerForms?.value?.name?.value ?? ''
+      break
+
+    case 'deputy':
+      nameForPad.value = deputyForms?.value?.deputy_name?.value ?? ''
+      break
+
+    case 'payment':
+      nameForPad.value = paymentForms?.value?.account_name?.value ?? ''
+      break
+  }
 }
 
 const deletePads = (type) => {
@@ -396,15 +418,8 @@ const savePads = (type, nameData, signData) => {
   }
 }
 
-const deleteAgreePad = () => {
-  agreePadData.value = null
-}
-
-const saveAgreePad = (padData) => {
-  console.log('agree pad save called')
-  agreePadData.value = padData
-}
-
+const deleteAgreePad = () => (agreePadData.value = null)
+const saveAgreePad = (padData) => (agreePadData.value = padData)
 //supported docs checkbox and handler
 const supportedImagesChecked = ref(true)
 // this handles file upload
@@ -413,7 +428,6 @@ const supportedImages = ref([])
 //  a ref for storing File objects
 const fileObjects = ref([])
 const handleFileUpload = async (event) => {
-  fileObjects.value = []
   const selectedFiles = event.target.files
   for (let i = 0; i < selectedFiles.length; i++) {
     fileObjects.value.push(selectedFiles[i])
@@ -442,11 +456,17 @@ const customerForms = ref({})
 const paymentForms = ref({})
 const deputyForms = ref({})
 
+//weather to show or hide deputy forms
+const deputyAvailable = ref(false)
+
 //find current plan info
 const currentPlanInfo = () =>
   PLANSINFO.find((item) => item.code === selectPlansPopup.type) // which type (postpaid or prepaid)
     ?.carriers.find((carrier) => carrier.code === selectPlansPopup.carrierCd) // which carrier
     ?.mvnos.find((mvno) => mvno.code === selectPlansPopup.mvnoCd) //which mvno
+
+//fetched data ref
+const fetchedData = ref({})
 
 //this generates forms
 async function generateForms() {
@@ -454,7 +474,6 @@ async function generateForms() {
   usimForms.value = {}
   customerForms.value = {}
   paymentForms.value = {}
-  deputyForms.value = {}
 
   for (const item of currentPlanInfo().usimForms) {
     usimForms.value[item] = USIM_FORM_DETAILS[item]
@@ -470,17 +489,24 @@ async function generateForms() {
     }
 
   //partner sign box shows if not Y
-  partnerNeedsToSign.value = fetchedData?.value?.chk_partner_sign !== 'Y'
+  partnerNeedsToSign.value = fetchedData?.value?.chk_partner_sign === 'N'
+
+  //should we show the agree image signer
+  shouldShowAgreeContent.value = fetchedData?.value?.usim_plan_info?.mvno_cd === 'UPM'
 
   //default setter should come after additional form generate
   generateAdditionalForms()
-  defaultSetter()
 }
 
-const generateAdditionalForms = () => {
+const generateAdditionalForms = async () => {
   //adding deputy forms
-  deputyForms.value = customerForms?.value?.cust_type_cd?.value === 'COL' ? DEPUTY_FORM_DETAILS : {}
-
+  if (customerForms?.value?.cust_type_cd?.value === 'COL') {
+    deputyAvailable.value = true
+    deputyForms.value = DEPUTY_FORM_DETAILS
+  } else {
+    deputyAvailable.value = false
+    deputyForms.value = {}
+  }
   //deleting and resetting forms
   delete usimForms.value.mnp_carrier_type
   delete usimForms.value.phone_number
@@ -521,10 +547,9 @@ const generateAdditionalForms = () => {
   if (paymentForms.value.paid_transfer_cd && paymentForms.value.paid_transfer_cd.value === 'C') {
     paymentForms.value.card_yy_mm = PAYMENT_FORM_DETAILS.card_yy_mm
   }
-}
 
-//fetched data ref
-const fetchedData = ref({})
+  defaultSetter()
+}
 
 // Iterating over usimForms/customerforms to set default values based on fetchData
 const defaultSetter = () => {
@@ -532,24 +557,40 @@ const defaultSetter = () => {
     if (key === 'usim_plan_nm') {
       usimForms.value.usim_plan_nm.value = fetchedData.value.usim_plan_info?.usim_plan_nm ?? ''
     }
-    if (usimForms.value[key].type === 'select' && usimForms.value[key].hasDefault) {
+    if (
+      usimForms.value[key].value === null &&
+      usimForms.value[key].type === 'select' &&
+      usimForms.value[key].hasDefault
+    ) {
       usimForms.value[key].value = fetchedData.value?.[key]?.[0]?.cd ?? null
     }
   }
 
   for (const key in customerForms.value) {
-    if (customerForms.value[key].type === 'select' && customerForms.value[key].hasDefault) {
+    if (
+      customerForms.value[key].value === null &&
+      customerForms.value[key].type === 'select' &&
+      customerForms.value[key].hasDefault
+    ) {
       customerForms.value[key].value = fetchedData.value?.[key]?.[0]?.cd ?? null
     }
-    for (const key in deputyForms.value) {
-      if (deputyForms?.value?.key?.type === 'select' && deputyForms.value[key].hasDefault) {
-        deputyForms.value[key].value = fetchedData.value?.[key]?.[0]?.cd ?? null
-      }
+  }
+  for (const key in deputyForms.value) {
+    if (
+      deputyForms.value[key].value === null &&
+      deputyForms.value[key].type === 'select' &&
+      deputyForms.value[key].hasDefault
+    ) {
+      deputyForms.value[key].value = fetchedData.value?.[key]?.[0]?.cd ?? null
     }
   }
 
   for (const key in paymentForms.value) {
-    if (paymentForms.value[key].type === 'select' && paymentForms.value[key].hasDefault) {
+    if (
+      paymentForms.value[key].value === null &&
+      paymentForms.value[key].type === 'select' &&
+      paymentForms.value[key].hasDefault
+    ) {
       paymentForms.value[key].value = fetchedData.value?.[key]?.[0]?.cd ?? null
     }
   }
@@ -572,6 +613,13 @@ watch(() => [selectPlansPopup.type, selectPlansPopup.mvnoCd, selectPlansPopup.ca
 
 //bindings for forms
 const inputBindings = (item) => {
+  if (item === 'name')
+    return { onInput: () => (customerForms.value[item].value = customerForms.value[item].value.toUpperCase()) }
+  if (item === 'account_name')
+    return { onInput: () => (paymentForms.value[item].value = paymentForms.value[item].value.toUpperCase()) }
+  if (item === 'deputy_name')
+    return { onInput: () => (deputyForms.value[item].value = deputyForms.value[item].value.toUpperCase()) }
+
   if (item === 'usim_plan_nm') return { onClick: (event) => selectPlansPopup.open(), readonly: true }
   if (item === 'address') return { onClick: () => searchAddressPopup.open(), readonly: true }
 
@@ -650,9 +698,17 @@ const submit = async () => {
     //form signs
     checklist.push([nameImageData.value, signImageData.value].every(Boolean))
 
+    //payment signs
     if (!selfRegisterChecked.value) {
-      //payment signs
       checklist.push([paymentNameImageData.value, paymentSignImageData.value].every(Boolean))
+    }
+
+    if (shouldShowAgreeContent) {
+      checklist.push(agreePadData.value ? true : false)
+    }
+
+    if (deputyAvailable) {
+      checklist.push([deputyNameImageData.value, deputySignImageData.value].every(Boolean))
     }
   }
 
@@ -698,8 +754,12 @@ async function dataConfigure() {
 
   //adding customer infos
   for (const key in customerForms.value) {
-    if (key == 'birthday') {
+    if (key === 'birthday') {
       formData.set(key, customerForms?.value?.[key]?.value?.replace(/-/g, '').substring(2))
+      continue
+    }
+    if (key === 'address') {
+      formData.set(key, customerForms?.value?.[key].value + customerForms?.value?.['addressdetail'].value)
       continue
     }
 
@@ -708,7 +768,7 @@ async function dataConfigure() {
 
   //adding payment infos
   for (const key in paymentForms.value) {
-    if (key == 'account_birthday') {
+    if (key === 'account_birthday') {
       formData.set(key, paymentForms?.value?.[key]?.value?.replace(/-/g, '').substring(2))
       continue
     }
@@ -718,7 +778,7 @@ async function dataConfigure() {
 
   //adding deputy infos
   for (const key in deputyForms.value) {
-    if (key == 'deputy_birthday') {
+    if (key === 'deputy_birthday') {
       formData.set(key, deputyForms?.value?.[key]?.value?.replace(/-/g, '').substring(2))
       continue
     }
@@ -746,22 +806,21 @@ const pdfUrl = ref([])
 async function fetchForms() {
   await dataConfigure()
 
-  let accessToken = localStorage.getItem('accessToken')
+  try {
+    const response = await fetchWithTokenRefresh('agent/actApply', { method: 'POST', body: formData })
 
-  const response = await fetch(BASEURL + 'agent/actApply', {
-    method: 'POST',
-    body: formData,
-    headers: { Authorization: `Bearer ${accessToken}` },
-  })
-  // console.log(await response.json())
-
-  if (response.ok) {
-    const decodedResponse = await response.json()
-    base64Images.value = decodedResponse.data.apply_forms_list
-    // console.log(base64Images.value.length)
-    usePrintablePopup().open(base64Images.value)
-    if (base64Images.value.length > 0) {
+    if (response.ok) {
+      const decodedResponse = await response.json()
+      base64Images.value = decodedResponse.data.apply_forms_list
+      // console.log(base64Images.value.length)
+      if (base64Images.value.length > 0) {
+        usePrintablePopup().open(base64Images.value)
+      }
+    } else {
+      throw new Error('Could not fetch image data')
     }
+  } catch (error) {
+    useSnackbarStore().showSnackbar(error.toString())
   }
 }
 </script>
@@ -916,7 +975,6 @@ async function fetchForms() {
   flex-flow: column;
   justify-content: center;
   align-items: center;
-
   height: 100%;
 }
 

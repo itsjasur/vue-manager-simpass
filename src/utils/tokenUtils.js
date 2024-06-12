@@ -47,14 +47,11 @@ export async function fetchWithTokenRefresh(url, options) {
   let fullUrl = BASEURL + url
   let accessToken = localStorage.getItem('accessToken')
 
-  options.headers = {
-    // 'Content-Type': type === 'formData' ? 'multipart/form-data' : 'application/json',
-    Authorization: `Bearer ${accessToken}`,
-  }
+  options.headers = { Authorization: `Bearer ${accessToken}` }
 
   // console.log('request body', options.body)
 
-  if (options.method === 'POST' && options.body) {
+  if (options.method === 'POST' && options.body && !(options.body instanceof FormData)) {
     options.body = JSON.stringify(options.body)
   }
 

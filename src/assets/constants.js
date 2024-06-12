@@ -262,7 +262,7 @@ export const PLANSINFO = [
               'usim_no',
               'usim_fee_cd',
               'extra_service_cd',
-              'data_block_cd',
+              'data_roming_block_cd',
               'usim_act_cd',
               // 'wish_number',
             ],
@@ -298,7 +298,7 @@ export const PAYMENT_FORM_DETAILS = {
   },
 
   account_name: {
-    value: 'test name',
+    value: 'TEST NAME',
     type: 'input',
     maxwidth: '300px',
     error: '예금주명 입력하세요.',
@@ -569,7 +569,7 @@ export const CUSTOMER_FORM_DETAILS = {
     error: '가입자명 입력하세요.',
     placeholder: '홍길동',
     hasDefault: true,
-    value: 'test name',
+    value: 'TEST NAME',
     label: '가입자명',
   },
 
@@ -663,6 +663,6 @@ export const DEPUTY_FORM_DETAILS = {
     error: '대리인 연락처 입력하세요.',
     placeholder: '010-0000-0000',
     label: '대리인 연락처',
-    hasDefault: true,
+    hasDefault: false,
   },
 }

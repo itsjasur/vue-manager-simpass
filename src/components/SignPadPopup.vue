@@ -2,18 +2,19 @@
   <div class="overlay">
     <div class="popup-content">
       <span @click="$emit('closePopup')" class="material-symbols-outlined close-button"> cancel </span>
-      <div class="group">
+      <div>
         <p class="title">서명(Name)란</p>
-        <div class="canvas-container">
-          <div class="overlay-text" :style="nameStyle">{{ overlayText }}</div>
-          <!-- <div class="overlay-text">SOBIRJONOV JASURBEK ARISLONBEK UGLI</div> -->
-          <canvas class="nameCanvas" ref="nameCanvas" @mousedown="onBeginName" @mouseup="onEndName"></canvas>
+        <div class="canvas-container name">
+          <span class="overlay-text" :style="nameStyle">{{ overlayText }}</span>
+          <canvas ref="nameCanvas" @mousedown="onBeginName" @mouseup="onEndName"></canvas>
         </div>
       </div>
 
-      <div class="group">
+      <div>
         <p class="title">사인(Sign)란</p>
-        <canvas class="signCanvas" ref="signCanvas" @mousedown="onBeginSign" @mouseup="onEndSign"></canvas>
+        <div class="canvas-container sign">
+          <canvas ref="signCanvas" @mousedown="onBeginSign" @mouseup="onEndSign"></canvas>
+        </div>
       </div>
 
       <div class="pen-style">
@@ -56,9 +57,9 @@ watch(signPenSickness, (newValue) => {
 
 //PLACEHOLDER NAME
 const nameStyle = ref()
-const overlayText = ref('홍길동')
+const overlayText = ref(props.userName ?? '')
 // overlayText.value = 'SOBIRJONOV JASURBEK'
-// overlayText.value = 'SOBIRJONOV JASURBEK ARISLONBEK UGLI'
+// overlayText.value = 'SOBIRJONOV JASURBEK ARISLONBEK UGLI '
 
 console.log(overlayText.value.length)
 
@@ -95,7 +96,7 @@ const setNameStyle = () => {
     }
     if (length >= 20 && length < 40) {
       nameStyle.value = {
-        fontSize: '8vw',
+        fontSize: '8.5vw',
         letterSpacing: '3px',
       }
     }
@@ -110,7 +111,7 @@ const setNameStyle = () => {
 
     if (length <= 4) {
       nameStyle.value = {
-        fontSize: '130px',
+        fontSize: '150px',
         letterSpacing: '10px',
       }
     }
@@ -256,7 +257,8 @@ const savePads = () => {
   gap: 20px;
   position: relative;
   height: 100%;
-  max-height: 800px;
+  max-height: 1000px;
+  height: 100%;
   overflow: auto;
 }
 
@@ -266,35 +268,40 @@ const savePads = () => {
 
 .canvas-container {
   position: relative;
-  width: 100%;
-}
-
-.overlay-text {
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: #000000; /* Set the desired text color */
-  font-weight: 900;
-  padding: 0 10px;
-  pointer-events: none; /* Makes the text non-interactive */
-  white-space: normal; /* Allow text to wrap */
+  padding: 10px;
+  box-sizing: border-box;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.canvas-container.name {
+  width: 100%;
+  height: 300px;
+}
+
+.canvas-container.sign {
+  width: 60%;
+  height: 300px;
+}
+
+.overlay-text {
+  pointer-events: none !important;
+  white-space: normal; /* Allow text to wrap */
   box-sizing: border-box;
   overflow: hidden;
-  /* text-align: center; */
+  color: #00000010; /* Set the desired text color */
+  font-weight: 900;
 }
 
 canvas {
-  width: 100%;
-  height: 250px;
+  position: absolute;
   border-radius: 3px;
-  background-color: #f1f1f1ee;
-  position: relative; /* Add this line */
+  background-color: #00000012;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .close-button {
@@ -304,10 +311,6 @@ canvas {
   color: #333;
   font-size: 30px;
   cursor: pointer;
-}
-
-.signCanvas {
-  width: 60%;
 }
 
 .title {
@@ -336,8 +339,8 @@ canvas {
 }
 
 @media (max-width: 600px) {
-  .signCanvas {
-    width: 100%;
+  .canvas-container {
+    width: 100% !important;
   }
 }
 </style>
