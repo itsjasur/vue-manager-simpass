@@ -1,5 +1,7 @@
 <template>
-  {{ title }}
+  <span>
+    {{ title }}
+  </span>
 </template>
 
 <script setup>
@@ -28,9 +30,17 @@ const title = computed(() => {
   if (route.path === '/applications') {
     return SIDEMENUNAMES[4]
   }
+  if (route.path === '/download-forms') {
+    return SIDEMENUNAMES[5]
+  }
 
   return 'Nothing'
 })
 </script>
 
-<style scoped></style>
+<style scoped>
+span {
+  font-size: 16px;
+  font-weight: 600;
+}
+</style>

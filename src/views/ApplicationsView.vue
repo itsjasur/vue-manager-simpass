@@ -49,7 +49,15 @@
         </template>
       </a-pagination>
 
-      <a-table class="table" :columns="columns" :data-source="dataList" bordered :pagination="false" size="middle">
+      <a-table
+        class="table"
+        :columns="columns"
+        :data-source="dataList"
+        bordered
+        :pagination="false"
+        size="middle"
+        :showSorterTooltip="false"
+      >
         <template #bodyCell="{ column, text, record }">
           <template v-if="column.dataIndex === 'usim_act_status'">
             <span :class="['status-' + text, 'status-default']">
@@ -125,7 +133,6 @@ import { useSnackbarStore } from '../stores/snackbar'
 import { fetchWithTokenRefresh } from '../utils/tokenUtils'
 import PrintablePopup from '../components/PrintablePopup.vue'
 import { usePrintablePopup } from '../stores/printable-popup'
-import router from '../router'
 
 const printPopup = usePrintablePopup()
 
@@ -225,7 +232,6 @@ const fetchData = async () => {
     useSnackbarStore().showSnackbar(error.toString())
   }
 }
-onMounted(fetchData)
 
 const fetchAndOpenFile = async (actNo) => {
   // console.log('fetch and open called')
@@ -251,6 +257,8 @@ const fetchAndOpenFile = async (actNo) => {
 
   //here printable popup opens
 }
+
+onMounted(fetchData)
 </script>
 
 <style scoped>

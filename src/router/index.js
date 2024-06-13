@@ -9,7 +9,8 @@ import ProfileView from '../views/ProfileView.vue'
 import FormDetailsView from '../views/FormDetailsView.vue'
 import NotFoundView from '../views/NotFoundView.vue'
 import RentalRegistrationView from '../views/RentalFormsView.vue'
-import Applications from '../views/Applications.vue'
+import ApplicationsView from '../views/ApplicationsView.vue'
+import DownloadForms from '../views/DownloadForms.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -22,7 +23,6 @@ const router = createRouter({
         requiresAuth: false, // No authentication required
       },
     },
-
     {
       path: '/',
       name: 'dashboard',
@@ -66,7 +66,6 @@ const router = createRouter({
           },
           props: true,
         },
-
         {
           path: '/rental-forms',
           name: 'rental-forms',
@@ -78,22 +77,29 @@ const router = createRouter({
         {
           path: '/applications',
           name: 'applications',
-          component: Applications,
+          component: ApplicationsView,
+          meta: {
+            requiresAuth: true,
+          },
+        },
+
+        {
+          path: '/download-forms',
+          name: 'download-forms',
+          component: DownloadForms,
           meta: {
             requiresAuth: true,
           },
         },
       ],
     },
-
-    // this catchs any route
+    // this catchs any  route
     {
       // path: '/:pathMatch(.*)*',
       path: '/:catchAll(.*)',
       name: 'NotFound',
       component: NotFoundView,
     },
-
     // {
     //   path: '/about',
     //   name: 'about',

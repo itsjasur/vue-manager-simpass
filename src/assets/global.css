@@ -21,6 +21,7 @@ button {
   cursor: pointer;
   transition: background-color 0.3s;
   font-size: 15px;
+  user-select: none; /* unselectable */
 }
 
 button:disabled {
@@ -41,6 +42,7 @@ button:hover:enabled {
   color: #fff;
   text-align: center;
   align-content: center;
+  user-select: none; /* unselectable */
 }
 
 .button.selected {

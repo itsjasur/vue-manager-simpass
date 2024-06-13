@@ -30,6 +30,12 @@
           <span class="material-symbols-outlined"> checklist_rtl </span>{{ SIDEMENUNAMES[4] }}</router-link
         >
       </li>
+
+      <li>
+        <router-link to="/download-forms">
+          <span class="material-symbols-outlined"> file_save </span>{{ SIDEMENUNAMES[5] }}</router-link
+        >
+      </li>
     </ul>
   </div>
 </template>
@@ -71,7 +77,7 @@ ul li {
   display: flex; /* Add this line */
 }
 li span {
-  font-size: 24px;
+  font-size: 22px;
   padding-right: 10px;
 }
 ul li .router-link-active {

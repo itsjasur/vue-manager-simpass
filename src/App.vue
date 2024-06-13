@@ -22,10 +22,12 @@
 <script setup>
 import { watch } from 'vue'
 import Snackbar from './components/Snackbar.vue'
-import router from './router'
+// import router from './router'
+import { useRouter } from 'vue-router'
 import { useAuthenticationStore } from './stores/authentication'
 import { useRouteMemoryStore } from './stores/router-memory-store'
 
+const router = useRouter()
 const authStore = useAuthenticationStore()
 
 // Watch for changes in isLoggedIn and redirect to login
