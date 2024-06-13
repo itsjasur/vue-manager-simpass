@@ -631,7 +631,6 @@ const inputBindings = (item) => {
 }
 
 async function fetchData() {
-  console.log('fetch called')
   try {
     const response = await fetchWithTokenRefresh('agent/applyInit', {
       method: 'POST',

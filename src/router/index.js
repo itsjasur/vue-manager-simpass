@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useAuthenticationStore } from '../stores/authentication'
+import { useRouteMemoryStore } from '../stores/router-memory-store'
 import DashBaordView from '../views/DashBoardView.vue'
 import LoginView from '../views/LoginView.vue'
 import HomeView from '../views/HomeView.vue'
@@ -105,14 +107,11 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth) {
-    const token = localStorage.getItem('accessToken')
-    // console.log(token)
-    if (token) {
-      // authenticated, proceed to the route
-      next()
-    } else {
-      //  not authenticated, redirect to login
+    if (!useAuthenticationStore().isLoggedIn) {
+      useRouteMemoryStore().save(to.fullPath)
       next('/login')
+    } else {
+      next()
     }
   } else {
     // non-protected route, allow access

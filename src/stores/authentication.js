@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 
 export const useAuthenticationStore = defineStore('status', {
   state: () => ({
-    isLoggedIn: true,
+    isLoggedIn: localStorage.getItem('accessToken') !== null,
     // role: [],
     id: '',
     userName: '',
@@ -13,7 +13,7 @@ export const useAuthenticationStore = defineStore('status', {
       this.isLoggedIn = false
       localStorage.removeItem('accessToken')
       localStorage.removeItem('refreshToken')
-      window.location.href = '/login'
+      // window.location.href = '/login'
     },
 
     login(token, refreshToken, id, userName) {
@@ -23,7 +23,7 @@ export const useAuthenticationStore = defineStore('status', {
       localStorage.setItem('id', id)
       localStorage.setItem('userName', userName)
 
-      window.location.href = '/home'
+      // window.location.href = '/home'
       // router.push('/home')
     },
 

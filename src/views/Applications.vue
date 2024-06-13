@@ -29,7 +29,7 @@
           <input v-model="toDate" v-cleave="cleavePatterns.datePattern()" />
         </div>
       </template>
-      <button style="min-width: 100px; width: auto">선택</button>
+      <button @click="fetchDate()" style="min-width: 100px; width: auto">선택</button>
     </div>
 
     <!-- table -->
@@ -124,7 +124,8 @@ import { formatDate } from '../utils/helpers'
 import { useSnackbarStore } from '../stores/snackbar'
 import { fetchWithTokenRefresh } from '../utils/tokenUtils'
 import PrintablePopup from '../components/PrintablePopup.vue'
-import { usePrintablePopup } from '@/stores/printable-popup'
+import { usePrintablePopup } from '../stores/printable-popup'
+import router from '../router'
 
 const printPopup = usePrintablePopup()
 
@@ -140,22 +141,16 @@ const selectedStatus = ref('A')
 const statuses = ref([])
 const totalCount = ref(0)
 const currentPage = ref(1)
-const rowLimit = ref(20)
+const rowLimit = ref(10)
 
 //from date set to 7 days ago default when initialized
 const toDate = ref(formatDate(new Date()))
 const fromDate = ref(formatDate(new Date(new Date().setDate(new Date().getDate() - 7))))
 
-function selectPlan(record) {
-  console.log('selected row item')
-}
-
 //pagination change
-
 function onPagChange(curPage, perPage) {
   currentPage.value = curPage
   rowLimit.value = perPage
-  console.log(curPage)
   fetchData()
 }
 
@@ -233,7 +228,7 @@ const fetchData = async () => {
 onMounted(fetchData)
 
 const fetchAndOpenFile = async (actNo) => {
-  console.log('fetch and open called')
+  // console.log('fetch and open called')
   //here fetches files
   try {
     const response = await fetchWithTokenRefresh('agent/actForms', {
@@ -243,7 +238,6 @@ const fetchAndOpenFile = async (actNo) => {
     if (response.ok) {
       const decodedResponse = await response.json()
       if (decodedResponse.data && decodedResponse.data.apply_forms_list) {
-        console.log(decodedResponse.data.apply_forms_list.length)
         printPopup.open(decodedResponse.data.apply_forms_list)
       } else {
         throw 'No form with this ID'
@@ -287,6 +281,24 @@ const fetchAndOpenFile = async (actNo) => {
   display: flex;
   flex-flow: column;
   gap: 10px;
+  overflow-x: auto;
+}
+
+.table-part::-webkit-scrollbar {
+  height: 12px;
+}
+
+.table-part::-webkit-scrollbar-track {
+  background-color: #f8f8f8;
+}
+
+.table-part::-webkit-scrollbar-thumb {
+  background-color: #e6e6e6;
+  border-radius: 6px;
+}
+
+.table-part::-webkit-scrollbar-thumb:hover {
+  background-color: #d4d4d4;
 }
 
 .status-default {

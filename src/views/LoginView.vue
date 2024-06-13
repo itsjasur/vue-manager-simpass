@@ -38,13 +38,16 @@ import { BASEURL } from '../assets/constants'
 import { useAuthenticationStore } from '../stores/authentication'
 import { useSnackbarStore } from '../stores/snackbar'
 import LoadingSpinner from '../components/Loader.vue'
+import { useRouteMemoryStore } from '@/stores/router-memory-store'
+import { useRouter } from 'vue-router'
 
 const username = ref('')
 const password = ref('')
-
 const usernameErr = ref('')
 const passwordErr = ref('')
 const isLoading = ref(false)
+
+const router = useRouter()
 
 async function login(event) {
   // console.log('button clicked')
@@ -75,8 +78,14 @@ async function login(event) {
     })
     if (response.ok) {
       const data = await response.json()
-
       useAuthenticationStore().login(data['accessToken'], data['refreshToken'], data['id'], data['username'])
+
+      //checks if user had intended route, and push that route. if not push '/'
+      if (useRouteMemoryStore().intendedRoute) {
+        router.push(useRouteMemoryStore().intendedRoute)
+      } else {
+        router.push('/')
+      }
     } else {
       useSnackbarStore().showSnackbar('Invalid credentials') // show snackbar with a success message
     }

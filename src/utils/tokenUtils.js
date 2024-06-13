@@ -1,4 +1,5 @@
 import { BASEURL } from '../assets/constants'
+import { useAuthenticationStore } from '../stores/authentication'
 
 // Function to refresh the access token
 export async function refreshToken() {
@@ -6,19 +7,18 @@ export async function refreshToken() {
     let currentRefreshToken = localStorage.getItem('refreshToken')
 
     if (!currentRefreshToken) {
-      throw 'No Access token and no Refresh token'
+      throw 'No Refresh token available'
     }
 
-    const response = await fetch(BASEURL + 'auth/refresh-token', {
+    const response = await fetch(BASEURL + 'auth/refreshtoken', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         // any other necessary headers?
       },
-      body: JSON.stringify({
-        refreshToken: currentRefreshToken,
-      }),
+      body: JSON.stringify({ refreshToken: currentRefreshToken }),
     })
+
     if (response.ok) {
       const data = await response.json()
       const newAccessToken = data.accessToken
@@ -26,17 +26,11 @@ export async function refreshToken() {
       // saving the new access token in lclstorage
       localStorage.setItem('accessToken', newAccessToken)
       localStorage.setItem('refreshToken', newRefreshToken)
-
-      return newAccessToken
     } else {
-      throw new Error('Token refresh failed')
+      throw 'Could not refresh the token'
     }
   } catch (error) {
-    // console.error('Token refresh failed:', error)
-    localStorage.removeItem('accessToken')
-    localStorage.removeItem('refreshToken')
-    window.location.href = '/login'
-
+    useAuthenticationStore().logout()
     throw error
   }
 }
@@ -59,7 +53,7 @@ export async function fetchWithTokenRefresh(url, options) {
   // console.log(options)
   try {
     response = await fetch(fullUrl, options)
-    // console.log(response.code)
+    // console.log('this is response ', response)
 
     if (response.status === 401 && !options._retry) {
       options._retry = true

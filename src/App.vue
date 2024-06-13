@@ -20,7 +20,25 @@
 </template>
 
 <script setup>
+import { watch } from 'vue'
 import Snackbar from './components/Snackbar.vue'
+import router from './router'
+import { useAuthenticationStore } from './stores/authentication'
+import { useRouteMemoryStore } from './stores/router-memory-store'
+
+const authStore = useAuthenticationStore()
+
+// Watch for changes in isLoggedIn and redirect to login
+watch(
+  () => authStore.isLoggedIn,
+  (newIsLoggedIn) => {
+    // console.log(router.currentRoute.value.fullPath)
+    if (!newIsLoggedIn) {
+      useRouteMemoryStore().save(router.currentRoute.value.fullPath)
+      router.push('/login')
+    }
+  }
+)
 </script>
 
 <style>

@@ -9,14 +9,12 @@ import cleaveDirective from './directives/cleaveDirective'
 
 // import 'ant-design-vue/dist/reset.css'
 
-const pinia = createPinia()
 const app = createApp(App)
 
+const pinia = createPinia()
 app.directive('cleave', cleaveDirective)
-
-app.use(router)
 app.use(pinia)
-
+app.use(router)
 app.use(Antd)
 
 app.mount('#app')
