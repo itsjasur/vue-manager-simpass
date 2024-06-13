@@ -7,6 +7,7 @@ import ProfileView from '../views/ProfileView.vue'
 import FormDetailsView from '../views/FormDetailsView.vue'
 import NotFoundView from '../views/NotFoundView.vue'
 import RentalRegistrationView from '../views/RentalFormsView.vue'
+import Applications from '../views/Applications.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -69,7 +70,15 @@ const router = createRouter({
           name: 'rental-forms',
           component: RentalRegistrationView,
           meta: {
-            // requiresAuth: true,
+            requiresAuth: true,
+          },
+        },
+        {
+          path: '/applications',
+          name: 'applications',
+          component: Applications,
+          meta: {
+            requiresAuth: true,
           },
         },
       ],

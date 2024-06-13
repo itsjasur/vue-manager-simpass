@@ -205,6 +205,7 @@ async function submit() {
       // console.log(await response.json())
       if (response.ok) {
         const decodedResponse = await response.json()
+        useSnackbarStore().showSnackbar(decodedResponse.message)
       }
     } catch (error) {
       useSnackbarStore().showSnackbar(error.toString())

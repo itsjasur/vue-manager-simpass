@@ -37,7 +37,7 @@
         </div>
         <div style="height: 30px"></div>
 
-        <a-table class="table" :columns="columns" :data-source="dataList" bordered :pagination="false">
+        <a-table class="table" :columns="columns" :data-source="dataList" bordered :pagination="false" size="middle">
           <template #bodyCell="{ column, text, record }">
             <template v-if="column.dataIndex === 'basic_fee' || column.dataIndex === 'sales_fee'">
               <div>{{ text.toLocaleString() }}</div>

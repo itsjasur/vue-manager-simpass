@@ -24,6 +24,12 @@
           <span class="material-symbols-outlined"> demography </span>{{ SIDEMENUNAMES[3] }}</router-link
         >
       </li>
+
+      <li>
+        <router-link to="/applications">
+          <span class="material-symbols-outlined"> checklist_rtl </span>{{ SIDEMENUNAMES[4] }}</router-link
+        >
+      </li>
     </ul>
   </div>
 </template>

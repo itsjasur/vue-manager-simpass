@@ -16,6 +16,16 @@ export const birthdayPattern = () => {
   }
 }
 
+export const datePattern = () => {
+  return {
+    date: true,
+    delimiter: '-',
+    datePattern: ['Y', 'm', 'd'],
+    // dateMin: '1930-01-01',
+    // dateMax: getTodaysDate(),
+  }
+}
+
 export const phoneNumberPattern = () => {
   return {
     phone: true,

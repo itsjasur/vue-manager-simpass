@@ -9,7 +9,7 @@
       <div class="scrollable-content">
         <img v-for="(image, index) in imageUrls" :key="index" class="image" :src="image" alt="" loading="lazy" />
       </div>
-      <button @click="printContent" :disabled="isPrinting" class="print-button">
+      <button v-if="popup.images" @click="printContent" :disabled="isPrinting" class="print-button">
         <template v-if="isPrinting">
           <LoadingSpinner height="20px" color="#ffffff" />
         </template>
@@ -63,7 +63,7 @@ function blobToURL(blob) {
 
 // converts base64 to Blob URL
 onMounted(() => {
-  imageUrls.value = popup.images.map((image) => blobToURL(base64ToBlob(image)))
+  imageUrls.value = popup.images?.map((image) => blobToURL(base64ToBlob(image)))
   document.addEventListener('keydown', keydownHandle)
 })
 

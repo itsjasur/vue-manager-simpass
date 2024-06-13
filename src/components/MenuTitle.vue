@@ -25,6 +25,9 @@ const title = computed(() => {
   if (route.path === '/rental-forms') {
     return SIDEMENUNAMES[3]
   }
+  if (route.path === '/applications') {
+    return SIDEMENUNAMES[4]
+  }
 
   return 'Nothing'
 })

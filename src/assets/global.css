@@ -13,13 +13,13 @@ body {
 button {
   width: 100%;
   min-height: 40px;
+  height: 40px;
   background-color: var(--main-color);
   color: white;
   border: none;
   border-radius: 4px;
-  font-size: 16px;
   cursor: pointer;
-  transition: background-color 0.3s; /* Corrected transition property */
+  transition: background-color 0.3s;
   font-size: 15px;
 }
 
@@ -28,7 +28,7 @@ button:disabled {
 }
 
 button:hover:enabled {
-  filter: brightness(0.8); /* 80% brightness to make it darker */
+  filter: brightness(0.8);
 }
 
 .button {
@@ -50,7 +50,7 @@ button:hover:enabled {
 
 .button:hover {
   cursor: pointer;
-  filter: brightness(0.9); /* 80% brightness to make it darker */
+  filter: brightness(0.9);
 }
 
 .close-button:hover {
@@ -60,7 +60,6 @@ button:hover:enabled {
 
 .card {
   background-color: #0000000a;
-  /* background-color: #fa9b0d15; */
   border-radius: 4px;
   box-sizing: border-box;
 }
@@ -102,7 +101,6 @@ input:focus {
   border-color: var(--main-color);
   box-shadow: 0 0 2px var(--main-color);
 }
-
 .input-error-message {
   margin: 0;
   padding: 0;

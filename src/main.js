@@ -7,6 +7,8 @@ import Antd from 'ant-design-vue'
 import './assets/global.css'
 import cleaveDirective from './directives/cleaveDirective'
 
+// import 'ant-design-vue/dist/reset.css'
+
 const pinia = createPinia()
 const app = createApp(App)
 

@@ -50,11 +50,13 @@ export async function fetchWithTokenRefresh(url, options) {
   options.headers = { Authorization: `Bearer ${accessToken}` }
 
   // console.log('request body', options.body)
-
   if (options.method === 'POST' && options.body && !(options.body instanceof FormData)) {
     options.body = JSON.stringify(options.body)
   }
 
+  //if body is not form data, content-type is always application/json
+  if (!(options.body instanceof FormData)) options.headers['Content-Type'] = 'application/json'
+  // console.log(options)
   try {
     response = await fetch(fullUrl, options)
     // console.log(response.code)
