@@ -2,7 +2,7 @@
   <div class="overlay">
     <div class="popup-content">
       <div class="innerHeader">
-        <h3 class="title">주소 검색</h3>
+        <h3 class="title">프린트</h3>
         <span @click="popup.close()" class="material-symbols-outlined close-button"> cancel </span>
       </div>
 

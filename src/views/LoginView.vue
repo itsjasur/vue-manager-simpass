@@ -82,7 +82,9 @@ async function login(event) {
 
       //checks if user had intended route, and push that route. if not push '/'
       if (useRouteMemoryStore().intendedRoute) {
-        router.push(useRouteMemoryStore().intendedRoute)
+        let url = useRouteMemoryStore().intendedRoute
+        useRouteMemoryStore().clear() //clearing intended route afters redirected
+        router.push(url)
       } else {
         router.push('/')
       }

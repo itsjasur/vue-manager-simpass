@@ -10,55 +10,111 @@
         <span class="name">{{ form.title }}</span>
         <span class="type">{{ form.sub_title }}</span>
         <div class="buttons-row">
-          <button class="download">다운로드</button>
-          <button class="print">프린트</button>
+          <button @click="downloadPdf(form)" class="download">다운로드</button>
+          <button v-if="!isMobile" @click="printPdf(form)" class="print">프린트</button>
         </div>
       </div>
     </template>
   </div>
+
+  <PrintablePdfPopup v-if="usePrintablePdfPopup().active" />
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useSnackbarStore } from '../stores/snackbar'
 import { fetchWithTokenRefresh } from '../utils/tokenUtils'
 import { logoFinder } from '../utils/logoFinder'
+import { usePrintablePdfPopup } from '../stores/printable-pdf-popup'
+
+import PrintablePdfPopup from '../components/PrintablePdfPopup.vue'
+
+const isMobile = ref(false)
 
 const router = useRouter()
-
 const forms = ref([])
 
 async function fetchData() {
   try {
     const response = await fetchWithTokenRefresh('agent/applyForms', { method: 'GET' })
-    if (response.ok) {
-      const decodedResponse = await response.json()
-      if (decodedResponse.data && decodedResponse.data.info) {
-        forms.value = decodedResponse.data.info
-      }
-    } else {
-      throw new Error('Fetch data error')
+
+    if (!response.ok) throw new Error('Fetch data error')
+    const decodedResponse = await response.json()
+    if (decodedResponse.data && decodedResponse.data.info) {
+      forms.value = decodedResponse.data.info
     }
   } catch (error) {
     useSnackbarStore().showSnackbar(error.toString())
   }
 }
 
-onMounted(fetchData)
+const fetchPdfBlob = async (form) => {
+  try {
+    const response = await fetchWithTokenRefresh(`agent/attach/${form.filename}`, { method: 'GET' })
+
+    if (!response.ok) throw new Error('Network response was not ok')
+    // const blob = await response.blob()
+
+    const pdfData = await response.blob()
+    const blob = new Blob([pdfData], { type: 'application/pdf' })
+
+    // a URL for the Blob
+    const url = URL.createObjectURL(blob)
+    return url
+  } catch (error) {
+    useSnackbarStore().showSnackbar(error.toString())
+  }
+}
+
+const downloadPdf = async (form) => {
+  try {
+    //  a URL for the Blob
+    const url = await fetchPdfBlob(form)
+    //  temporary anchor element to trigger the download
+    const a = document.createElement('a')
+    a.href = url
+    a.download = form.title + '.pdf' // desired file name
+    document.body.appendChild(a)
+    a.click()
+
+    window.open(url, '_blank')
+
+    // Clean up
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  } catch (error) {
+    useSnackbarStore().showSnackbar(error.toString())
+  }
+}
+
+const printPdf = async (form) => {
+  try {
+    const url = await fetchPdfBlob(form)
+    usePrintablePdfPopup().open(url)
+  } catch (error) {
+    useSnackbarStore().showSnackbar(error.toString())
+  }
+}
+
+onMounted(() => {
+  isMobile.value = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+  fetchData()
+})
 </script>
 
 <style scoped>
 .container {
-  height: 100%;
-  justify-content: center;
-  align-items: center;
   align-content: center;
-  margin: 0px 20px;
+  padding: 30px;
+  min-height: calc(100% - 60px);
   display: flex;
   flex-flow: wrap;
+  justify-content: center;
   gap: 20px;
+  overflow-y: auto;
 }
+
 .card {
   height: 200px;
   width: 300px;
@@ -101,7 +157,10 @@ onMounted(fetchData)
   position: absolute;
   right: 10px;
   top: 10px;
-  height: 8%;
+  height: auto;
+  max-height: 8%;
+  width: 18%;
+  object-fit: contain;
 }
 
 .card .name {
@@ -123,6 +182,8 @@ onMounted(fetchData)
 .card .buttons-row {
   display: flex;
   gap: 20px;
+  width: 50%;
+  justify-content: center;
 }
 
 .card button {

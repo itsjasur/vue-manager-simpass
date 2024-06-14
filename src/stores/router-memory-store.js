@@ -9,5 +9,8 @@ export const useRouteMemoryStore = defineStore('router-memory-store', {
     save(url) {
       this.intendedRoute = url
     },
+    clear() {
+      this.intendedRoute = ''
+    },
   },
 })
