@@ -54,7 +54,6 @@ img {
   justify-content: center;
   align-items: center;
   margin: 0px 20px;
-  /* background-color: yellow; */
 }
 .card {
   height: 170px;

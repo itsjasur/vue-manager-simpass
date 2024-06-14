@@ -126,7 +126,7 @@ onMounted(fetchData)
 }
 
 .button {
-  min-height: 60px;
+  min-height: 55px;
   min-width: 140px;
 }
 

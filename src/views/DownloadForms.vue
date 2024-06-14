@@ -109,7 +109,7 @@ onMounted(() => {
   display: flex;
   flex-flow: wrap;
   justify-content: center;
-  gap: 20px;
+  gap: 30px;
   overflow-y: auto;
 
   box-sizing: border-box;

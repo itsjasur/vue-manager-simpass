@@ -75,7 +75,7 @@
       >신청서 프린트 인쇄후 서명/사인 자필</a-checkbox
     >
 
-    <div v-if="registererSignChecked" class="sign-container">
+    <div v-if="registererSignChecked">
       <!-- partner sign container -->
       <p class="sign-title">판매자 서명</p>
       <div v-if="!nameImageData && !signImageData" @click="isDrawPadOpen = true" class="singImagesBox">
@@ -93,7 +93,7 @@
       </p>
     </div>
 
-    <button @click="submit">Submit</button>
+    <button @click="submit">접수하기</button>
   </div>
 </template>
 

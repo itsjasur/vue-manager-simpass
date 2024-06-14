@@ -178,6 +178,12 @@ const columns = ref([
     sorter: (a, b) => (a.usim_act_status ?? '').localeCompare(b.usim_act_status ?? ''),
   },
   {
+    title: '고객명',
+    dataIndex: 'name',
+    key: 'name',
+    sorter: (a, b) => (a.phone_number ?? '').localeCompare(b.phone_number ?? ''),
+  },
+  {
     title: '휴대폰',
     dataIndex: 'phone_number',
     key: 'phone_number',
@@ -268,7 +274,7 @@ onMounted(fetchData)
   display: flex;
   flex-direction: column;
   gap: 30px;
-  padding: 15px;
+  padding: 20px;
 }
 
 .search-row {

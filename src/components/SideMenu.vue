@@ -1,42 +1,37 @@
 <template>
-  <div class="side-menu">
-    <div class="logo" @click="handleResize()">
+  <div class="menu">
+    <div class="logo">
       <router-link to="/home"><img src="../assets/logo.png" alt="Logo" style="width: 200px" /> </router-link>
     </div>
-    <ul @click="handleResize()">
-      <li>
-        <router-link to="/home">
-          <span class="material-symbols-outlined"> home </span>{{ SIDEMENUNAMES[0] }}</router-link
-        >
-      </li>
-      <li>
-        <router-link to="/profile">
-          <span class="material-symbols-outlined"> person </span>{{ SIDEMENUNAMES[1] }}</router-link
-        >
-      </li>
-      <li>
-        <router-link to="/registration-forms">
-          <span class="material-symbols-outlined"> description </span>{{ SIDEMENUNAMES[2] }}</router-link
-        >
-      </li>
-      <li>
-        <router-link to="/rental-forms">
-          <span class="material-symbols-outlined"> demography </span>{{ SIDEMENUNAMES[3] }}</router-link
-        >
-      </li>
+    <router-link to="/home" class="menu-item">
+      <span class="material-symbols-outlined"> home </span>
+      <span class="menu-title">{{ SIDEMENUNAMES[0] }}</span>
+    </router-link>
 
-      <li>
-        <router-link to="/applications">
-          <span class="material-symbols-outlined"> checklist_rtl </span>{{ SIDEMENUNAMES[4] }}</router-link
-        >
-      </li>
+    <router-link to="/profile" class="menu-item">
+      <span class="material-symbols-outlined"> person </span>
+      <span class="menu-title">{{ SIDEMENUNAMES[1] }}</span>
+    </router-link>
 
-      <li>
-        <router-link to="/download-forms">
-          <span class="material-symbols-outlined"> file_save </span>{{ SIDEMENUNAMES[5] }}</router-link
-        >
-      </li>
-    </ul>
+    <router-link to="/registration-forms" class="menu-item">
+      <span class="material-symbols-outlined"> description </span>
+      <span class="menu-title">{{ SIDEMENUNAMES[2] }}</span>
+    </router-link>
+
+    <router-link to="/rental-forms" class="menu-item">
+      <span class="material-symbols-outlined"> demography </span>
+      <span class="menu-title">{{ SIDEMENUNAMES[3] }}</span>
+    </router-link>
+
+    <router-link to="/applications" class="menu-item">
+      <span class="material-symbols-outlined"> checklist_rtl </span>
+      <span class="menu-title">{{ SIDEMENUNAMES[4] }}</span>
+    </router-link>
+
+    <router-link to="/download-forms" class="menu-item">
+      <span class="material-symbols-outlined"> file_save </span>
+      <span class="menu-title">{{ SIDEMENUNAMES[4] }}</span>
+    </router-link>
   </div>
 </template>
 
@@ -44,18 +39,35 @@
 import MenuTitle from '../components/MenuTitle.vue'
 import { SIDEMENUNAMES } from '../assets/constants'
 import { useSideMenuStore } from '../stores/side-menu'
+import { useRouter, useRoute } from 'vue-router'
+
+const router = useRouter()
+
+const route = useRoute()
+
+console.log(route.fullPath)
 
 const handleResize = () => {
-  if (window.innerWidth <= 960) {
-    useSideMenuStore().close()
-  }
+  // if (window.innerWidth <= 960) {
+  // useSideMenuStore().close()
+  // }
 }
 </script>
 
 <style scoped>
+.menu {
+  min-width: 300px;
+  width: 100%;
+  height: 100%;
+  background-color: rgb(38, 38, 38);
+  display: flex;
+  flex-flow: column;
+  gap: 15px;
+}
 .logo {
   padding: 10px;
   margin: 15px 10px;
+  user-select: none;
 }
 img {
   color: antiquewhite;
@@ -66,39 +78,33 @@ img {
   border-radius: 5px;
 }
 
-ul {
-  padding: 0;
-  margin: 0;
+a {
+  text-decoration: none; /* router link underline */
 }
 
-ul li {
-  text-align: left;
-  margin: 10px;
-  display: flex; /* Add this line */
-}
-li span {
-  font-size: 22px;
-  padding-right: 10px;
-}
-ul li .router-link-active {
-  background-color: #313131;
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  /* background-color: #ffffff2c; */
+  margin: 0 15px;
   border-radius: 5px;
-}
-
-ul li :hover {
-  background-color: #4e4e4e;
-  border-radius: 5px;
-}
-
-ul li a {
+  padding: 0 10px;
+  min-height: 50px;
+  box-sizing: border-box;
   color: #fff;
-  text-decoration: none;
-  display: block;
-  padding: 12px 15px;
-  width: 100%; /* Add this line */
-  display: flex; /* Add this line */
-  /* justify-content: start; */
-  /* justify-items: center; */
-  align-items: flex-end;
+  cursor: pointer;
+  user-select: none;
+}
+
+.menu-item:hover {
+  background-color: #ffffff45;
+}
+.menu-item:active {
+  background-color: #ffffff57;
+}
+
+.menu-item.router-link-active {
+  background-color: #ffffff25;
 }
 </style>

@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <div class="title">가입신청/고객정보</div>
     <div class="row">
       <div class="groups">
         <label>판매점코드 </label>
@@ -10,17 +11,6 @@
         <label>판매점명</label>
         <input v-model="pname" placeholder="" readonly />
       </div>
-      <!-- <div class="groups">
-        <label>판매점명 </label>
-        <a-select
-          ref="select"
-          v-model:value="pname"
-          :style="{ width: '100%' }"
-          placeholder="Please select"
-          :options="options"
-        >
-        </a-select>
-      </div> -->
     </div>
 
     <div class="row">
@@ -58,7 +48,33 @@
         <input v-model="status" placeholder="" readonly />
       </div>
     </div>
+
+    <div class="title">가입신청/고객정보</div>
+
+    <div class="sign-container">
+      <!-- partner sign container -->
+      <p class="sign-title">판매자 서명</p>
+      <div v-if="!nameImageData && !signImageData" @click="isDrawPadOpen = true" class="singImagesBox">
+        <span class="inner-icon material-symbols-outlined"> stylus_note </span>
+      </div>
+      <div v-else class="singImagesBox">
+        <span @click="deletePads()" class="delete-icon material-symbols-outlined"> delete </span>
+        <div class="images-row">
+          <img class="image" :src="nameImageData" alt="오류 이미지" @error="deletePads" />
+          <img class="image" :src="signImageData" alt="오류 이미지" />
+        </div>
+      </div>
+    </div>
+    <button @click="submit">접수하기</button>
   </div>
+
+  <SignPadPopup
+    v-if="isDrawPadOpen"
+    type="self"
+    :userName="''"
+    @savePads="savePads"
+    @closePopup="isDrawPadOpen = false"
+  />
 </template>
 
 //
@@ -66,6 +82,7 @@
 import { ref, onMounted } from 'vue'
 import { useSnackbarStore } from '../stores/snackbar'
 import { fetchWithTokenRefresh } from '../utils/tokenUtils'
+import SignPadPopup from '../components/SignPadPopup.vue'
 
 const pname = ref('')
 const pcode = ref('')
@@ -75,6 +92,19 @@ const storeAddress = ref('')
 const storeDetailAddress = ref('')
 const contractDate = ref('')
 const status = ref('')
+
+const isDrawPadOpen = ref(false)
+const nameImageData = ref(null)
+const signImageData = ref(null)
+const deletePads = () => {
+  nameImageData.value = null
+  signImageData.value = null
+}
+
+const savePads = (type, nameData, signData) => {
+  nameImageData.value = nameData
+  signImageData.value = signData
+}
 
 // const options = [...Array(25)].map((_, i) => ({
 //   value: (i + 10).toString(36) + (i + 1)
@@ -98,8 +128,9 @@ async function fetchProfileData() {
         storeAddress.value = info.address
         storeDetailAddress.value = info.dtl_address
         contractDate.value = new Date(info.contract_date).toLocaleString()
-
         status.value = info.status_nm
+        nameImageData.value = info.partner_sign
+        signImageData.value = info.partner_seal
       }
     } else {
       throw new Error('Fetch profile data error')
@@ -108,17 +139,45 @@ async function fetchProfileData() {
     useSnackbarStore().showSnackbar(error.toString())
   }
 }
+
+//FORM DATA REQUEST
+const formData = new FormData()
+
+async function submit() {
+  //adding sign images data
+  formData.set('partner_sign', nameImageData.value)
+  formData.set('partner_seal', signImageData.value)
+
+  // //checks if all values are filled
+
+  try {
+    const response = await fetchWithTokenRefresh('agent/setActSign', {
+      method: 'POST',
+      body: {
+        partner_sign: nameImageData.value,
+        partner_seal: signImageData.value,
+      },
+    })
+    if (response.ok) {
+      const decodedResponse = await response.json()
+      useSnackbarStore().showSnackbar(decodedResponse.message)
+    }
+  } catch (error) {
+    useSnackbarStore().showSnackbar(error.toString())
+  }
+}
+
 onMounted(fetchProfileData)
 </script>
 
 <style scoped>
 .container {
-  width: 80%;
-  min-width: 300px;
   max-width: 1000px;
-  margin-top: 20px;
-  padding: 0 15px;
-  box-sizing: border-box; /*  padding and border in the element's total width and height */
+  margin: 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-flow: column;
+  gap: 30px;
 }
 
 .groups {
@@ -128,20 +187,77 @@ onMounted(fetchProfileData)
 .row {
   display: flex;
   width: 100%;
-  gap: 20px; /* adds spacing between items */
-  margin-bottom: 30px;
+  gap: 20px;
   align-items: center;
 }
 
-@media (max-width: 600px) {
-  .container {
-    width: 100%;
-  }
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
 
+.sign-title {
+  line-height: 1;
+  padding: 0;
+  margin: 0;
+  margin-bottom: 7px;
+}
+
+.singImagesBox {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 400px;
+  width: 100%;
+  height: 100px;
+  border-radius: 5px;
+  border: 1px dashed var(--main-color);
+  cursor: pointer;
+  position: relative;
+}
+.singImagesBox .images-row {
+  display: flex;
+  flex-flow: row;
+  height: 100%;
+  width: 100%;
+  gap: 5px;
+  box-sizing: border-box;
+  padding: 5px;
+  align-items: center;
+}
+.singImagesBox .image {
+  width: 100%;
+  height: auto;
+  min-width: 100px;
+  max-height: 100px; /* Set a maximum height limit if needed */
+  /* object-fit: contain;  */
+  background-color: #fbfbfb;
+}
+.delete-icon {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  color: #ff3535 !important;
+  cursor: pointer !important;
+  background-color: #ffffff;
+  padding: 2px;
+  border-radius: 20px;
+}
+
+button {
+  max-width: 200px;
+  margin-top: 20px;
+  height: 45px;
+  margin-bottom: 400px;
+}
+
+@media (max-width: 600px) {
   .row {
     flex-direction: column;
     width: 100%;
-    margin-bottom: 20px;
     align-items: center;
   }
 }
