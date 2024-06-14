@@ -7,7 +7,6 @@ export const useSideMenuStore = defineStore('sidemenu', {
 
   actions: {
     toggle() {
-      // console.log('toggled')
       this.isSideMenuOpen = !this.isSideMenuOpen
     },
     close() {

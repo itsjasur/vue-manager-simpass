@@ -27,11 +27,9 @@ import { useSnackbarStore } from '../stores/snackbar'
 import { fetchWithTokenRefresh } from '../utils/tokenUtils'
 import { logoFinder } from '../utils/logoFinder'
 import { usePrintablePdfPopup } from '../stores/printable-pdf-popup'
-
 import PrintablePdfPopup from '../components/PrintablePdfPopup.vue'
 
 const isMobile = ref(false)
-
 const router = useRouter()
 const forms = ref([])
 
@@ -107,12 +105,14 @@ onMounted(() => {
 .container {
   align-content: center;
   padding: 30px;
-  min-height: calc(100% - 60px);
+  min-height: 100%;
   display: flex;
   flex-flow: wrap;
   justify-content: center;
   gap: 20px;
   overflow-y: auto;
+
+  box-sizing: border-box;
 }
 
 .card {

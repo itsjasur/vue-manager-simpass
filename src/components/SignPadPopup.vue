@@ -33,6 +33,7 @@
 <script setup>
 import SignaturePad from 'signature_pad'
 import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { useSnackbarStore } from '../stores/snackbar'
 
 const emit = defineEmits(['savePads', 'closePopup'])
 const props = defineProps(['type', 'userName'])
@@ -58,10 +59,8 @@ watch(signPenSickness, (newValue) => {
 //PLACEHOLDER NAME
 const nameStyle = ref()
 const overlayText = ref(props.userName ?? '')
-// overlayText.value = 'SOBIRJONOV JASURBEK'
-// overlayText.value = 'SOBIRJONOV JASURBEK ARISLONBEK UGLI '
 
-console.log(overlayText.value.length)
+// overlayText.value = 'LKAJYDG AKSJKAJ ADFFSEEROIH ASDS '
 
 const nameCanvas = ref('')
 const namePad = ref(null)
@@ -216,11 +215,10 @@ const clearCanvases = () => {
 }
 const savePads = () => {
   if (signPad.value.isEmpty() || namePad.value.isEmpty()) {
-    console.log('Please provide a signature first.')
+    useSnackbarStore().showSnackbar('먼저 서명을 해주세요.')
   } else {
     const nameData = namePad.value.toDataURL()
     const signData = signPad.value.toDataURL()
-    console.log(props.type)
     emit('savePads', props.type, nameData, signData)
     emit('closePopup')
   }

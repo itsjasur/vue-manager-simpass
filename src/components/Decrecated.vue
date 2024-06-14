@@ -99,8 +99,6 @@ const convertToPdfAndPrint = () => {
 
   const pdfBlob = doc.output('blob')
   const pdfUrl = URL.createObjectURL(pdfBlob)
-
-  console.log(pdfUrl)
   imagePdfUrl.value = pdfUrl
 
   const iframe = document.createElement('iframe')

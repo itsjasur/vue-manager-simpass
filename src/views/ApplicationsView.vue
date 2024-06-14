@@ -234,7 +234,6 @@ const fetchData = async () => {
 }
 
 const fetchAndOpenFile = async (actNo) => {
-  // console.log('fetch and open called')
   //here fetches files
   try {
     const response = await fetchWithTokenRefresh('agent/actForms', {

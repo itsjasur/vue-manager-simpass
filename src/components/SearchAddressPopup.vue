@@ -39,16 +39,9 @@ onMounted(async () => {
       let jibunAddr = data.jibunAddress
       let buildingName = data.buildingName
 
-      // console.log('jubunaddress' + jibunAddr)
-      // console.log('roadaddress' + roadAddr)
-
-      // emit('selectAddress', selectedType === 'R' ? roadAddr : jibunAddr, buildingName)
-
       popup.address = selectedType === 'R' ? roadAddr : jibunAddr
       popup.buildingName = buildingName
       popup.close()
-
-      // emit('closePopup')
     },
   }).embed(embed.value)
 })

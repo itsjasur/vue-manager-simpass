@@ -295,7 +295,7 @@ import { ref, onMounted, watch, reactive, nextTick } from 'vue'
 import { Select } from 'ant-design-vue'
 import { fetchWithTokenRefresh } from '../utils/tokenUtils'
 import { USIM_FORM_DETAILS, CUSTOMER_FORM_DETAILS, PLANSINFO } from '../assets/constants'
-import { PAYMENT_FORM_DETAILS, BASEURL, DEPUTY_FORM_DETAILS } from '../assets/constants'
+import { PAYMENT_FORM_DETAILS, DEPUTY_FORM_DETAILS } from '../assets/constants'
 import { useSelectPlansPopup } from '../stores/select-plans-popup'
 import { usePrintablePopup } from '../stores/printable-popup'
 
@@ -446,7 +446,6 @@ const createImageUrls = () => {
 
 const deleteDocImages = (index) => {
   fileObjects.value.splice(index, 1)
-  // console.log(fileObjects.value)
   createImageUrls()
 }
 
@@ -639,7 +638,6 @@ async function fetchData() {
 
     if (response.ok) {
       const decodedResponse = await response.json()
-      // console.log(decodedResponse)
       if (decodedResponse.data) {
         let info = decodedResponse.data
         fetchedData.value = info
@@ -811,7 +809,6 @@ async function fetchForms() {
     if (response.ok) {
       const decodedResponse = await response.json()
       base64Images.value = decodedResponse.data.apply_forms_list
-      // console.log(base64Images.value.length)
       if (base64Images.value.length > 0) {
         usePrintablePopup().open(base64Images.value)
       }

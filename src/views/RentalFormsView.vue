@@ -166,7 +166,6 @@ const createImageUrls = () => {
 
 const deleteDocImages = (index) => {
   fileObjects.value.splice(index, 1)
-  // console.log(fileObjects.value)
   createImageUrls()
 }
 
@@ -186,9 +185,6 @@ async function submit() {
 
   formData.set('name', registrer.value)
   formData.set('birthday', registrerBirthday?.value?.substring(2))
-
-  console.log(registrerBirthday.value)
-
   formData.set('contact', registrerPhoneNumber.value)
   formData.set('address', address.value + addressDetails.value)
   formData.set('usim_no', usimNumber.value)
@@ -202,7 +198,6 @@ async function submit() {
   if (checklist.every(Boolean)) {
     try {
       const response = await fetchWithTokenRefresh('agent/rentalApply', { method: 'POST', body: formData })
-      // console.log(await response.json())
       if (response.ok) {
         const decodedResponse = await response.json()
         useSnackbarStore().showSnackbar(decodedResponse.message)

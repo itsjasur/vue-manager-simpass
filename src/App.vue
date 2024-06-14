@@ -34,7 +34,6 @@ const authStore = useAuthenticationStore()
 watch(
   () => authStore.isLoggedIn,
   (newIsLoggedIn) => {
-    // console.log(router.currentRoute.value.fullPath)
     if (!newIsLoggedIn) {
       useRouteMemoryStore().save(router.currentRoute.value.fullPath)
       router.push('/login')

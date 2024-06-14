@@ -1,4 +1,3 @@
-import { BASEURL } from '../assets/constants'
 import { useAuthenticationStore } from '../stores/authentication'
 
 // Function to refresh the access token
@@ -10,7 +9,7 @@ export async function refreshToken() {
       throw 'No Refresh token available'
     }
 
-    const response = await fetch(BASEURL + 'auth/refreshtoken', {
+    const response = await fetch(import.meta.env.VITE_API_BASE_URL + 'auth/refreshtoken', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -38,7 +37,7 @@ export async function refreshToken() {
 // function to make HTTP requests with token refresh logic
 export async function fetchWithTokenRefresh(url, options) {
   let response
-  let fullUrl = BASEURL + url
+  let fullUrl = import.meta.env.VITE_API_BASE_URL + url
   let accessToken = localStorage.getItem('accessToken')
 
   options.headers = { Authorization: `Bearer ${accessToken}` }
@@ -50,10 +49,8 @@ export async function fetchWithTokenRefresh(url, options) {
 
   //if body is not form data, content-type is always application/json
   if (!(options.body instanceof FormData)) options.headers['Content-Type'] = 'application/json'
-  // console.log(options)
   try {
     response = await fetch(fullUrl, options)
-    // console.log('this is response ', response)
 
     if (response.status === 401 && !options._retry) {
       options._retry = true

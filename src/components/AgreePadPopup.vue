@@ -30,6 +30,7 @@
 <script setup>
 import { ref, watch, onMounted, onUnmounted } from 'vue'
 import SignaturePad from 'signature_pad'
+import { useSnackbarStore } from '../stores/snackbar'
 
 const emit = defineEmits(['savePad', 'closePopup'])
 
@@ -92,7 +93,7 @@ const clearCanvase = () => {
 
 const savePad = () => {
   if (pad.value.isEmpty()) {
-    console.log('Please provide a signature first.')
+    useSnackbarStore().showSnackbar('먼저 서명을 해주세요.')
   } else {
     const padData = pad.value.toDataURL()
     emit('savePad', padData, padData)

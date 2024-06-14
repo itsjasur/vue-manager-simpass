@@ -34,7 +34,6 @@
 
 <script setup>
 import { ref } from 'vue'
-import { BASEURL } from '../assets/constants'
 import { useAuthenticationStore } from '../stores/authentication'
 import { useSnackbarStore } from '../stores/snackbar'
 import LoadingSpinner from '../components/Loader.vue'
@@ -50,7 +49,6 @@ const isLoading = ref(false)
 const router = useRouter()
 
 async function login(event) {
-  // console.log('button clicked')
   isLoading.value = true
 
   // Check if input fields are empty
@@ -68,7 +66,7 @@ async function login(event) {
   }
 
   try {
-    const response = await fetch(BASEURL + 'auth/signin', {
+    const response = await fetch(import.meta.env.VITE_API_BASE_URL + 'auth/signin', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

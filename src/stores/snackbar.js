@@ -9,8 +9,6 @@ export const useSnackbarStore = defineStore('snackbar', {
 
   actions: {
     showSnackbar(message) {
-      // console.log('show snackbr called')
-      //if text is empty, no need to show snackbar
       if (message) {
         this.message = message
 

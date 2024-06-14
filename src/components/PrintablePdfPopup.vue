@@ -17,7 +17,6 @@
 </template>
 
 <script setup>
-import { BASEURL } from '@/assets/constants'
 import { nextTick, onMounted, onUnmounted, ref } from 'vue'
 import LoadingSpinner from '../components/Loader.vue'
 
