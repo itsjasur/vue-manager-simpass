@@ -1,20 +1,22 @@
 <template>
-  <div class="container">
-    <template v-for="(form, index) in forms" :key="index">
-      <div class="card">
-        <!-- <span class="material-symbols-outlined" style="color: red"> assignment </span> -->
-        <img class="carrier-logo" :src="logoFinder(form.carrier_cd)" :alt="form.carrier_nm" height="100%" />
-        <div class="mvno-logo-card">
-          <img class="mvno-logo" :src="form.image_url" :alt="form.title" />
+  <div class="main">
+    <div class="container">
+      <template v-for="(form, index) in forms" :key="index">
+        <div class="card">
+          <!-- <span class="material-symbols-outlined" style="color: red"> assignment </span> -->
+          <img class="carrier-logo" :src="logoFinder(form.carrier_cd)" :alt="form.carrier_nm" height="100%" />
+          <div class="mvno-logo-card">
+            <img class="mvno-logo" :src="form.image_url" :alt="form.title" />
+          </div>
+          <span class="name">{{ form.title }}</span>
+          <span class="type">{{ form.sub_title }}</span>
+          <div class="buttons-row">
+            <button @click="downloadPdf(form)" class="download">다운로드</button>
+            <button v-if="!isMobile" @click="printPdf(form)" class="print">프린트</button>
+          </div>
         </div>
-        <span class="name">{{ form.title }}</span>
-        <span class="type">{{ form.sub_title }}</span>
-        <div class="buttons-row">
-          <button @click="downloadPdf(form)" class="download">다운로드</button>
-          <button v-if="!isMobile" @click="printPdf(form)" class="print">프린트</button>
-        </div>
-      </div>
-    </template>
+      </template>
+    </div>
   </div>
 
   <PrintablePdfPopup v-if="usePrintablePdfPopup().active" />
@@ -102,16 +104,22 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
 .container {
-  align-content: center;
-  padding: 30px;
-  min-height: 100%;
+  max-width: 1000px;
+  width: 100%;
   display: flex;
   flex-flow: wrap;
+  gap: 20px;
   justify-content: center;
-  gap: 30px;
-  overflow-y: auto;
-
+  /* overflow-y: scroll; */
+  padding: 40px 20px;
   box-sizing: border-box;
 }
 
@@ -123,7 +131,7 @@ onMounted(() => {
   flex-flow: column;
   align-items: center;
   justify-content: center;
-  /* box-sizing: border-box; */
+  box-sizing: border-box;
   position: relative;
   gap: 10px;
 }

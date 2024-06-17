@@ -30,7 +30,7 @@
 
     <router-link to="/download-forms" class="menu-item">
       <span class="material-symbols-outlined"> file_save </span>
-      <span class="menu-title">{{ SIDEMENUNAMES[4] }}</span>
+      <span class="menu-title">{{ SIDEMENUNAMES[5] }}</span>
     </router-link>
   </div>
 </template>

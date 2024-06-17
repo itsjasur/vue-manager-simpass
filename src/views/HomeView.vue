@@ -1,41 +1,42 @@
 <template>
-  <div class="container">
-    <div class="card" @click="router.push('/registration-forms')">
-      <div class="img">
-        <img src="../assets/icons/sim.png" alt="" />
+  <div class="main">
+    <div class="container">
+      <div class="card" @click="router.push('/registration-forms')">
+        <div class="img">
+          <img src="../assets/icons/sim.png" alt="" />
+        </div>
+        <div class="textbox">
+          <p class="primaryT">후불/선불유심</p>
+          <p class="secondoryT">가입신청서</p>
+        </div>
       </div>
-      <div class="textbox">
-        <p class="primaryT">후불/선불유심</p>
-        <p class="secondoryT">가입신청서</p>
-      </div>
-    </div>
 
-    <div class="card">
-      <div class="img">
-        <img src="../assets/icons/docs.png" alt="" />
+      <div class="card">
+        <div class="img">
+          <img src="../assets/icons/docs.png" alt="" />
+        </div>
+        <div class="textbox">
+          <p class="primaryT">정책보기</p>
+        </div>
       </div>
-      <div class="textbox">
-        <p class="primaryT">정책보기</p>
+      <div class="card">
+        <div class="img">
+          <img src="../assets/icons/handshake.png" alt="" />
+        </div>
+        <div class="textbox">
+          <p class="primaryT">거래요청</p>
+        </div>
       </div>
-    </div>
-    <div class="card">
-      <div class="img">
-        <img src="../assets/icons/handshake.png" alt="" />
-      </div>
-      <div class="textbox">
-        <p class="primaryT">거래요청</p>
-      </div>
-    </div>
-    <div class="card">
-      <div class="img">
-        <img src="../assets/icons/store.png" alt="" />
-      </div>
-      <div class="textbox">
-        <p class="primaryT">거래대리점</p>
+      <div class="card">
+        <div class="img">
+          <img src="../assets/icons/store.png" alt="" />
+        </div>
+        <div class="textbox">
+          <p class="primaryT">거래대리점</p>
+        </div>
       </div>
     </div>
   </div>
-  <!-- <div class="card1"></div> -->
 </template>
 
 <script setup>
@@ -44,23 +45,37 @@ const router = useRouter()
 </script>
 
 <style scoped>
-img {
-  height: 75px;
-}
-.container {
+.main {
   display: flex;
+  flex-direction: column;
   height: 100%;
-  gap: 20px;
   justify-content: center;
   align-items: center;
-  margin: 0px 20px;
+  /* margin: 0 20px; */
+  padding: 0 20px;
+  box-sizing: border-box;
 }
+.container {
+  width: 100%;
+  display: flex;
+  flex-flow: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
 .card {
   height: 170px;
   width: 170px;
   padding: 10px;
   box-sizing: border-box;
   align-content: center;
+  background-color: #fff;
+
+  box-shadow: 0 0 5px #0000000a;
+}
+
+img {
+  height: 75px;
 }
 
 .img {

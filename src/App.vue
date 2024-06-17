@@ -20,12 +20,13 @@
 </template>
 
 <script setup>
-import { watch } from 'vue'
+import { onMounted, onUnmounted, watch } from 'vue'
 import Snackbar from './components/Snackbar.vue'
 // import router from './router'
 import { useRouter } from 'vue-router'
 import { useAuthenticationStore } from './stores/authentication'
 import { useRouteMemoryStore } from './stores/router-memory-store'
+import { useSideMenuStore } from './stores/side-menu'
 
 const router = useRouter()
 const authStore = useAuthenticationStore()
@@ -40,6 +41,23 @@ watch(
     }
   }
 )
+
+const sidemenuStore = useSideMenuStore()
+
+const handleResize = () => {
+  if (window.innerWidth <= 960) {
+    sidemenuStore.close()
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('resize', handleResize)
+  handleResize() //
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
+})
 </script>
 
 <style>

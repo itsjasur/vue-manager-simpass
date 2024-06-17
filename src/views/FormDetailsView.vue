@@ -1,16 +1,7 @@
 <template>
   <SelectPlanPopup v-if="selectPlansPopup.active" />
   <SearchAddressPopup v-if="searchAddressPopup.active" />
-  <AgreePadPopup v-if="isAgreePadOpen" @savePad="saveAgreePad" @closePopup="isAgreePadOpen = false" />
   <PrintablePopup v-if="usePrintablePopup().active" />
-
-  <SignPadPopup
-    v-if="isDrawPadOpen"
-    :type="drawType"
-    :userName="nameForPad"
-    @savePads="savePads"
-    @closePopup="isDrawPadOpen = false"
-  />
 
   <div v-if="isPlanAvailable" class="container">
     <div class="partition">
@@ -186,90 +177,61 @@
       >
       <template v-if="!signAfterPrintChecked">
         <!-- form sign container -->
-        <div class="sign-container">
-          <p class="sign-title">가입자 서명</p>
-          <div v-if="!nameImageData && !signImageData" @click="addSigns('forms')" class="singImagesBox">
-            <span class="inner-icon material-symbols-outlined"> stylus_note </span>
-          </div>
-          <div v-else class="singImagesBox">
-            <span @click="deletePads('forms')" class="delete-icon material-symbols-outlined"> delete </span>
-            <div class="images-row">
-              <img class="image" :src="nameImageData" alt="Signature" />
-              <img class="image" :src="signImageData" alt="Signature" />
-            </div>
-          </div>
-          <p v-if="!nameImageData && !signImageData && formSubmitted" class="input-error-message">
-            가입자서명을 하지 않았습니다.
-          </p>
-        </div>
+        <SignImageRowContainer
+          type="forms"
+          :placeholder="customerForms?.name?.value"
+          @updated="updatePads"
+          title="가입자서명"
+          :errorMessage="!nameImageData && !signImageData && formSubmitted ? '가입자서명을 하지 않았습니다.' : null"
+        />
 
+        <!-- payment sign container -->
         <div v-if="!selfRegisterChecked" class="sign-container">
-          <!-- payment sign container -->
-          <p class="sign-title">자동이체 서명</p>
-          <div v-if="!paymentNameImageData && !paymentSignImageData" @click="addSigns('payment')" class="singImagesBox">
-            <span class="inner-icon material-symbols-outlined"> stylus_note </span>
-          </div>
-          <div v-else class="singImagesBox">
-            <span @click="deletePads('payment')" class="delete-icon material-symbols-outlined"> delete </span>
-            <div class="images-row">
-              <img class="image" :src="paymentNameImageData" alt="Signature" />
-              <img class="image" :src="paymentSignImageData" alt="Signature" />
-            </div>
-          </div>
-          <p v-if="!paymentNameImageData && !paymentSignImageData && formSubmitted" class="input-error-message">
-            후불이체동의 서명을 하지 않았습니다.
-          </p>
+          <SignImageRowContainer
+            type="payment"
+            :placeholder="paymentForms?.account_name?.value"
+            @updated="updatePads"
+            title="자동이체 서명"
+            :errorMessage="
+              !paymentNameImageData && !paymentSignImageData && formSubmitted
+                ? '후불이체동의 서명을 하지 않았습니다.'
+                : null
+            "
+          />
         </div>
 
         <!-- deputy sign container -->
         <div v-if="deputyAvailable" class="sign-container">
-          <p class="sign-title">법정대리인 서명</p>
-          <div v-if="!deputyNameImageData && !deputySignImageData" @click="addSigns('deputy')" class="singImagesBox">
-            <span class="inner-icon material-symbols-outlined"> stylus_note </span>
-          </div>
-          <div v-else class="singImagesBox">
-            <span @click="deletePads('deputy')" class="delete-icon material-symbols-outlined"> delete </span>
-            <div class="images-row">
-              <img class="image" :src="deputyNameImageData" alt="Signature" />
-              <img class="image" :src="deputySignImageData" alt="Signature" />
-            </div>
-          </div>
-          <p v-if="!deputyNameImageData && !deputySignImageData && formSubmitted" class="input-error-message">
-            법정대리인서명을 하지 않았습니다.
-          </p>
+          <SignImageRowContainer
+            type="deputy"
+            :placeholder="deputyForms?.deputy_name?.value"
+            @updated="updatePads"
+            title="법정대리인 서명"
+            :errorMessage="
+              !deputyNameImageData && !deputySignImageData && formSubmitted ? '법정대리인서명을 하지 않았습니다.' : null
+            "
+          />
         </div>
 
         <!-- partner sign container -->
         <div v-if="partnerNeedsToSign" class="sign-container">
-          <p class="sign-title">판매자 서명</p>
-          <div v-if="!partnerNameImageData && !partnerSignImageData" @click="addSigns('partner')" class="singImagesBox">
-            <span class="inner-icon material-symbols-outlined"> stylus_note </span>
-          </div>
-          <div v-else class="singImagesBox">
-            <span @click="deletePads('partner')" class="delete-icon material-symbols-outlined"> delete </span>
-            <div class="images-row">
-              <img class="image" :src="partnerNameImageData" alt="Signature" />
-              <img class="image" :src="partnerSignImageData" alt="Signature" />
-            </div>
-          </div>
-          <p v-if="!partnerNameImageData && !partnerSignImageData && formSubmitted" class="input-error-message">
-            판매자서명을 하지 않았습니다.
-          </p>
+          <SignImageRowContainer
+            type="partner"
+            @updated="updatePads"
+            title="판매자 서명"
+            :errorMessage="
+              !partnerNameImageData && !partnerSignImageData && formSubmitted ? '판매자서명을 하지 않았습니다.' : null
+            "
+          />
         </div>
 
         <!-- i agree sign container -->
         <div v-if="shouldShowAgreeContent" class="sign-container">
-          <p class="sign-title">동의합니다.</p>
-          <div v-if="!agreePadData" @click="isAgreePadOpen = true" class="singImagesBox">
-            <span class="inner-icon material-symbols-outlined"> stylus_note </span>
-          </div>
-          <div v-else class="singImagesBox">
-            <span @click="agreePadData = null" class="delete-icon material-symbols-outlined"> delete </span>
-            <div class="images-row">
-              <img class="image" :src="agreePadData" alt="Signature" />
-            </div>
-          </div>
-          <p v-if="!agreePadData && formSubmitted" class="input-error-message">가입약관에 동의하지 않았습니다.</p>
+          <AgreePadPopupContainer
+            @updated="updateAgreePad"
+            title="동의합니다"
+            :errorMessage="!agreePadData && formSubmitted ? '가입약관에 동의하지 않았습니다.' : null"
+          />
         </div>
       </template>
 
@@ -302,12 +264,13 @@ import { usePrintablePopup } from '../stores/printable-popup'
 import { useSearchaddressStore } from '../stores/select-address-popup'
 import SelectPlanPopup from '../components/SelectPlanPopup.vue'
 import SearchAddressPopup from '../components/SearchAddressPopup.vue'
-import SignPadPopup from '../components/SignPadPopup.vue'
-import AgreePadPopup from '../components/AgreePadPopup.vue'
 import PrintablePopup from '../components/PrintablePopup.vue'
 import { convertToPdfAndGetUrl } from '../utils/helpers'
 import LoadingSpinner from '../components/Loader.vue'
 import { useSnackbarStore } from '../stores/snackbar'
+
+import AgreePadPopupContainer from '../components/AgreePadPopupContainer.vue'
+import SignImageRowContainer from '../components/SignImageRowContainer.vue'
 
 //props
 const props = defineProps({ id: String })
@@ -326,7 +289,7 @@ const searchAddressPopup = useSearchaddressStore()
 const selfRegisterChecked = ref(false)
 
 //signAfterPrintChecked
-const signAfterPrintChecked = ref(true)
+const signAfterPrintChecked = ref(false)
 //signs image data
 const nameImageData = ref(null)
 const signImageData = ref(null)
@@ -343,83 +306,41 @@ const partnerNameImageData = ref(null)
 const partnerSignImageData = ref(null)
 
 //draw popup
-const isDrawPadOpen = ref(false)
 const drawType = ref('')
 const nameForPad = ref('')
 
-//agre pad
+const updatePads = ({ name, sign, type }) => {
+  // console.log
+  switch (type) {
+    case 'forms':
+      nameImageData.value = name
+      signImageData.value = sign
+      break
+    case 'deputy':
+      deputyNameImageData.value = name
+      deputySignImageData.value = sign
+      break
+    case 'payment':
+      paymentNameImageData.value = name
+      paymentSignImageData.value = sign
+      break
+    case 'partner':
+      partnerNameImageData.value = name
+      partnerSignImageData.value = sign
+      break
+    default:
+      useSnackbarStore().showSnackbar('Invalid pad type')
+  }
+}
+
+//agree pad
 const shouldShowAgreeContent = ref(false)
-const isAgreePadOpen = ref(false)
+
 const agreePadData = ref(null)
-
-const addSigns = (type) => {
-  drawType.value = type
-  isDrawPadOpen.value = true
-
-  //which name to show on name pad
-  switch (type) {
-    case 'forms':
-      nameForPad.value = customerForms?.value?.name?.value ?? ''
-      break
-
-    case 'deputy':
-      nameForPad.value = deputyForms?.value?.deputy_name?.value ?? ''
-      break
-
-    case 'payment':
-      nameForPad.value = paymentForms?.value?.account_name?.value ?? ''
-      break
-  }
+const updateAgreePad = (data) => {
+  agreePadData.value = data
 }
 
-const deletePads = (type) => {
-  switch (type) {
-    case 'forms':
-      nameImageData.value = null
-      signImageData.value = null
-      break
-    case 'deputy':
-      deputyNameImageData.value = null
-      deputySignImageData.value = null
-      break
-    case 'payment':
-      paymentNameImageData.value = null
-      paymentSignImageData.value = null
-      break
-    case 'partner':
-      partnerNameImageData.value = null
-      partnerSignImageData.value = null
-      break
-    default:
-      console.error('Invalid pad type:', type)
-  }
-}
-
-const savePads = (type, nameData, signData) => {
-  switch (type) {
-    case 'forms':
-      nameImageData.value = nameData
-      signImageData.value = signData
-      break
-    case 'deputy':
-      deputyNameImageData.value = nameData
-      deputySignImageData.value = signData
-      break
-    case 'payment':
-      paymentNameImageData.value = nameData
-      paymentSignImageData.value = signData
-      break
-    case 'partner':
-      partnerNameImageData.value = nameData
-      partnerSignImageData.value = signData
-      break
-    default:
-      console.error('Invalid pad type:', type)
-  }
-}
-
-const deleteAgreePad = () => (agreePadData.value = null)
-const saveAgreePad = (padData) => (agreePadData.value = padData)
 //supported docs checkbox and handler
 const supportedImagesChecked = ref(true)
 // this handles file upload
@@ -700,16 +621,16 @@ const submit = async () => {
       checklist.push([paymentNameImageData.value, paymentSignImageData.value].every(Boolean))
     }
 
-    if (shouldShowAgreeContent) {
+    if (shouldShowAgreeContent.value) {
       checklist.push(agreePadData.value ? true : false)
     }
 
-    if (deputyAvailable) {
+    if (deputyAvailable.value) {
       checklist.push([deputyNameImageData.value, deputySignImageData.value].every(Boolean))
     }
   }
 
-  console.log(checklist.every((item) => item === true))
+  // console.log(checklist.every((item) => item === true))
 
   if (checklist.every((item) => item === true)) {
     await fetchForms()
@@ -918,45 +839,6 @@ async function fetchForms() {
 
 .uploadImageBox img:hover {
   opacity: 0.2;
-}
-
-.singImagesBox {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  max-width: 400px;
-  width: 100%;
-  height: 100px;
-  border-radius: 5px;
-  border: 1px dashed var(--main-color);
-  cursor: pointer;
-  position: relative;
-}
-
-.singImagesBox .images-row {
-  display: flex;
-  flex-flow: row;
-  height: 100%;
-  width: 100%;
-  gap: 5px;
-  box-sizing: border-box;
-  padding: 5px;
-}
-
-.singImagesBox .image {
-  width: 100%;
-  height: auto;
-  min-width: 100px;
-  max-height: 100px; /* Set a maximum height limit if needed */
-  object-fit: contain; /* Maintain aspect ratio and fit within the container */
-  background-color: #fbfbfb;
-}
-
-.sign-title {
-  line-height: 1;
-  padding: 0;
-  margin: 0;
-  margin-bottom: 7px;
 }
 
 .submit {

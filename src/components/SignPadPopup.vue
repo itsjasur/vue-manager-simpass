@@ -36,7 +36,7 @@ import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { useSnackbarStore } from '../stores/snackbar'
 
 const emit = defineEmits(['savePads', 'closePopup'])
-const props = defineProps(['type', 'userName'])
+const props = defineProps(['userName'])
 
 //pen sickness
 const signPenSickness = ref(4)
@@ -219,7 +219,7 @@ const savePads = () => {
   } else {
     const nameData = namePad.value.toDataURL()
     const signData = signPad.value.toDataURL()
-    emit('savePads', props.type, nameData, signData)
+    emit('savePads', nameData, signData)
     emit('closePopup')
   }
 }

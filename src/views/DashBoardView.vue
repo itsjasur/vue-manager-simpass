@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard-container">
-    <div :class="['dashboard-side-menu', { closed: !sideMenuStore.isOpen }]">
+    <div :class="['dashboard-side-menu', { open: sideMenuStore.isOpen }]">
       <SideMenu />
     </div>
 
@@ -36,41 +36,49 @@ const sideMenuStore = useSideMenuStore()
   flex-flow: row;
   height: 100vh;
   width: 100vw;
-  background-color: #fff;
   z-index: 1000;
+
+  background-color: #ffc0cb76;
 }
 
 .dashboard-side-menu {
   height: 100%;
-  width: 300px;
+  /* width: 300px; */
+  width: 0px;
   transition: width 0.3s ease;
+  z-index: 1001;
 }
 
-.dashboard-side-menu.closed {
-  width: 0px;
+.dashboard-side-menu.open {
+  width: 300px;
 }
+
+/* .dashboard-side-menu.closed {
+  width: 0px;
+} */
 
 .dashboard-view-content {
-  height: 100%;
-  background-color: #fce6fc;
   flex: 1;
+  height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
+  background-color: var(--main-background-color);
+  z-index: 1003;
 }
 
 .dashboard-view-content-header {
   height: 65px;
   width: 100%;
-  background-color: #fff;
   box-shadow: 0 2px 4px #00000010;
-  z-index: 1001;
+  /* z-index: 1002; */
 }
 
 .scrollable-view {
   display: flex;
   flex-flow: column;
   height: 100%;
-  background-color: #fff;
+  /* width: 100%; */
   overflow-y: scroll;
 }
 
@@ -79,7 +87,8 @@ const sideMenuStore = useSideMenuStore()
   font-size: 30px;
 }
 
-.mobile {
+.m-dashboard-side-menu-overlay,
+.m-dashboard-side-menu {
   display: none;
 }
 
@@ -90,6 +99,7 @@ const sideMenuStore = useSideMenuStore()
   }
 
   .m-dashboard-side-menu-overlay {
+    display: block;
     position: absolute;
     top: 0;
     left: 0;
@@ -100,6 +110,7 @@ const sideMenuStore = useSideMenuStore()
   }
 
   .m-dashboard-side-menu {
+    display: block;
     position: absolute;
     top: 0;
     left: 0;
@@ -107,7 +118,6 @@ const sideMenuStore = useSideMenuStore()
     width: 300px;
     z-index: 1101;
     transition: width 0.3s ease;
-    background-color: pink;
     overflow: hidden;
   }
 

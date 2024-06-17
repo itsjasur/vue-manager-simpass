@@ -7,8 +7,8 @@
       <span v-else @click="sideMenuStore.open()" class="material-symbols-outlined"> menu </span>
       <div class="title"><MenuTitle /></div>
     </div>
-    <!-- <div class="button" @click="useAuthenticationStore().logout()">Logout</div> -->
-    <div class="button" @click="sideMenuStore.toggle()">Logout</div>
+    <div class="button" @click="useAuthenticationStore().logout()">Logout</div>
+    <!-- <div class="button" @click="sideMenuStore.toggle()">Logout</div> -->
   </div>
 </template>
 
@@ -23,13 +23,14 @@ const sideMenuStore = useSideMenuStore()
 <style scoped>
 .header-row {
   display: flex;
+  /* flex-flow: wrap; */
   width: 100%;
   height: 100%;
   padding: 0 20px;
   align-items: center;
   justify-content: space-between;
-  background-color: #fff;
   box-sizing: border-box;
+  /* background-color: #fff; */
 }
 .button {
   font-size: 14px;

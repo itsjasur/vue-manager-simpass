@@ -43,6 +43,7 @@ export async function fetchWithTokenRefresh(url, options) {
   options.headers = { Authorization: `Bearer ${accessToken}` }
 
   // console.log('request body', options.body)
+
   if (options.method === 'POST' && options.body && !(options.body instanceof FormData)) {
     options.body = JSON.stringify(options.body)
   }

@@ -299,7 +299,7 @@ export const PAYMENT_FORM_DETAILS = {
   },
 
   account_name: {
-    value: 'TEST NAME',
+    value: null,
     type: 'input',
     maxwidth: '300px',
     error: '예금주명 입력하세요.',
@@ -309,7 +309,7 @@ export const PAYMENT_FORM_DETAILS = {
   },
 
   account_birthday: {
-    value: '1999-01-31',
+    value: null,
     type: 'cleave',
     pattern: cleavePatterns.birthdayPattern(),
     maxwidth: '200px',
@@ -320,7 +320,7 @@ export const PAYMENT_FORM_DETAILS = {
   },
 
   account_agency: {
-    value: 'Hana bank',
+    value: null,
     type: 'input',
     maxwidth: '300px',
     error: '은행(카드사)명 입력하세요.',
@@ -330,7 +330,7 @@ export const PAYMENT_FORM_DETAILS = {
   },
 
   account_number: {
-    value: '1231240293432',
+    value: null,
     type: 'input',
     maxwidth: '300px',
     error: '계좌번호(카드번호) 입력하세요.',
@@ -340,7 +340,7 @@ export const PAYMENT_FORM_DETAILS = {
   },
 
   card_yy_mm: {
-    value: '11/29',
+    value: null,
     type: 'cleave',
     pattern: {
       date: true,
@@ -380,7 +380,7 @@ export const USIM_FORM_DETAILS = {
   },
 
   usim_no: {
-    value: '1092312983712',
+    value: null,
     type: 'input',
     maxwidth: '300px',
     error: '일련번호 입력하세요.',
@@ -409,8 +409,8 @@ export const USIM_FORM_DETAILS = {
   },
 
   data_block_cd: {
-    label: '해외데이터로밍',
     value: null,
+    label: '해외데이터로밍',
     type: 'select',
     maxwidth: '300px',
     error: '해외데이터로밍을 선택하세요.',
@@ -419,8 +419,8 @@ export const USIM_FORM_DETAILS = {
   },
 
   data_roming_block_cd: {
-    label: '해외데이터로밍',
     value: null,
+    label: '해외데이터로밍',
     type: 'select',
     maxwidth: '300px',
     error: '해외데이터로밍을 선택하세요.',
@@ -477,7 +477,7 @@ export const USIM_FORM_DETAILS = {
   },
 
   phone_number: {
-    value: '010-1234-1234',
+    value: null,
     type: 'cleave',
     pattern: {
       prefix: '010-',
@@ -528,7 +528,7 @@ export const CUSTOMER_FORM_DETAILS = {
   },
 
   contact: {
-    value: '010-1234-1234',
+    value: null,
     type: 'cleave',
     pattern: {
       phone: true,
@@ -548,7 +548,7 @@ export const CUSTOMER_FORM_DETAILS = {
     error: '국적 선택하세요.',
     placeholder: '대한민국',
     hasDefault: true,
-    value: 'Korea',
+    value: null,
     label: '국적',
   },
 
@@ -558,7 +558,7 @@ export const CUSTOMER_FORM_DETAILS = {
     maxwidth: '200px',
     error: '신분증번호/여권번호 입력하세요.',
     placeholder: '910131-0000000',
-    value: '91239128321s',
+    value: null,
     hasDefault: true,
     label: '신분증번호/여권번호',
   },
@@ -570,7 +570,7 @@ export const CUSTOMER_FORM_DETAILS = {
     error: '가입자명 입력하세요.',
     placeholder: '홍길동',
     hasDefault: true,
-    value: 'TEST NAME',
+    value: null,
     label: '가입자명',
   },
 
@@ -582,7 +582,7 @@ export const CUSTOMER_FORM_DETAILS = {
     hasDefault: true,
     error: '생년월일 입력하세요.',
     placeholder: '1991-01-31',
-    value: '1999-01-31',
+    value: null,
     label: '생년월일',
   },
 
@@ -598,7 +598,7 @@ export const CUSTOMER_FORM_DETAILS = {
 
   address: {
     //
-    value: 'asdasdsa',
+    value: null,
     type: 'input',
     maxwidth: '400px',
     error: '주소 입력하세요.',
@@ -637,7 +637,7 @@ export const DEPUTY_FORM_DETAILS = {
     hasDefault: true,
     error: '법정대리인 생년월일 입력하세요.',
     placeholder: '1991-01-31',
-    value: '1999-01-31',
+    value: null,
     label: '법정대리인 생년월일',
   },
 
@@ -653,7 +653,7 @@ export const DEPUTY_FORM_DETAILS = {
   },
 
   deputy_contact: {
-    value: '010-1234-1234',
+    value: null,
     type: 'cleave',
     pattern: {
       phone: true,

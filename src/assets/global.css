@@ -3,6 +3,8 @@
   --text-color: #333;
   --border-color: #cccccc;
   --placeholder-color: #cacaca;
+
+  --main-background-color: #f7f7f7;
 }
 
 body {
@@ -67,7 +69,7 @@ button:hover:enabled {
 }
 
 .card:hover {
-  opacity: 0.7;
+  opacity: 0.5;
   cursor: pointer;
 }
 

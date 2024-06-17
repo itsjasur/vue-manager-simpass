@@ -51,30 +51,10 @@
 
     <div class="title">가입신청/고객정보</div>
 
-    <div class="sign-container">
-      <!-- partner sign container -->
-      <p class="sign-title">판매자 서명</p>
-      <div v-if="!nameImageData && !signImageData" @click="isDrawPadOpen = true" class="singImagesBox">
-        <span class="inner-icon material-symbols-outlined"> stylus_note </span>
-      </div>
-      <div v-else class="singImagesBox">
-        <span @click="deletePads()" class="delete-icon material-symbols-outlined"> delete </span>
-        <div class="images-row">
-          <img class="image" :src="nameImageData" alt="오류 이미지" @error="deletePads" />
-          <img class="image" :src="signImageData" alt="오류 이미지" />
-        </div>
-      </div>
-    </div>
+    <SignImageRowContainer type="self" placeholder="Jasur" @updated="updatePads" title="판매자 서명" />
+
     <button @click="submit">접수하기</button>
   </div>
-
-  <SignPadPopup
-    v-if="isDrawPadOpen"
-    type="self"
-    :userName="''"
-    @savePads="savePads"
-    @closePopup="isDrawPadOpen = false"
-  />
 </template>
 
 //
@@ -82,7 +62,7 @@
 import { ref, onMounted } from 'vue'
 import { useSnackbarStore } from '../stores/snackbar'
 import { fetchWithTokenRefresh } from '../utils/tokenUtils'
-import SignPadPopup from '../components/SignPadPopup.vue'
+import SignImageRowContainer from '../components/SignImageRowContainer.vue'
 
 const pname = ref('')
 const pcode = ref('')
@@ -93,23 +73,13 @@ const storeDetailAddress = ref('')
 const contractDate = ref('')
 const status = ref('')
 
-const isDrawPadOpen = ref(false)
 const nameImageData = ref(null)
 const signImageData = ref(null)
-const deletePads = () => {
-  nameImageData.value = null
-  signImageData.value = null
-}
 
-const savePads = (type, nameData, signData) => {
-  nameImageData.value = nameData
-  signImageData.value = signData
+const updatePads = ({ name, sign, type }) => {
+  nameImageData.value = name
+  signImageData.value = sign
 }
-
-// const options = [...Array(25)].map((_, i) => ({
-//   value: (i + 10).toString(36) + (i + 1)
-// }))
-const options = [{ value: 'a' }, { value: 'b' }]
 
 async function fetchProfileData() {
   try {
@@ -158,6 +128,7 @@ async function submit() {
         partner_seal: signImageData.value,
       },
     })
+
     if (response.ok) {
       const decodedResponse = await response.json()
       useSnackbarStore().showSnackbar(decodedResponse.message)
@@ -217,6 +188,8 @@ onMounted(fetchProfileData)
   border: 1px dashed var(--main-color);
   cursor: pointer;
   position: relative;
+
+  background-color: #fff;
 }
 .singImagesBox .images-row {
   display: flex;
@@ -230,10 +203,10 @@ onMounted(fetchProfileData)
 }
 .singImagesBox .image {
   width: 100%;
-  height: auto;
+  height: 100%;
   min-width: 100px;
   max-height: 100px; /* Set a maximum height limit if needed */
-  /* object-fit: contain;  */
+  object-fit: contain;
   background-color: #fbfbfb;
 }
 .delete-icon {

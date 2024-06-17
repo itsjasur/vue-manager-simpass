@@ -102,10 +102,12 @@
           <span class="left-label">휴대폰: </span>
           <span class="right-content">{{ item.phone_number }}</span>
         </div>
+
         <div class="card-row">
           <span class="left-label">접수일자: </span>
           <span class="right-content">{{ item.apply_date }}</span>
         </div>
+
         <div v-if="item.apply_forms === 'Y'" class="card-row">
           <span class="left-label">가입신청서: </span>
 
@@ -269,6 +271,7 @@ onMounted(fetchData)
 <style scoped>
 .container {
   max-width: 1400px;
+
   width: 100%;
   box-sizing: border-box;
   display: flex;
@@ -321,6 +324,7 @@ onMounted(fetchData)
   font-size: 14px;
   width: 100%;
   border-radius: 20px;
+  white-space: nowrap;
 }
 
 .status-A {

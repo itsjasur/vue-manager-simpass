@@ -1,12 +1,5 @@
 <template>
   <SearchAddressPopup v-if="addressPopup.active" />
-  <SignPadPopup
-    v-if="isDrawPadOpen"
-    type="rental"
-    :userName="registrer"
-    @savePads="savePads"
-    @closePopup="isDrawPadOpen = false"
-  />
 
   <div class="container">
     <div class="forms">
@@ -75,19 +68,9 @@
       >신청서 프린트 인쇄후 서명/사인 자필</a-checkbox
     >
 
+    <!-- partner sign container -->
     <div v-if="registererSignChecked">
-      <!-- partner sign container -->
-      <p class="sign-title">판매자 서명</p>
-      <div v-if="!nameImageData && !signImageData" @click="isDrawPadOpen = true" class="singImagesBox">
-        <span class="inner-icon material-symbols-outlined"> stylus_note </span>
-      </div>
-      <div v-else class="singImagesBox">
-        <span @click="deletePads()" class="delete-icon material-symbols-outlined"> delete </span>
-        <div class="images-row">
-          <img class="image" :src="nameImageData" alt="Signature" />
-          <img class="image" :src="signImageData" alt="Signature" />
-        </div>
-      </div>
+      <SignImageRowContainer type="self" :placeholder="registrer" @updated="updatePads" title="가입자서명" />
       <p v-if="!nameImageData && !signImageData && submitted" class="input-error-message">
         판매자서명을 하지 않았습니다.
       </p>
@@ -102,35 +85,28 @@ import { ref, watch } from 'vue'
 import * as cleavePatterns from '../utils/cleavePatterns'
 import SearchAddressPopup from '../components/SearchAddressPopup.vue'
 import { useSearchaddressStore } from '../stores/select-address-popup'
-import SignPadPopup from '../components/SignPadPopup.vue'
 import { useSnackbarStore } from '../stores/snackbar'
 import { fetchWithTokenRefresh } from '../utils/tokenUtils'
+import SignImageRowContainer from '../components/SignImageRowContainer.vue'
 
 const addressPopup = useSearchaddressStore()
-const registrer = ref('JASUR')
-const registrerBirthday = ref('1999-12-12')
-const registrerPhoneNumber = ref('010-1234-1234')
-const address = ref('test address')
-const addressDetails = ref('test address')
-const usimNumber = ref('asdas')
+const registrer = ref('')
+const registrerBirthday = ref('')
+const registrerPhoneNumber = ref('')
+const address = ref('')
+const addressDetails = ref('')
+const usimNumber = ref('')
 
 const submitted = ref(false)
 
 //sign checker
-//draw popup
-const isDrawPadOpen = ref(false)
 const registererSignChecked = ref(true)
 const nameImageData = ref(null)
 const signImageData = ref(null)
 
-const deletePads = () => {
-  nameImageData.value = null
-  signImageData.value = null
-}
-
-const savePads = (type, nameData, signData) => {
-  nameImageData.value = nameData
-  signImageData.value = signData
+const updatePads = ({ name, sign, type }) => {
+  nameImageData.value = name
+  signImageData.value = sign
 }
 
 watch(
