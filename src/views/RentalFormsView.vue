@@ -244,6 +244,7 @@ async function submit() {
   border: 1px dashed var(--main-color);
   cursor: pointer;
   position: relative;
+  background-color: #fff;
 }
 
 .upload-images-box img {
@@ -259,7 +260,7 @@ async function submit() {
   right: 3px;
   color: #ff3535 !important;
   cursor: pointer !important;
-  background-color: #ffffff;
+  background-color: #fff;
   padding: 2px;
   border-radius: 20px;
 }

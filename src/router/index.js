@@ -3,6 +3,7 @@ import { useAuthenticationStore } from '../stores/authentication'
 import { useRouteMemoryStore } from '../stores/router-memory-store'
 import DashBaordView from '../views/DashBoardView.vue'
 import LoginView from '../views/LoginView.vue'
+import SignupView from '../views/SignupView.vue'
 import HomeView from '../views/HomeView.vue'
 import RegistrationFormsView from '../views/RegistrationFormsView.vue'
 import ProfileView from '../views/ProfileView.vue'
@@ -21,6 +22,15 @@ const router = createRouter({
       component: LoginView,
       meta: {
         requiresAuth: false, // No authentication required
+      },
+    },
+
+    {
+      path: '/signup',
+      name: 'signup',
+      component: SignupView,
+      meta: {
+        requiresAuth: false,
       },
     },
     {

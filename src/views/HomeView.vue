@@ -69,9 +69,6 @@ const router = useRouter()
   padding: 10px;
   box-sizing: border-box;
   align-content: center;
-  background-color: #fff;
-
-  box-shadow: 0 0 5px #0000000a;
 }
 
 img {

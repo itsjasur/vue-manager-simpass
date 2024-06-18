@@ -137,19 +137,19 @@ onMounted(() => {
 }
 
 .card:hover {
-  opacity: 1;
   cursor: default;
+  background-color: #fff;
 }
+
 .mvno-logo-card {
   width: 50%;
   height: 30%;
-
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   margin-bottom: 10px;
-  background-color: white;
+  background-color: #f6f6f6;
   border-radius: 30px;
   position: relative;
 }

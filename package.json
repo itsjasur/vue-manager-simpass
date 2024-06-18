@@ -23,6 +23,7 @@
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.8.0",
+    "@types/cleave.js": "^1.4.12",
     "@types/vue-the-mask": "^0.11.5",
     "@vitejs/plugin-vue": "^5.0.4",
     "@vue/eslint-config-prettier": "^9.0.0",

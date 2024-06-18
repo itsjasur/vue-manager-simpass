@@ -812,6 +812,7 @@ async function fetchForms() {
   border: 1px dashed var(--main-color);
   cursor: pointer;
   position: relative;
+  background-color: #fff;
 }
 
 .uploadImageBox img {

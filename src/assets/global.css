@@ -16,7 +16,6 @@ button {
   width: 100%;
   min-height: 40px;
   height: 40px;
-  background-color: var(--main-color);
   color: white;
   border: none;
   border-radius: 4px;
@@ -24,10 +23,11 @@ button {
   transition: background-color 0.3s;
   font-size: 15px;
   user-select: none; /* unselectable */
+  background-color: var(--main-color);
 }
 
 button:disabled {
-  background-color: #959595;
+  background-color: #ababab;
 }
 
 button:hover:enabled {
@@ -40,11 +40,11 @@ button:hover:enabled {
   line-height: 1;
   box-sizing: border-box;
   border-radius: 4px;
-  background-color: #cbcbcb;
   color: #fff;
   text-align: center;
   align-content: center;
   user-select: none; /* unselectable */
+  background-color: #ababab;
 }
 
 .button.selected {
@@ -54,7 +54,7 @@ button:hover:enabled {
 
 .button:hover {
   cursor: pointer;
-  filter: brightness(0.9);
+  filter: brightness(0.6);
 }
 
 .close-button:hover {
@@ -63,14 +63,17 @@ button:hover:enabled {
 }
 
 .card {
-  background-color: #0000000a;
   border-radius: 4px;
   box-sizing: border-box;
+  background-color: #fff;
+  /* background-color: #0000000a; */
+  box-shadow: 0 0 5px #00000013;
 }
 
 .card:hover {
-  opacity: 0.5;
+  /* opacity: 0.5; */
   cursor: pointer;
+  background-color: #b5b5b5;
 }
 
 label {
@@ -110,11 +113,11 @@ input:focus {
   padding: 0;
   margin-top: 5px;
   color: #ff4c4c;
-  margin-top: 5px;
   font-size: 14px;
-  line-height: 1;
   max-lines: 2;
   white-space: pre-line; /* breaks into lines */
+  text-align: start;
+  line-height: 1;
 }
 
 .material-symbols-outlined {

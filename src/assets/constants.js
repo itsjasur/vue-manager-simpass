@@ -667,3 +667,12 @@ export const DEPUTY_FORM_DETAILS = {
     hasDefault: false,
   },
 }
+// const emailOptions = [
+//   { value: '@kakao.com', label: '@kakao.com' },
+//   { value: '@daum.net', label: '@daum.net' },
+//   { value: '@hanmail.net', label: '@hanmail.net' },
+//   { value: '@gmail.com', label: '@gmail.com' },
+//   { value: '@hotmail.com', label: '@hotmail.com' },
+//   { value: '@naver.com', label: '@naver.com' },
+//   { value: null, label: '직접입력' },
+// ]

@@ -17,11 +17,13 @@
   <router-view />
 
   <Snackbar />
+  <Warning />
 </template>
 
 <script setup>
 import { onMounted, onUnmounted, watch } from 'vue'
 import Snackbar from './components/Snackbar.vue'
+import Warning from './components/Warning.vue'
 // import router from './router'
 import { useRouter } from 'vue-router'
 import { useAuthenticationStore } from './stores/authentication'
@@ -64,6 +66,6 @@ onUnmounted(() => {
 body {
   margin: 0;
   padding: 0;
-  background-color: white;
+  background-color: var(--main-background-color);
 }
 </style>

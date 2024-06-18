@@ -1,27 +1,34 @@
 <template>
   <div class="main">
     <div class="login-container">
-      <h2>로그인</h2>
-      <p class="text2">판매점 아이디 와 비밀번호를 입력하세요</p>
-      <form @submit.prevent="login">
-        <div class="input-group">
-          <label for="username">판매점 아이디</label>
-          <input type="text" id="username" name="username" v-model="username" />
-          <p v-if="!username" class="input-error-message">{{ usernameErr }}</p>
-        </div>
-        <div class="input-group">
-          <label for="password">비밀번호</label>
-          <input type="password" id="password" name="password" v-model="password" />
-          <p v-if="!password" class="input-error-message">{{ passwordErr }}</p>
-        </div>
-        <div style="height: 20px"></div>
-        <button type="submit" :disabled="isLoading">
-          <span v-if="isLoading">
-            <LoadingSpinner height="20px" color="#ffffff" />
-          </span>
-          <span v-else>Login</span>
-        </button>
-      </form>
+      <div class="title-container">
+        <div class="title">로그인</div>
+        <div class="subtitle">판매점 아이디 와 비밀번호를 입력하세요</div>
+      </div>
+
+      <div class="group">
+        <label for="username">판매점 아이디</label>
+        <input type="text" id="username" name="username" v-model="username" />
+        <p v-if="!username" class="input-error-message">{{ usernameErr }}</p>
+      </div>
+
+      <div class="group">
+        <label for="password">비밀번호</label>
+        <input type="password" id="password" name="password" v-model="password" />
+        <p v-if="!password" class="input-error-message">{{ passwordErr }}</p>
+      </div>
+
+      <button @click="login" class="submit-button" :disabled="isLoading">
+        <span v-if="isLoading">
+          <LoadingSpinner height="20px" color="#ffffff" />
+        </span>
+        <span v-else>Login</span>
+      </button>
+      <hr />
+
+      <router-link to="/signup">
+        <button class="signup-button">판매점 계약 접수</button>
+      </router-link>
     </div>
 
     <p class="foot-note">
@@ -99,33 +106,52 @@ async function login(event) {
 
 <style scoped>
 .main {
-  justify-items: center;
-  align-content: center;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  display: flex;
-  height: 100vh;
-  background-color: #ffffff;
-  flex-direction: column;
-}
-
-.text2 {
-  padding: 10px 0;
+  box-sizing: border-box;
 }
 
 .login-container {
+  display: flex;
+  flex-flow: column;
+  gap: 20px;
   background-color: #ffffff;
-  padding: 40px 40px;
+  padding: 0 30px;
+  box-sizing: border-box;
   border-radius: 10px;
   text-align: center;
-  align-items: center;
-  justify-self: center;
-  width: 80%;
+  width: 450px;
+  height: auto;
+  box-shadow: 0 0 5px #00000013;
+}
+
+.title-container {
+  margin-top: 30px;
+  margin-bottom: 10px;
+  font-size: 15px;
+}
+
+.title {
+  font-size: 26px;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.group {
+  width: 100%;
+  display: flex;
+  flex-flow: column;
+  align-items: flex-start;
 }
 
 .input-group {
   margin: 20px 0;
   text-align: left;
+  width: 100%;
 }
 
 .foot-note {
@@ -135,19 +161,45 @@ async function login(event) {
   line-height: 1.6;
   font-size: 14px;
   text-align: center;
+  width: 500px;
 }
 
-@media (min-width: 600px) {
+.submit-button {
+  width: 100%;
+  margin-top: 20px;
+}
+
+hr {
+  border: none;
+  border-top: 1px dashed #ccc;
+  color: #fff;
+  margin: 10px;
+}
+
+.signup-button {
+  width: 100%;
+  background-color: #4471ca;
+  margin-bottom: 30px;
+}
+
+@media (max-width: 600px) {
   .main {
-    background-color: #f0f2f5;
+    background-color: #fff;
   }
+
   .login-container {
-    width: 400px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    box-shadow: none;
+
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
   }
 
   .foot-note {
-    width: 500px;
+    width: 100%;
   }
 }
 </style>
