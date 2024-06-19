@@ -75,6 +75,7 @@ const store = useWarningStore()
   font-size: 16px;
   color: #535353;
   line-height: 1.5;
+  white-space: pre-line;
 }
 
 button {

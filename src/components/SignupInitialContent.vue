@@ -87,7 +87,17 @@
   </div>
 
   <AgreementPopup v-if="agreementPopupIsOpen" @closePopup="agreementPopupIsOpen = false" />
-  <WaitingConfirmationPopup @closePopup="waitingConfirmationPopupOpen = false" v-if="waitingConfirmationPopupOpen" />
+
+  <WaitingConfirmationPopup
+    @closePopup="handleAgreemenPopupClosed"
+    v-if="waitingConfirmationPopupOpen"
+    :name="name"
+    :birthday="birthday"
+    :phoneNumber="phoneNumber"
+    :receiptId="receiptId"
+    :salesCd="employeeCode"
+    :idCertType="confirmationType"
+  />
 </template>
 
 <script setup>
@@ -98,19 +108,25 @@ import LoadingSpinner from './Loader.vue'
 import { useSnackbarStore } from '../stores/snackbar'
 import WaitingConfirmationPopup from './WaitingConfirmationPopup.vue'
 
+function handleAgreemenPopupClosed(result) {
+  waitingConfirmationPopupOpen.value = false
+  console.log('aggreement result is: ', result)
+}
+
 const agreeToTerms = ref(false)
-const employeeCode = ref('')
-const codeUnavailable = ref(false)
+const employeeCode = ref('') //sales_cd
+const codeUnavailable = ref(true)
 const agreementPopupIsOpen = ref(false)
 const name = ref('SOBIRJONOV JASURBEK ARISLONBEK UGLI')
 const phoneNumber = ref('01058189352')
 const birthday = ref('19950818')
-const confirmationType = ref('PASS')
+const confirmationType = ref('KAKAO')
 
 const isLoading = ref(false)
 const isSubmitted = ref(false)
 
 const waitingConfirmationPopupOpen = ref(false)
+const receiptId = ref('02406190231200000060000000000001') //response returns
 
 async function submit(event) {
   isLoading.value = true
@@ -129,27 +145,33 @@ async function submit(event) {
     return
   }
 
-  try {
-    const response = await fetch(import.meta.env.VITE_API_BASE_URL + 'auth/requestSign', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: name.value,
-        birthday: birthday.value.replace(/-/g, ''),
-        cert_phone_number: phoneNumber.value.replace(/-/g, ''),
-        id_cert_type: confirmationType.value,
-      }),
-    })
+  console.log(phoneNumber.value)
 
-    const data = await response.json()
-    if (data.result === 'ERROR') throw data.message
+  // try {
+  //   const response = await fetch(import.meta.env.VITE_API_BASE_URL + 'auth/requestSign', {
+  //     method: 'POST',
+  //     headers: { 'Content-Type': 'application/json' },
+  //     body: JSON.stringify({
+  //       name: name.value,
+  //       birthday: birthday.value.replace(/-/g, ''),
+  //       cert_phone_number: phoneNumber.value.replace(/-/g, ''),
+  //       id_cert_type: confirmationType.value,
+  //       sales_cd: employeeCode.value ?? '',
+  //     }),
+  //   })
 
-    waitingConfirmationPopupOpen.value = true
+  //   const data = await response.json()
+  //   if (data.result === 'ERROR') throw data.message
 
-    console.log(data)
-  } catch (err) {
-    useSnackbarStore().showSnackbar(err.toString())
-  }
+  //   if (data.result === 'SUCCESS') {
+  //     receiptId.value = data.receipt_id
+  //     waitingConfirmationPopupOpen.value = true
+  //   }
+
+  //   console.log(data)
+  // } catch (err) {
+  //   useSnackbarStore().showSnackbar(err.toString())
+  // }
 
   isLoading.value = false
 }

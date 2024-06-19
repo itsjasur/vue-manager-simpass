@@ -12,7 +12,7 @@
 
         <div class="steps">
           <div class="step">
-            <img v-if="props.type === 'kakao'" class="circle-cont" src=" ../assets/logos/kakao.png" alt="kakao" />
+            <img v-if="props.idCertType === 'kakao'" class="circle-cont" src=" ../assets/logos/kakao.png" alt="kakao" />
             <img v-else class="circle-cont" src=" ../assets/logos/pass.png" alt="kakao" />
 
             <span>STEP 01</span>
@@ -34,7 +34,7 @@
         </div>
 
         <div class="footer-note">
-          <template v-if="props.type === 'kakao'">
+          <template v-if="props.idCertType === 'kakao'">
             <span>문제발생시 조치방법</span>
             <span>
               1. 카카오인증서 이용에 문제가 있는 경우<a
@@ -63,7 +63,7 @@
           </template>
         </div>
 
-        <button @click="openWarning">인증완료</button>
+        <button @click="submit">인증완료</button>
       </div>
     </div>
   </div>
@@ -73,8 +73,10 @@
 import { useSnackbarStore } from '@/stores/snackbar'
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useWarningStore } from '../stores/warning'
+import { useSignUpstore } from '@/stores/signup-store'
 
 const warningStore = useWarningStore()
+const singUpStore = useSignUpstore()
 
 function openWarning() {
   warningStore.open('인증 미완료', [
@@ -86,11 +88,12 @@ function openWarning() {
 const emit = defineEmits(['closePopup'])
 
 const props = defineProps({
-  name: { type: String, default: 'pass' },
-  birthday: { type: String, default: 'pass' },
-  phoneNumber: { type: String, default: 'pass' },
-  type: { type: String, default: 'pass' },
-  id: { type: String, default: 'pass' },
+  name: { type: String, required: true },
+  birthday: { type: String, required: true },
+  phoneNumber: { type: String, required: true },
+  salesCd: { type: String, default: '', required: false },
+  receiptId: { type: String, required: true },
+  idCertType: { type: String, required: true },
 })
 
 onUnmounted(() => {
@@ -105,41 +108,46 @@ onMounted(() => {
   document.addEventListener('keydown', keydownHandle)
 })
 
-async function submit(event) {
+async function submit() {
+  console.log('submit closed')
+  emit('closePopup')
+
   try {
     const response = await fetch(import.meta.env.VITE_API_BASE_URL + 'auth/chkSign', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        name: name.value,
+        name: props.name,
         birthday: props.birthday.replace(/-/g, ''),
         cert_phone_number: props.phoneNumber.replace(/-/g, ''),
-        id_cert_type: props.confirmationType,
-        receipt_id: props.id,
+        id_cert_type: props.idCertType,
+        receipt_id: props.receiptId,
       }),
     })
 
-    if (!response.ok) throw 'Request error'
-
-    if (data.result === 'SUCCESS') {
-      //redirect to fill page
-    }
-
+    // if (!response.ok) throw 'Request error'
     const data = await response.json()
+    console.log(data)
+
+    // if (data.result === 'SUCCESS') {
+    if (true) {
+      //this closes the popup and updates the signup step in the store
+      console.log(props.phoneNumber)
+      singUpStore.next('secondary', data.receipt_id, props.salesCd, props.phoneNumber)
+      emit('closePopup')
+      return
+    }
 
     if (data?.result === 'EXPIRE' || data?.result === 'ERROR' || data?.result === 'BAD') {
       emit('closePopup')
-      warningStore.open('인증서 요청 만료', ['전자서명 화면을 닫고 다시 실행 부탁드립니다.', `사유:${data?.message}`])
+      warningStore.open('인증서 요청 만료', [data?.message])
+      return
     }
 
     if (data?.result === 'WAIT') {
-      warningStore.open('인증 미완료', [
-        '본인인증 전자서명이 완료되지 않았습니다.',
-        'PASS앱에서 인증서 전자서명을 완료한 이후에 다시 시도해주세요.',
-      ])
+      warningStore.open('인증 미완료', [data?.message])
+      return
     }
-
-    console.log(data)
   } catch (err) {
     useSnackbarStore().showSnackbar(err.toString())
   }

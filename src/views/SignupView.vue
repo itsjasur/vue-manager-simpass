@@ -1,10 +1,10 @@
 <template>
   <div class="container">
-    <template v-if="useGlobalDataStore().signupStep === 'initial'">
+    <template v-if="useSignUpstore().signupStep === 'initial'">
       <SignupInitialContent />
     </template>
 
-    <template v-if="useGlobalDataStore().signupStep === 'secondary'">
+    <template v-if="useSignUpstore().signupStep === 'secondary'">
       <SignupSecondaryContent />
     </template>
   </div>
@@ -13,7 +13,7 @@
 <script setup>
 import SignupInitialContent from '../components/SignupInitialContent.vue'
 import SignupSecondaryContent from '../components/SignupSecondaryContent.vue'
-import { useGlobalDataStore } from '../stores/global-data'
+import { useSignUpstore } from '../stores/signup-store'
 </script>
 
 <style scoped>
