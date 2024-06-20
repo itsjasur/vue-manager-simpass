@@ -49,3 +49,24 @@ export const formatDate = (today) => {
   const day = String(today.getDate()).padStart(2, '0')
   return `${year}-${month}-${day}`
 }
+
+export const isValidPassword = (password) => {
+  const minLength = 8
+  const uppercasePattern = /[A-Z]/
+  const numberPattern = /[0-9]/
+  const specialCharPattern = /[!@#$&~*%^?]/
+
+  if (password.length < minLength) {
+    return false
+  }
+  if (!uppercasePattern.test(password)) {
+    return false
+  }
+  if (!numberPattern.test(password)) {
+    return false
+  }
+  if (!specialCharPattern.test(password)) {
+    return false
+  }
+  return true
+}

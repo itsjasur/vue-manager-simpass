@@ -12,7 +12,12 @@
 
         <div class="steps">
           <div class="step">
-            <img v-if="props.idCertType === 'kakao'" class="circle-cont" src=" ../assets/logos/kakao.png" alt="kakao" />
+            <img
+              v-if="props.data?.idCertType === 'kakao'"
+              class="circle-cont"
+              src=" ../assets/logos/kakao.png"
+              alt="kakao"
+            />
             <img v-else class="circle-cont" src=" ../assets/logos/pass.png" alt="kakao" />
 
             <span>STEP 01</span>
@@ -34,7 +39,7 @@
         </div>
 
         <div class="footer-note">
-          <template v-if="props.idCertType === 'kakao'">
+          <template v-if="props.data?.idCertType === 'kakao'">
             <span>문제발생시 조치방법</span>
             <span>
               1. 카카오인증서 이용에 문제가 있는 경우<a
@@ -63,7 +68,14 @@
           </template>
         </div>
 
-        <button @click="submit">인증완료</button>
+        <button @click="submit" :disabled="isLoading">
+          <template v-if="isLoading">
+            <LoadingSpinner height="20px" color="#ffffff" />
+          </template>
+          <template v-else>
+            <span>인증완료</span>
+          </template>
+        </button>
       </div>
     </div>
   </div>
@@ -74,9 +86,12 @@ import { useSnackbarStore } from '@/stores/snackbar'
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useWarningStore } from '../stores/warning'
 import { useSignUpstore } from '@/stores/signup-store'
+import LoadingSpinner from '../components/Loader.vue'
 
 const warningStore = useWarningStore()
-const singUpStore = useSignUpstore()
+const signUpStore = useSignUpstore()
+
+const isLoading = ref(false)
 
 function openWarning() {
   warningStore.open('인증 미완료', [
@@ -88,12 +103,7 @@ function openWarning() {
 const emit = defineEmits(['closePopup'])
 
 const props = defineProps({
-  name: { type: String, required: true },
-  birthday: { type: String, required: true },
-  phoneNumber: { type: String, required: true },
-  salesCd: { type: String, default: '', required: false },
-  receiptId: { type: String, required: true },
-  idCertType: { type: String, required: true },
+  data: { type: Object, required: true },
 })
 
 onUnmounted(() => {
@@ -109,38 +119,28 @@ onMounted(() => {
 })
 
 async function submit() {
-  console.log('submit closed')
-  emit('closePopup')
-
+  isLoading.value = true
   try {
     const response = await fetch(import.meta.env.VITE_API_BASE_URL + 'auth/chkSign', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        name: props.name,
-        birthday: props.birthday.replace(/-/g, ''),
-        cert_phone_number: props.phoneNumber.replace(/-/g, ''),
-        id_cert_type: props.idCertType,
-        receipt_id: props.receiptId,
+        name: props.data?.name,
+        birthday: props.data?.birthday.replace(/-/g, ''),
+        cert_phone_number: props.data?.phoneNumber.replace(/-/g, ''),
+        id_cert_type: props.data?.idCertType,
+        receipt_id: props.data?.receiptId,
       }),
     })
 
     // if (!response.ok) throw 'Request error'
     const data = await response.json()
-    console.log(data)
 
-    // if (data.result === 'SUCCESS') {
-    if (true) {
+    // if (true) {
+    if (data.result === 'SUCCESS') {
       //this closes the popup and updates the signup step in the store
-      console.log(props.phoneNumber)
-      singUpStore.next('secondary', data.receipt_id, props.salesCd, props.phoneNumber)
+      signUpStore.next('secondary', props.data)
       emit('closePopup')
-      return
-    }
-
-    if (data?.result === 'EXPIRE' || data?.result === 'ERROR' || data?.result === 'BAD') {
-      emit('closePopup')
-      warningStore.open('인증서 요청 만료', [data?.message])
       return
     }
 
@@ -148,8 +148,16 @@ async function submit() {
       warningStore.open('인증 미완료', [data?.message])
       return
     }
+
+    if (data?.result === 'EXPIRE' || data?.result === 'ERROR' || data?.result === 'BAD') {
+      warningStore.open('인증서 요청 만료', [data?.message])
+      emit('closePopup')
+      return
+    }
   } catch (err) {
     useSnackbarStore().showSnackbar(err.toString())
+  } finally {
+    isLoading.value = false
   }
 }
 </script>

@@ -105,22 +105,19 @@ onMounted(() => {
 
 <style scoped>
 .main {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
+  min-height: 100%;
+  align-content: center;
 }
 .container {
-  max-width: 1000px;
-  width: 100%;
   display: flex;
   flex-flow: wrap;
   gap: 20px;
   justify-content: center;
-  /* overflow-y: scroll; */
+  align-items: center;
+  height: auto;
   padding: 40px 20px;
   box-sizing: border-box;
+  overflow-y: auto;
 }
 
 .card {

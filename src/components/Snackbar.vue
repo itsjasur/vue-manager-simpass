@@ -24,7 +24,7 @@ const snackbarStore = useSnackbarStore()
   padding: 10px 15px;
   border-radius: 4px;
   display: flex;
-  font-size: 15px;
+  font-size: 14px;
   max-width: 80%; /* mobile default */
   min-width: 40%;
   align-items: center;

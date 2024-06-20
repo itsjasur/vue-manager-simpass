@@ -14,7 +14,7 @@
         <label>사업자번호*</label>
 
         <div class="group-inner-row">
-          <input ref="companyNumberRef" placeholder="" />
+          <input ref="companyNumberRef" placeholder="" value="125-68-95633" />
           <button @click="checkBusinessRegNumber">중복채크</button>
         </div>
 
@@ -29,20 +29,19 @@
           <label>연락 번호*</label>
           <input
             placeholder=""
-            v-model="phoneNumber"
+            v-model="signUpStore.data.phoneNumber"
+            readonly
             v-cleave="{
               phone: true,
               phoneRegionCode: 'KR',
               delimiter: '-',
             }"
           />
-          <p v-if="!phoneNumber && isSubmitted" class="input-error-message">연락 번호를 입력하세요.</p>
         </div>
 
         <div class="group">
           <label>대표자 명*</label>
-          <input v-model="directoryName" placeholder="" />
-          <p v-if="!directoryName && isSubmitted" class="input-error-message">대표자 명을 입력해주세요.</p>
+          <input :value="signUpStore.data.name" placeholder="" readonly />
         </div>
       </div>
 
@@ -115,6 +114,7 @@
 
         <div class="group-inner-row">
           <input
+            type="username"
             v-model="username"
             @input="
               (event) => {
@@ -137,18 +137,26 @@
       <div class="group-row">
         <div class="group">
           <label>패스워드</label>
-          <input v-model="password" placeholder="" />
+          <input v-model="password" placeholder="" type="password" />
           <p v-if="!password && isSubmitted" class="input-error-message">연락 번호를 입력하세요.</p>
         </div>
 
         <div class="group">
           <label>패스워드 확인</label>
-          <input v-model="passwordCheck" placeholder="" />
+          <input v-model="passwordCheck" placeholder="" type="password" />
           <p v-if="!passwordCheck && isSubmitted" class="input-error-message">이메일주소를 입력해주세요.</p>
         </div>
       </div>
     </div>
-    <button @click="submit" class="submit-button">가입신청</button>
+
+    <button @click="submit" class="submit-button" :disabled="isLoading">
+      <template v-if="isLoading">
+        <LoadingSpinner height="20px" color="#ffffff" />
+      </template>
+      <template v-else>
+        <span>가입신청</span>
+      </template>
+    </button>
   </div>
 </template>
 
@@ -160,9 +168,16 @@ import SearchAddressPopup from '../components/SearchAddressPopup.vue'
 import { useSearchaddressStore } from '@/stores/select-address-popup'
 import { useSignUpstore } from '../stores/signup-store'
 import Cleave from 'cleave.js'
+import * as helpers from '@/utils/helpers'
+import { useRouter } from 'vue-router'
+import LoadingSpinner from '../components/Loader.vue'
+
+const router = useRouter()
 
 const signUpStore = useSignUpstore()
 const searchAddressPopup = useSearchaddressStore()
+
+const isLoading = ref(false)
 
 watch(
   () => searchAddressPopup.address,
@@ -194,19 +209,15 @@ async function checkUsername() {
     })
 
     const data = await response.json()
-    // console.log(data?.result)
     if (data?.result === 'OK') isUsernameOk.value = true
     usernamePrompt.value = data?.message
-    // console.log(data.message)
   } catch (err) {
     useSnackbarStore().showSnackbar(err.toString())
   }
 }
-async function checkBusinessRegNumber() {
+const checkBusinessRegNumber = async () => {
   isCompanyRegNumberOk.value = false
   companyRegNumberPrompt.value = null
-
-  console.log(companyRegNumber.value)
 
   try {
     const response = await fetch(import.meta.env.VITE_API_BASE_URL + 'auth/chkBizNum', {
@@ -219,8 +230,6 @@ async function checkBusinessRegNumber() {
 
     if (data?.result === 'OK') isCompanyRegNumberOk.value = true
     companyRegNumberPrompt.value = data?.message
-
-    console.log(data.message)
   } catch (err) {
     useSnackbarStore().showSnackbar(err.toString())
   }
@@ -228,13 +237,9 @@ async function checkBusinessRegNumber() {
 
 const companyName = ref('test name')
 
-const companyRegNumber = ref('101-12-12344')
+const companyRegNumber = ref('')
 const isCompanyRegNumberOk = ref(false)
 const companyRegNumberPrompt = ref()
-
-const directoryName = ref('test director')
-
-const phoneNumber = ref(signUpStore.phoneNumber)
 
 const email = ref('test@gmail.com')
 const emailAddition = ref(null)
@@ -243,26 +248,25 @@ const emailError = ref()
 const shopPhoneNumber = ref('02-2344-2434')
 const shopPhoneFax = ref()
 
-const username = ref()
+const username = ref('asd234kjas')
 const isUsernameOk = ref(false)
 const usernamePrompt = ref()
 
 const address = ref('test address')
 const addressDetails = ref()
 
-const password = ref('password1234')
-const passwordCheck = ref('password1234')
+const password = ref('Password1234!')
+const passwordCheck = ref('Password1234!')
 
 const isSubmitted = ref(false)
 
 async function submit() {
   isSubmitted.value = true
+  isLoading.value = true
 
   const isAllfilled = [
     companyName.value,
     companyRegNumber.value,
-    phoneNumber.value,
-    directoryName.value,
     shopPhoneNumber.value,
     address.value,
     username.value,
@@ -282,48 +286,56 @@ async function submit() {
     return
   }
 
-  console.log(isAllfilled)
-
+  //checks if all required fields and requirements are met
   if (!isAllfilled) return
 
   try {
+    const body = {
+      username: username.value, //아이디
+      password: password.value, //패스워드
+      partner_nm: companyName.value, //판매점명
+      business_num: companyRegNumber.value, //사업자번호
+      address: address.value, //주소
+      dtl_address: addressDetails.value, //상세주소
+      email: email.value,
+      store_contact: shopPhoneNumber.value.replace(/-/g, ''), //매장번호
+      store_fax: shopPhoneFax.value.replace(/-/g, ''), //매장팩스
+
+      contractor: signUpStore.data.name, //대표자명
+      receipt_id: signUpStore.data.receiptId,
+      id_cert_type: signUpStore.data.idCertType,
+      phone_number: signUpStore.data.phoneNumber.replace(/-/g, ''),
+      birthday: signUpStore.data.birthday.replace(/-/g, ''), // 생년월일
+      sales_cd: signUpStore.data.salesCd, //영업사원코드
+    }
+
     const response = await fetch(import.meta.env.VITE_API_BASE_URL + 'auth/partnerjoin', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username: username.value, //아이디
-        password: password.value, //패스워드
-        contractor: directoryName.value, //대표자명
-        birthday: birthday.value, // 생년월일
-        partner_nm: companyName.value, //판매점명
-        phone_number: phoneNumber.value.replace(/-/g, ''), //휴대폰번호
-        bussines_num: companyRegNumber.value, //사업자번호
-        id_cert_type: signUpStore.idCertType,
-        receipt_id: signUpStore.receiptId,
-        address: address.value, //주소
-        dtl_address: addressDetails.value, //상세주소
-        email: email.value,
-        store_contact: shopPhoneNumber.value.replace(/-/g, ''), //매장번호
-        store_fax: shopPhoneFax.value.replace(/-/g, ''), //매장팩스
-        sales_cd: '', //영업사원코드
-      }),
+      body: JSON.stringify(body),
     })
 
     const data = await response.json()
 
-    if (data?.result === 'OK') isCompanyRegNumberOk.value = true
-    companyRegNumberPrompt.value = data?.message
-
-    console.log(data.message)
+    if (data.result === 'SUCCESS') {
+      //success redirect to login
+      signUpStore.clear()
+      router.push('login')
+      useSnackbarStore().showSnackbar('등록이 성공적으로 완료되었습니다. 아이디와 비밀번호로 로그인해주세요.')
+      return
+    } else {
+      //errors redirect to login
+      throw data?.message
+    }
   } catch (err) {
     useSnackbarStore().showSnackbar(err.toString())
+  } finally {
+    isLoading.value = false
   }
 }
 function validateEmail() {
   emailError.value = false
-
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
   emailError.value = !emailPattern.test(email.value + emailAddition.value)
 }
 

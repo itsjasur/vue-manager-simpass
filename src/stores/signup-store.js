@@ -2,21 +2,19 @@ import { defineStore } from 'pinia'
 
 export const useSignUpstore = defineStore('signupStore', {
   state: () => ({
-    // signupStep: 'initial',
-    signupStep: 'secondary',
-    receiptId: '',
-    salesCd: '',
-    phoneNumber: '01023123123',
-    idCertType: '',
+    signupStep: 'initial',
+    data: {},
   }),
 
   actions: {
-    next(newStep, receiptId, salesCd, phoneNumber, idCertType) {
+    next(newStep, data) {
       this.signupStep = newStep
-      this.receiptId = receiptId
-      this.salesCd = salesCd
-      this.phoneNumber = phoneNumber
-      this.idCertType = idCertType
+      this.data = data
+    },
+
+    clear() {
+      this.signupStep = 'initial'
+      this.data = {}
     },
   },
 })

@@ -310,7 +310,6 @@ const drawType = ref('')
 const nameForPad = ref('')
 
 const updatePads = ({ name, sign, type }) => {
-  // console.log
   switch (type) {
     case 'forms':
       nameImageData.value = name
@@ -629,8 +628,6 @@ const submit = async () => {
       checklist.push([deputyNameImageData.value, deputySignImageData.value].every(Boolean))
     }
   }
-
-  // console.log(checklist.every((item) => item === true))
 
   if (checklist.every((item) => item === true)) {
     await fetchForms()

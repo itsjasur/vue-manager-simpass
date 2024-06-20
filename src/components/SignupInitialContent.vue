@@ -13,7 +13,7 @@
     <div class="partition">
       <div class="partition-title">
         <span> 영업사원코드 입력</span>
-        <a-checkbox v-model:checked="codeUnavailable" @change="codeUnavailable ? (employeeCode = '') : null"
+        <a-checkbox v-model:checked="codeUnavailable" @change="codeUnavailable ? (salesCd = '') : null"
           >코드없음</a-checkbox
         >
       </div>
@@ -21,15 +21,15 @@
       <div class="group">
         <label>영업사원코드</label>
         <input
-          v-model="employeeCode"
+          v-model="salesCd"
           placeholder="AAA0000"
-          @input="employeeCode = employeeCode.toUpperCase()"
+          @input="salesCd = salesCd.toUpperCase()"
           :disabled="codeUnavailable"
         />
-        <p v-if="!codeUnavailable && isSubmitted && !employeeCode" class="input-error-message">
+        <p v-if="!codeUnavailable && isSubmitted && !salesCd" class="input-error-message">
           영업사원에게서 전달받은 코드를 입력해주세요.
         </p>
-        <p v-if="!codeUnavailable && isSubmitted && !employeeCode" class="input-error-message">
+        <p v-if="!codeUnavailable && isSubmitted && !salesCd" class="input-error-message">
           없을 경우 코드없음을 체크해 주세요.
         </p>
       </div>
@@ -59,7 +59,7 @@
       </div>
     </div>
 
-    <a-radio-group v-model:value="confirmationType" class="radio-partition">
+    <a-radio-group v-model:value="idCertType" class="radio-partition">
       <div class="radio-container">
         <img src="../assets/logos/kakao.png" alt="kakao" />
         <div>카카오 인증서</div>
@@ -79,24 +79,29 @@
     </div>
 
     <button @click="submit" :disabled="isLoading">
-      <span v-if="isLoading">
+      <template v-if="isLoading">
         <LoadingSpinner height="20px" color="#ffffff" />
-      </span>
-      <span v-else class="material-symbols-outlined"> verified_user </span> 전자서명
+      </template>
+      <template v-else>
+        <span class="material-symbols-outlined"> verified_user </span>
+        <span>전자서명</span>
+      </template>
     </button>
   </div>
 
   <AgreementPopup v-if="agreementPopupIsOpen" @closePopup="agreementPopupIsOpen = false" />
 
   <WaitingConfirmationPopup
-    @closePopup="handleAgreemenPopupClosed"
+    @closePopup="waitingConfirmationPopupOpen.value = false"
     v-if="waitingConfirmationPopupOpen"
-    :name="name"
-    :birthday="birthday"
-    :phoneNumber="phoneNumber"
-    :receiptId="receiptId"
-    :salesCd="employeeCode"
-    :idCertType="confirmationType"
+    :data="{
+      name: name,
+      birthday: birthday.replace(/-/g, ''),
+      phoneNumber: phoneNumber.replace(/-/g, ''),
+      receiptId: receiptId,
+      salesCd: salesCd,
+      idCertType: idCertType,
+    }"
   />
 </template>
 
@@ -104,29 +109,28 @@
 import { ref, onMounted } from 'vue'
 import AgreementPopup from './AgreementPopup.vue'
 import * as cleavePatterns from '../utils/cleavePatterns'
-import LoadingSpinner from './Loader.vue'
+import LoadingSpinner from '../components/Loader.vue'
 import { useSnackbarStore } from '../stores/snackbar'
 import WaitingConfirmationPopup from './WaitingConfirmationPopup.vue'
-
-function handleAgreemenPopupClosed(result) {
-  waitingConfirmationPopupOpen.value = false
-  console.log('aggreement result is: ', result)
-}
+import { useSignUpstore } from '@/stores/signup-store'
 
 const agreeToTerms = ref(false)
-const employeeCode = ref('') //sales_cd
+const salesCd = ref('') //sales_cd
 const codeUnavailable = ref(true)
 const agreementPopupIsOpen = ref(false)
 const name = ref('SOBIRJONOV JASURBEK ARISLONBEK UGLI')
 const phoneNumber = ref('01058189352')
 const birthday = ref('19950818')
-const confirmationType = ref('KAKAO')
+const idCertType = ref('KAKAO')
 
 const isLoading = ref(false)
 const isSubmitted = ref(false)
 
 const waitingConfirmationPopupOpen = ref(false)
-const receiptId = ref('02406190231200000060000000000001') //response returns
+const receiptId = ref() //response returns
+
+//cleaning up store
+onMounted(useSignUpstore().clear)
 
 async function submit(event) {
   isLoading.value = true
@@ -136,7 +140,7 @@ async function submit(event) {
     name.value,
     phoneNumber.value,
     birthday.value,
-    codeUnavailable.value ? true : employeeCode.value,
+    codeUnavailable.value ? true : salesCd.value,
   ].every(Boolean)
 
   if (!isAllTruthy) {
@@ -145,35 +149,29 @@ async function submit(event) {
     return
   }
 
-  console.log(phoneNumber.value)
-
-  // try {
-  //   const response = await fetch(import.meta.env.VITE_API_BASE_URL + 'auth/requestSign', {
-  //     method: 'POST',
-  //     headers: { 'Content-Type': 'application/json' },
-  //     body: JSON.stringify({
-  //       name: name.value,
-  //       birthday: birthday.value.replace(/-/g, ''),
-  //       cert_phone_number: phoneNumber.value.replace(/-/g, ''),
-  //       id_cert_type: confirmationType.value,
-  //       sales_cd: employeeCode.value ?? '',
-  //     }),
-  //   })
-
-  //   const data = await response.json()
-  //   if (data.result === 'ERROR') throw data.message
-
-  //   if (data.result === 'SUCCESS') {
-  //     receiptId.value = data.receipt_id
-  //     waitingConfirmationPopupOpen.value = true
-  //   }
-
-  //   console.log(data)
-  // } catch (err) {
-  //   useSnackbarStore().showSnackbar(err.toString())
-  // }
-
-  isLoading.value = false
+  try {
+    const response = await fetch(import.meta.env.VITE_API_BASE_URL + 'auth/requestSign', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: name.value,
+        birthday: birthday.value.replace(/-/g, ''),
+        cert_phone_number: phoneNumber.value.replace(/-/g, ''),
+        id_cert_type: idCertType.value,
+        sales_cd: salesCd.value ?? '',
+      }),
+    })
+    const data = await response.json()
+    if (data.result === 'ERROR') throw data.message
+    if (data.result === 'SUCCESS') {
+      receiptId.value = data.receipt_id
+      waitingConfirmationPopupOpen.value = true
+    }
+  } catch (err) {
+    useSnackbarStore().showSnackbar(err.toString())
+  } finally {
+    isLoading.value = false
+  }
 }
 </script>
 

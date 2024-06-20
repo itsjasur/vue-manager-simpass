@@ -39,19 +39,6 @@
 import MenuTitle from '../components/MenuTitle.vue'
 import { SIDEMENUNAMES } from '../assets/constants'
 import { useSideMenuStore } from '../stores/side-menu'
-import { useRouter, useRoute } from 'vue-router'
-
-const router = useRouter()
-
-const route = useRoute()
-
-console.log(route.fullPath)
-
-const handleResize = () => {
-  // if (window.innerWidth <= 960) {
-  // useSideMenuStore().close()
-  // }
-}
 </script>
 
 <style scoped>
