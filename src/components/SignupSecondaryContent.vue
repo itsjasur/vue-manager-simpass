@@ -14,8 +14,8 @@
         <label>사업자번호*</label>
 
         <div class="group-inner-row">
-          <input ref="companyNumberRef" placeholder="" value="125-68-95633" />
-          <button @click="checkBusinessRegNumber">중복채크</button>
+          <input ref="companyNumberRef" placeholder="" value="" />
+          <button @click="checkBusinessRegNumber">중복체크</button>
         </div>
 
         <p v-if="!companyRegNumber && isSubmitted" class="input-error-message">사업자번호를 정확하게 입력하세요.</p>
@@ -118,6 +118,7 @@
             v-model="username"
             @input="
               (event) => {
+                validateIdInput(event)
                 if (isUsernameOk || !usernamePrompt) {
                   isUsernameOk = false
                   usernamePrompt = null
@@ -126,7 +127,7 @@
             "
             placeholder=""
           />
-          <button @click="checkUsername">중복채크</button>
+          <button @click="checkUsername">중복체크</button>
         </div>
         <p v-if="!username && isSubmitted" class="input-error-message">아이디를 입력하세요.</p>
         <p v-if="username && usernamePrompt" :class="['input-error-message', { 'input-success': isUsernameOk }]">
@@ -137,14 +138,23 @@
       <div class="group-row">
         <div class="group">
           <label>패스워드</label>
-          <input v-model="password" placeholder="" type="password" />
-          <p v-if="!password && isSubmitted" class="input-error-message">연락 번호를 입력하세요.</p>
+          <input v-model="password" placeholder="" type="password" @input="checkPass" />
+          <p v-if="!password && isSubmitted" class="input-error-message">비밀번호를 입력해주세요.</p>
+          <p v-if="password && passwordPrompt" :class="['input-error-message', { 'input-success': passwordValid }]">
+            {{ passwordPrompt }}
+          </p>
         </div>
 
         <div class="group">
           <label>패스워드 확인</label>
-          <input v-model="passwordCheck" placeholder="" type="password" />
-          <p v-if="!passwordCheck && isSubmitted" class="input-error-message">이메일주소를 입력해주세요.</p>
+          <input v-model="passwordCheck" placeholder="" type="password" @input="checkPass" />
+          <p v-if="!passwordCheck && isSubmitted" class="input-error-message">비밀번호를 다시 입력해주세요.</p>
+          <p
+            v-if="passwordCheck && passwordCheckPrompt"
+            :class="['input-error-message', { 'input-success': passwordCheckValid }]"
+          >
+            {{ passwordCheckPrompt }}
+          </p>
         </div>
       </div>
     </div>
@@ -171,6 +181,9 @@ import Cleave from 'cleave.js'
 import * as helpers from '@/utils/helpers'
 import { useRouter } from 'vue-router'
 import LoadingSpinner from '../components/Loader.vue'
+import { useWarningStore } from '../stores/warning'
+
+const warningStore = useWarningStore()
 
 const router = useRouter()
 
@@ -188,13 +201,13 @@ watch(
 )
 
 const emailOptions = [
-  { value: null, label: '직접입력' },
-  { value: '@kakao.com', label: '@kakao.com' },
-  { value: '@daum.net', label: '@daum.net' },
-  { value: '@hanmail.net', label: '@hanmail.net' },
-  { value: '@gmail.com', label: '@gmail.com' },
-  { value: '@hotmail.com', label: '@hotmail.com' },
+  { value: '', label: '직접입력' },
   { value: '@naver.com', label: '@naver.com' },
+  { value: '@daum.net', label: '@daum.net' },
+  { value: '@kakao.com', label: '@kakao.com' },
+  { value: '@gmail.com', label: '@gmail.com' },
+  { value: '@hanmail.net', label: '@hanmail.net' },
+  { value: '@hotmail.com', label: '@hotmail.com' },
 ]
 
 async function checkUsername() {
@@ -235,34 +248,60 @@ const checkBusinessRegNumber = async () => {
   }
 }
 
-const companyName = ref('test name')
-
+const companyName = ref()
 const companyRegNumber = ref('')
 const isCompanyRegNumberOk = ref(false)
 const companyRegNumberPrompt = ref()
 
-const email = ref('test@gmail.com')
-const emailAddition = ref(null)
-const emailError = ref()
+const email = ref()
+const emailAddition = ref('')
+const emailError = ref(false)
 
-const shopPhoneNumber = ref('02-2344-2434')
+const shopPhoneNumber = ref()
 const shopPhoneFax = ref()
 
-const username = ref('asd234kjas')
+const username = ref('')
 const isUsernameOk = ref(false)
 const usernamePrompt = ref()
 
-const address = ref('test address')
+const address = ref()
 const addressDetails = ref()
 
-const password = ref('Password1234!')
-const passwordCheck = ref('Password1234!')
+const password = ref()
+const passwordValid = ref(false)
+const passwordPrompt = ref()
+const passwordCheck = ref()
+const passwordCheckValid = ref()
+const passwordCheckPrompt = ref()
 
 const isSubmitted = ref(false)
 
+function checkPass() {
+  passwordPrompt.value = null
+  passwordValid.value = false
+  passwordCheckPrompt.value = null
+  passwordCheckValid.value = false
+
+  if (!helpers.isValidPassword(password.value)) {
+    passwordPrompt.value =
+      '최소 8자이상, 영문대문자 1개이상포함, 숫자 1개이상포함, 특수문자(! @ # $ & ~ * % ^ ?) 1개이상포함'
+  } else {
+    passwordValid.value = true
+    passwordPrompt.value = 'OK'
+  }
+
+  if (password.value !== passwordCheck.value) {
+    passwordCheckPrompt.value = '비밀번호가 일치하지 않습니다'
+  } else {
+    passwordCheckValid.value = true
+    passwordCheckPrompt.value = 'OK'
+  }
+}
+
 async function submit() {
+  if (password.value !== passwordCheck.value) useSnackbarStore().showSnackbar('비밀번호가 일치하지 않습니다')
+
   isSubmitted.value = true
-  isLoading.value = true
 
   const isAllfilled = [
     companyName.value,
@@ -270,7 +309,9 @@ async function submit() {
     shopPhoneNumber.value,
     address.value,
     username.value,
-    password.value && password.value === passwordCheck.value,
+    password.value,
+    password.value === passwordCheck.value,
+    passwordCheck.value,
     username.value && isUsernameOk.value,
     email.value && !emailError.value,
   ].every(Boolean)
@@ -290,6 +331,8 @@ async function submit() {
   if (!isAllfilled) return
 
   try {
+    isLoading.value = true
+
     const body = {
       username: username.value, //아이디
       password: password.value, //패스워드
@@ -297,15 +340,15 @@ async function submit() {
       business_num: companyRegNumber.value, //사업자번호
       address: address.value, //주소
       dtl_address: addressDetails.value, //상세주소
-      email: email.value,
-      store_contact: shopPhoneNumber.value.replace(/-/g, ''), //매장번호
-      store_fax: shopPhoneFax.value.replace(/-/g, ''), //매장팩스
+      email: email.value + emailAddition.value,
+      store_contact: shopPhoneNumber.value?.replace(/-/g, ''), //매장번호
+      store_fax: shopPhoneFax.value?.replace(/-/g, ''), //매장팩스
 
       contractor: signUpStore.data.name, //대표자명
       receipt_id: signUpStore.data.receiptId,
       id_cert_type: signUpStore.data.idCertType,
-      phone_number: signUpStore.data.phoneNumber.replace(/-/g, ''),
-      birthday: signUpStore.data.birthday.replace(/-/g, ''), // 생년월일
+      phone_number: signUpStore.data?.phoneNumber?.replace(/-/g, ''),
+      birthday: signUpStore.data?.birthday?.replace(/-/g, ''), // 생년월일
       sales_cd: signUpStore.data.salesCd, //영업사원코드
     }
 
@@ -319,9 +362,15 @@ async function submit() {
 
     if (data.result === 'SUCCESS') {
       //success redirect to login
+
+      const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+      await delay(2000)
+
+      warningStore.open('등록이 성공적으로 완료되었습니다', ['아이디와 비밀번호로 로그인해주세요.'])
+
       signUpStore.clear()
       router.push('login')
-      useSnackbarStore().showSnackbar('등록이 성공적으로 완료되었습니다. 아이디와 비밀번호로 로그인해주세요.')
+
       return
     } else {
       //errors redirect to login
@@ -333,8 +382,14 @@ async function submit() {
     isLoading.value = false
   }
 }
+
+const validateIdInput = (event) => {
+  const regex = /[^a-zA-Z0-9]/g // Regular expression to match non-alphanumeric characters
+  event.target.value = event.target.value.toLowerCase().replace(regex, '')
+  username.value = event.target.value
+}
+
 function validateEmail() {
-  emailError.value = false
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   emailError.value = !emailPattern.test(email.value + emailAddition.value)
 }

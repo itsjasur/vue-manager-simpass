@@ -25,8 +25,12 @@
 </template>
 
 <script setup>
-import { ref, defineProps, defineEmits } from 'vue'
+import { ref, watch, onUnmounted } from 'vue'
 import SignPadPopup from '../components/SignPadPopup.vue'
+
+import { useNameSignDataStore } from '../stores/name-sign-data-store'
+
+const signStore = useNameSignDataStore()
 
 const props = defineProps({
   errorMessage: { type: String, default: null },
@@ -38,8 +42,8 @@ const props = defineProps({
 const emit = defineEmits(['updated']) // emits with a data object
 
 const isDrawPadOpen = ref(false)
-const nameData = ref(null)
-const signData = ref(null)
+const nameData = ref(signStore.nameData)
+const signData = ref(signStore.signData)
 
 const deletePads = () => {
   nameData.value = null
@@ -52,6 +56,15 @@ const savePads = (name, sign) => {
   signData.value = sign
   emit('updated', { name, sign, type: props.type }) // emits saved data
 }
+
+watch(
+  () => [signStore.nameData, signStore.signData],
+  () => {
+    nameData.value = signStore.nameData
+    signData.value = signStore.signData
+  }
+)
+onUnmounted(signStore.clear)
 </script>
 
 <style scoped>

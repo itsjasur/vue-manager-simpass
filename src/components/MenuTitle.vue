@@ -34,6 +34,12 @@ const title = computed(() => {
     return SIDEMENUNAMES[5]
   }
 
+  console.log(route.name)
+
+  if (route.name === 'form-details') {
+    return SIDEMENUNAMES[2]
+  }
+
   return 'Nothing'
 })
 </script>

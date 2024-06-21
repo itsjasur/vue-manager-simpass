@@ -1,53 +1,57 @@
 <template>
-  <div class="overlay">
+  <div v-if="popup.active" class="overlay">
     <div class="popup-content">
       <div class="innerHeader">
         <h3 class="title">주소 검색</h3>
-
-        <span @click="popup.close()" class="material-symbols-outlined close-button"> cancel </span>
+        <span @click="popup.close()" class="material-symbols-outlined close-button">cancel</span>
       </div>
-
       <div style="margin-top: 10px; width: 100%; height: calc(100% - 70px)" ref="embed"></div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref, watchEffect } from 'vue'
 import { useSearchaddressStore } from '../stores/select-address-popup'
 
 const popup = useSearchaddressStore()
 const embed = ref(null)
 
-//this handles keyboard actions
+// This handles keyboard actions
 function keydownHandle(event) {
-  if (event.key === 'Escape') {
-    // emit('closePopup')
-    popup.close()
-  }
+  if (event.key === 'Escape') popup.close()
 }
 
-onMounted(async () => {
+onMounted(() => {
+  // listen for keydown events
   document.addEventListener('keydown', keydownHandle)
-
-  new window.daum.Postcode({
-    width: '100%', //width of the iframe
-    height: '100%',
-    oncomplete: (data) => {
-      let selectedType = data.userSelectedType
-      let roadAddr = data.roadAddress
-      let jibunAddr = data.jibunAddress
-      let buildingName = data.buildingName
-
-      popup.address = selectedType === 'R' ? roadAddr : jibunAddr
-      popup.buildingName = buildingName
-      popup.close()
-    },
-  }).embed(embed.value)
 })
 
 onUnmounted(() => {
+  // cleanup keydown event listener
   document.removeEventListener('keydown', keydownHandle)
+})
+
+// watchs for changes in popup.active and mount the Daum Postcode widget when active
+watchEffect(() => {
+  if (popup.active) {
+    if (embed.value) {
+      new window.daum.Postcode({
+        width: '100%', // Width of the iframe
+        height: '100%',
+        oncomplete: (data) => {
+          let selectedType = data.userSelectedType
+          let roadAddr = data.roadAddress
+          let jibunAddr = data.jibunAddress
+          let buildingName = data.buildingName
+
+          popup.address = selectedType === 'R' ? roadAddr : jibunAddr
+          popup.buildingName = buildingName
+          popup.close()
+        },
+      }).embed(embed.value)
+    }
+  }
 })
 </script>
 
@@ -60,8 +64,8 @@ onUnmounted(() => {
   left: 0;
   width: 100vw;
   height: 100vh;
-  justify-content: center; /* Center horizontally */
-  align-items: center; /* Center vertically */
+  justify-content: center; /* cnters horizontally */
+  align-items: center; /* centers vertically */
   z-index: 1100;
   background-color: rgba(0, 0, 0, 0.552);
   padding: 20px;

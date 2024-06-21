@@ -6,6 +6,7 @@ export const useAuthenticationStore = defineStore('status', {
     // role: [],
     id: '',
     userName: '',
+    isAutoLoggedOut: true,
   }),
 
   actions: {

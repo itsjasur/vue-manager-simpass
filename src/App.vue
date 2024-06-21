@@ -18,6 +18,7 @@
 
   <Snackbar />
   <Warning />
+  <SearchAddressPopup />
 </template>
 
 <script setup>
@@ -29,6 +30,7 @@ import { useRouter } from 'vue-router'
 import { useAuthenticationStore } from './stores/authentication'
 import { useRouteMemoryStore } from './stores/router-memory-store'
 import { useSideMenuStore } from './stores/side-menu'
+import SearchAddressPopup from './components/SearchAddressPopup.vue'
 
 const router = useRouter()
 const authStore = useAuthenticationStore()
@@ -38,7 +40,7 @@ watch(
   () => authStore.isLoggedIn,
   (newIsLoggedIn) => {
     if (!newIsLoggedIn) {
-      useRouteMemoryStore().save(router.currentRoute.value.fullPath)
+      if (authStore.isAutoLoggedOut) useRouteMemoryStore().save(router.currentRoute.value.fullPath)
       router.push('/login')
     }
   }

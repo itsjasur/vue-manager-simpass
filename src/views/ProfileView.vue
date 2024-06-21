@@ -3,13 +3,25 @@
     <div class="title">가입신청/고객정보</div>
     <div class="row">
       <div class="groups">
-        <label>판매점코드 </label>
+        <label>판매점 아이디 </label>
         <input v-model="pcode" placeholder="SM00000" readonly />
       </div>
 
       <div class="groups">
         <label>판매점명</label>
         <input v-model="pname" placeholder="" readonly />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="groups">
+        <label for="contact">대표자명</label>
+        <input id="contact" :value="data.contractor" placeholder="" readonly />
+      </div>
+
+      <div class="groups">
+        <label>사업자번호</label>
+        <input :value="data.business_num" placeholder="" readonly />
       </div>
     </div>
 
@@ -39,7 +51,7 @@
 
     <div class="row">
       <div class="groups">
-        <label>계약일자 </label>
+        <label>가입일자 </label>
         <input v-model="contractDate" placeholder="" readonly />
       </div>
 
@@ -49,11 +61,11 @@
       </div>
     </div>
 
-    <div class="title">가입신청/고객정보</div>
+    <div class="title">판매자 서명</div>
 
-    <SignImageRowContainer type="self" placeholder="Jasur" @updated="updatePads" title="판매자 서명" />
+    <SignImageRowContainer type="self" :placeholder="data.contractor" @updated="updatePads" title="" />
 
-    <button @click="submit">접수하기</button>
+    <button @click="submit">사인 저장</button>
   </div>
 </template>
 
@@ -63,6 +75,12 @@ import { ref, onMounted } from 'vue'
 import { useSnackbarStore } from '../stores/snackbar'
 import { fetchWithTokenRefresh } from '../utils/tokenUtils'
 import SignImageRowContainer from '../components/SignImageRowContainer.vue'
+
+import { useNameSignDataStore } from '../stores/name-sign-data-store'
+
+const signStore = useNameSignDataStore()
+
+const data = ref({})
 
 const pname = ref('')
 const pcode = ref('')
@@ -91,16 +109,17 @@ async function fetchProfileData() {
       const decodedResponse = await response.json()
       if (decodedResponse.data && decodedResponse.data.info) {
         let info = decodedResponse.data.info
+        data.value = info
+
         pname.value = info.partner_nm
         pcode.value = info.partner_cd
         contact.value = info.phone_number
         email.value = info.email
         storeAddress.value = info.address
         storeDetailAddress.value = info.dtl_address
-        contractDate.value = new Date(info.contract_date).toLocaleString()
+        contractDate.value = new Date(info.apply_date).toLocaleString()
         status.value = info.status_nm
-        nameImageData.value = info.partner_sign
-        signImageData.value = info.partner_seal
+        signStore.save(info.partner_seal, info.partner_sign)
       }
     } else {
       throw new Error('Fetch profile data error')
@@ -168,56 +187,6 @@ onMounted(fetchProfileData)
   width: 100%;
   margin: 0;
   padding: 0;
-}
-
-.sign-title {
-  line-height: 1;
-  padding: 0;
-  margin: 0;
-  margin-bottom: 7px;
-}
-
-.singImagesBox {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  max-width: 400px;
-  width: 100%;
-  height: 100px;
-  border-radius: 5px;
-  border: 1px dashed var(--main-color);
-  cursor: pointer;
-  position: relative;
-
-  background-color: #fff;
-}
-.singImagesBox .images-row {
-  display: flex;
-  flex-flow: row;
-  height: 100%;
-  width: 100%;
-  gap: 5px;
-  box-sizing: border-box;
-  padding: 5px;
-  align-items: center;
-}
-.singImagesBox .image {
-  width: 100%;
-  height: 100%;
-  min-width: 100px;
-  max-height: 100px; /* Set a maximum height limit if needed */
-  object-fit: contain;
-  background-color: #fbfbfb;
-}
-.delete-icon {
-  position: absolute;
-  top: 3px;
-  right: 3px;
-  color: #ff3535 !important;
-  cursor: pointer !important;
-  background-color: #ffffff;
-  padding: 2px;
-  border-radius: 20px;
 }
 
 button {

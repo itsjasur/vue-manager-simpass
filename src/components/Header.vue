@@ -7,7 +7,7 @@
       <span v-else @click="sideMenuStore.open()" class="material-symbols-outlined"> menu </span>
       <div class="title"><MenuTitle /></div>
     </div>
-    <div class="button" @click="useAuthenticationStore().logout()">Logout</div>
+    <div class="button" @click="logout">Logout</div>
     <!-- <div class="button" @click="sideMenuStore.toggle()">Logout</div> -->
   </div>
 </template>
@@ -16,8 +16,15 @@
 import MenuTitle from '../components/MenuTitle.vue'
 import { useSideMenuStore } from '../stores/side-menu'
 import { useAuthenticationStore } from '../stores/authentication'
+import { useRouteMemoryStore } from '@/stores/router-memory-store'
 
 const sideMenuStore = useSideMenuStore()
+
+function logout() {
+  useRouteMemoryStore().clear() //clearing intended route afters redirected
+  useAuthenticationStore().isAutoLoggedOut = false
+  useAuthenticationStore().logout()
+}
 </script>
 
 <style scoped>

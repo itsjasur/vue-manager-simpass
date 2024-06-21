@@ -13,12 +13,12 @@
         <div class="steps">
           <div class="step">
             <img
-              v-if="props.data?.idCertType === 'kakao'"
+              v-if="props.data?.idCertType === 'KAKAO'"
               class="circle-cont"
               src=" ../assets/logos/kakao.png"
               alt="kakao"
             />
-            <img v-else class="circle-cont" src=" ../assets/logos/pass.png" alt="kakao" />
+            <img v-else class="circle-cont" src=" ../assets/logos/pass.png" alt="KAKAO" />
 
             <span>STEP 01</span>
             <span>앱에서 인증요청 메시지확인</span>
@@ -39,7 +39,7 @@
         </div>
 
         <div class="footer-note">
-          <template v-if="props.data?.idCertType === 'kakao'">
+          <template v-if="props.data?.idCertType === 'KAKAO'">
             <span>문제발생시 조치방법</span>
             <span>
               1. 카카오인증서 이용에 문제가 있는 경우<a
@@ -84,10 +84,10 @@
 <script setup>
 import { useSnackbarStore } from '@/stores/snackbar'
 import { ref, onMounted, onUnmounted } from 'vue'
-import { useWarningStore } from '../stores/warning'
 import { useSignUpstore } from '@/stores/signup-store'
 import LoadingSpinner from '../components/Loader.vue'
 
+import { useWarningStore } from '../stores/warning'
 const warningStore = useWarningStore()
 const signUpStore = useSignUpstore()
 
@@ -119,8 +119,9 @@ onMounted(() => {
 })
 
 async function submit() {
-  isLoading.value = true
   try {
+    isLoading.value = true
+
     const response = await fetch(import.meta.env.VITE_API_BASE_URL + 'auth/chkSign', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -139,8 +140,8 @@ async function submit() {
     // if (true) {
     if (data.result === 'SUCCESS') {
       //this closes the popup and updates the signup step in the store
-      signUpStore.next('secondary', props.data)
       emit('closePopup')
+      signUpStore.next('secondary', props.data)
       return
     }
 
@@ -152,6 +153,7 @@ async function submit() {
     if (data?.result === 'EXPIRE' || data?.result === 'ERROR' || data?.result === 'BAD') {
       warningStore.open('인증서 요청 만료', [data?.message])
       emit('closePopup')
+      signUpStore.clear()
       return
     }
   } catch (err) {

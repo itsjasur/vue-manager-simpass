@@ -85,6 +85,7 @@ async function login(event) {
       const data = await response.json()
       useAuthenticationStore().login(data['accessToken'], data['refreshToken'], data['id'], data['username'])
 
+      console.log('intended router: ', useRouteMemoryStore().intendedRoute)
       //checks if user had intended route, and push that route. if not push '/'
       if (useRouteMemoryStore().intendedRoute) {
         let url = useRouteMemoryStore().intendedRoute

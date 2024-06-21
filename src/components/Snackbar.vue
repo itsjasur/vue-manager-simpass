@@ -1,7 +1,7 @@
 <template>
   <div v-if="snackbarStore.active" class="snackbar" :class="snackbarStore.type">
     <div class="snackbar-content">
-      <span>{{ snackbarStore.message }}</span>
+      {{ snackbarStore.message }}
     </div>
     <div class="close-icon" @click="snackbarStore.hideSnackbar">&times;</div>
   </div>
@@ -35,6 +35,7 @@ const snackbarStore = useSnackbarStore()
 .snackbar-content {
   flex-grow: 1;
   text-align: center;
+  white-space: pre-line;
 }
 
 /* Desktop styles */

@@ -23,6 +23,7 @@
         <input
           v-model="salesCd"
           placeholder="AAA0000"
+          maxlength="10"
           @input="salesCd = salesCd.toUpperCase()"
           :disabled="codeUnavailable"
         />
@@ -37,7 +38,7 @@
 
     <div class="partition">
       <div class="partition-title">
-        <span>영업사원코드 입력</span>
+        <span>본인인증</span>
       </div>
 
       <div class="group">
@@ -92,7 +93,7 @@
   <AgreementPopup v-if="agreementPopupIsOpen" @closePopup="agreementPopupIsOpen = false" />
 
   <WaitingConfirmationPopup
-    @closePopup="waitingConfirmationPopupOpen.value = false"
+    @closePopup="waitingConfirmationPopupOpen = false"
     v-if="waitingConfirmationPopupOpen"
     :data="{
       name: name,
@@ -118,9 +119,9 @@ const agreeToTerms = ref(false)
 const salesCd = ref('') //sales_cd
 const codeUnavailable = ref(true)
 const agreementPopupIsOpen = ref(false)
-const name = ref('SOBIRJONOV JASURBEK ARISLONBEK UGLI')
-const phoneNumber = ref('01058189352')
-const birthday = ref('19950818')
+const name = ref('')
+const phoneNumber = ref('')
+const birthday = ref('')
 const idCertType = ref('KAKAO')
 
 const isLoading = ref(false)
@@ -133,10 +134,15 @@ const receiptId = ref() //response returns
 onMounted(useSignUpstore().clear)
 
 async function submit(event) {
-  isLoading.value = true
   isSubmitted.value = true
 
+  if (!agreeToTerms.value) {
+    useSnackbarStore().showSnackbar('개인정보 보호 약관에 동의해주세요.')
+    return
+  }
+
   const isAllTruthy = [
+    agreeToTerms.value,
     name.value,
     phoneNumber.value,
     birthday.value,
@@ -150,6 +156,8 @@ async function submit(event) {
   }
 
   try {
+    isLoading.value = true
+
     const response = await fetch(import.meta.env.VITE_API_BASE_URL + 'auth/requestSign', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -182,7 +190,6 @@ async function submit(event) {
   box-shadow: 0 0 5px #00000013;
   width: 500px;
   padding: 30px;
-  margin: 20px;
   min-height: 600px;
   box-sizing: border-box;
   display: flex;

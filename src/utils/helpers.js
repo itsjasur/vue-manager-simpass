@@ -50,6 +50,7 @@ export const formatDate = (today) => {
   return `${year}-${month}-${day}`
 }
 
+// 최소 8자이상, 영문대문자 1개이상포함, 숫자 1개이상포함, 특수문자(! @ # $ & ~ * % ^ ?) 1개이상포함
 export const isValidPassword = (password) => {
   const minLength = 8
   const uppercasePattern = /[A-Z]/
@@ -70,3 +71,6 @@ export const isValidPassword = (password) => {
   }
   return true
 }
+
+// const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+// await delay(3000)
