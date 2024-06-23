@@ -286,7 +286,6 @@ import { useSearchaddressStore } from '../stores/select-address-popup'
 import SelectPlanPopup from '../components/SelectPlanPopup.vue'
 import SearchAddressPopup from '../components/SearchAddressPopup.vue'
 import PrintablePopup from '../components/PrintablePopup.vue'
-import { convertToPdfAndGetUrl } from '../utils/helpers'
 import LoadingSpinner from '../components/Loader.vue'
 import { useSnackbarStore } from '../stores/snackbar'
 

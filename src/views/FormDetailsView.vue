@@ -1,14 +1,16 @@
 <template>
   <div v-if="serverData" class="container">
+    <!-- FORMS -->
     <template v-for="(typeFormNames, index) of availableForms" :key="index">
       <template v-if="typeFormNames.length > 0">
         <div class="partition">
-          <!-- <div class="title">{{ index }}</div> -->
-
           <div v-if="index === 'usim'" class="title">요금제 정보</div>
           <div v-if="index === 'customer'" class="title">고객 정보</div>
           <div v-if="index === 'deputy'" class="title">법정대리인</div>
-          <div v-if="index === 'payment'" class="title">자동이체</div>
+          <div v-if="index === 'payment'" class="title">
+            <span> 자동이체 </span>
+            <a-checkbox class="checkbox left-margin" v-model:checked="selfRegisterChecked">가입자와 동일</a-checkbox>
+          </div>
 
           <template v-for="(formName, index) in typeFormNames" :key="index">
             <!-- <div>{{ FIXED_FORMS[formName] }}</div> -->
@@ -40,26 +42,112 @@
                   v-bind="inputBindings(formName)"
                 />
               </template>
+
+              <p v-if="formSubmitted && !FIXED_FORMS[formName].value" class="input-error-message">
+                {{ FIXED_FORMS[formName].error }}
+              </p>
             </div>
           </template>
         </div>
       </template>
     </template>
+
+    <!-- IMAGE UPLOAD -->
+    <div class="supperted-images">
+      <a-checkbox class="checkbox" v-model:checked="supportedImagesChecked">증빙자료첨부(선택사항)</a-checkbox>
+      <input id="file-input" @change="handleFileUpload" type="file" style="display: none" accept="image/*" multiple />
+
+      <div v-if="supportedImagesChecked" class="uploadedImagesRow">
+        <label for="file-input" class="uploadImageBox">
+          <span class="inner-icon material-symbols-outlined"> add </span>
+          <p>이미지 업로드</p>
+        </label>
+
+        <div v-for="(image, index) in supportedImages" :key="index" class="uploadImageBox">
+          <img :src="image" :alt="index" />
+          <span @click="deleteDocImages(index)" class="delete-icon material-symbols-outlined"> delete </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- checks and enables sign container -->
+    <a-checkbox class="checkbox" v-model:checked="signAfterPrintChecked"
+      >신청서 프린트 인쇄후 서명/사인 자필</a-checkbox
+    >
+
+    <div class="sing-name-pads" v-if="!signAfterPrintChecked">
+      <!-- form sign pad -->
+      <SignImageRowContainer
+        type="forms"
+        :placeholder="FIXED_FORMS.name?.value"
+        @updated="updatePads"
+        title="가입자서명"
+        :errorMessage="!nameImageData && !signImageData && formSubmitted ? '가입자서명을 하지 않았습니다.' : null"
+      />
+      <!-- payment pad-->
+      <SignImageRowContainer
+        v-if="serverData.usim_plan_info.carrier_type === 'PO' && !selfRegisterChecked"
+        type="payment"
+        :placeholder="FIXED_FORMS.account_name?.value"
+        @updated="updatePads"
+        title="자동이체 서명"
+        :errorMessage="
+          !paymentNameImageData && !paymentSignImageData && formSubmitted
+            ? '후불이체동의 서명을 하지 않았습니다.'
+            : null
+        "
+      />
+      <!-- deputy sign pad -->
+      <SignImageRowContainer
+        v-if="availableForms.deputy.length > 0"
+        type="deputy"
+        :placeholder="FIXED_FORMS.deputy_name?.value"
+        @updated="updatePads"
+        title="법정대리인 서명"
+        :errorMessage="
+          !deputyNameImageData && !deputySignImageData && formSubmitted ? '법정대리인서명을 하지 않았습니다.' : null
+        "
+      />
+      <!-- partner sign pad -->
+      <SignImageRowContainer
+        v-if="serverData?.chk_partner_sign === 'N'"
+        type="partner"
+        @updated="updatePads"
+        title="판매자 서명"
+        :errorMessage="
+          !partnerNameImageData && !partnerSignImageData && formSubmitted ? '판매자서명을 하지 않았습니다.' : null
+        "
+      />
+
+      <!-- i agree pad -->
+      <AgreePadPopupContainer
+        @updated="updateAgreePad"
+        title="동의합니다"
+        :errorMessage="!agreePadData && formSubmitted ? '가입약관에 동의하지 않았습니다.' : null"
+      />
+    </div>
+
+    <button class="submit" @click="submit" :disabled="formSubmitting">
+      <LoadingSpinner v-if="formSubmitting" height="20px" color="#ffffff" />
+      <span v-else> 개통 신청/서식출력</span>
+    </button>
   </div>
+
+  <div v-else class="plan-not-found">요금제를 찾을 수 없습니다</div>
 </template>
 
 <script setup>
 import { useSnackbarStore } from '@/stores/snackbar'
 import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
-import { nextTick, onMounted, onUnmounted, reactive, ref, watchEffect } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { computed, onMounted, reactive, ref } from 'vue'
+import { useRoute } from 'vue-router'
 import { FORMS } from '../assets/constants2'
 import { PLANSINFO } from '../assets/constants'
 import _ from 'lodash'
-import Cleave from 'cleave.js'
-
+import SignImageRowContainer from '../components/SignImageRowContainer.vue'
+import AgreePadPopupContainer from '../components/AgreePadPopupContainer.vue'
 import { useSearchaddressStore } from '../stores/select-address-popup'
-import { watch } from 'less'
+import LoadingSpinner from '../components/Loader.vue'
 
 //address poup
 const selectAddressPopup = useSearchaddressStore()
@@ -69,13 +157,16 @@ const route = useRoute()
 //need to make deep copy in order to reset when page reloads
 const FIXED_FORMS = reactive(_.cloneDeep(FORMS))
 
+//setting address and addressdetail to store value
+//addressdetail needs get and set in order to be editable
+FIXED_FORMS.address.value = computed(() => selectAddressPopup.address)
+FIXED_FORMS.addressdetail.value = computed({
+  get: () => selectAddressPopup.buildingName,
+  set: (newValue) => (selectAddressPopup.buildingName = newValue),
+})
+
 //this inits page
 onMounted(fetchData)
-
-// onMounted(() => {
-//   FIXED_FORMS.address.value = selectAddressPopup.address
-//   FIXED_FORMS.addressdetail.value = selectAddressPopup.buildingName
-// })
 
 // 1 first fetch data onMounted()
 const serverData = ref(null)
@@ -107,12 +198,9 @@ function generateInitialForms() {
   //usim plan info is form server data
   const usimPlanInfo = serverData.value.usim_plan_info
 
-  //selected type
-  const selectedTypeInfo = PLANSINFO.find((item) => item.code === usimPlanInfo.carrier_type)
-  //selected carrier
-  const selectedCarrierInfo = selectedTypeInfo.carriers.find((carrier) => carrier.code === usimPlanInfo.carrier_cd)
-  //selected mvno
-  const selectedMvnoInfo = selectedCarrierInfo.mvnos.find((mvno) => mvno.code === usimPlanInfo.mvno_cd)
+  let selectedTypeInfo = PLANSINFO.find((item) => item.code === usimPlanInfo.carrier_type) //selected type
+  let selectedCarrierInfo = selectedTypeInfo.carriers.find((carrier) => carrier.code === usimPlanInfo.carrier_cd) //selected carrier
+  let selectedMvnoInfo = selectedCarrierInfo.mvnos.find((mvno) => mvno.code === usimPlanInfo.mvno_cd) //selected mvno
 
   //setting available forms in each mvno
   // availableForms.usim = selectedMvnoInfo?.usimForms ?? null
@@ -195,6 +283,102 @@ const inputBindings = (formName) => {
 
   return bindings
 }
+
+// weather the registerer is owner or somebody else
+const selfRegisterChecked = ref(false)
+
+//supported docs checkbox and handler
+const supportedImagesChecked = ref(true)
+// this handles file upload
+const supportedImages = ref([])
+
+//  a ref for storing File objects
+const fileObjects = ref([])
+const handleFileUpload = async (event) => {
+  const selectedFiles = event.target.files
+  for (let i = 0; i < selectedFiles.length; i++) {
+    fileObjects.value.push(selectedFiles[i])
+  }
+  createImageUrls()
+}
+//create url images
+const createImageUrls = () => {
+  supportedImages.value = []
+  for (let i = 0; i < fileObjects.value.length; i++) {
+    const imageUrl = URL.createObjectURL(fileObjects.value[i])
+    supportedImages.value.push(imageUrl)
+  }
+}
+
+const deleteDocImages = (index) => {
+  fileObjects.value.splice(index, 1)
+  createImageUrls()
+}
+
+//will sign after print
+const signAfterPrintChecked = ref(false)
+//signs image data
+const nameImageData = ref(null)
+const signImageData = ref(null)
+
+const paymentNameImageData = ref(null)
+const paymentSignImageData = ref(null)
+
+const deputyNameImageData = ref(null)
+const deputySignImageData = ref(null)
+
+//shows if partner has no sign in profile
+const partnerNameImageData = ref(null)
+const partnerSignImageData = ref(null)
+
+//draw popup
+const updatePads = ({ name, sign, type }) => {
+  switch (type) {
+    case 'forms':
+      nameImageData.value = name
+      signImageData.value = sign
+      break
+    case 'deputy':
+      deputyNameImageData.value = name
+      deputySignImageData.value = sign
+      break
+    case 'payment':
+      paymentNameImageData.value = name
+      paymentSignImageData.value = sign
+      break
+    case 'partner':
+      partnerNameImageData.value = name
+      partnerSignImageData.value = sign
+      break
+    default:
+      useSnackbarStore().showSnackbar('Invalid pad type')
+  }
+}
+
+//i agreee pad
+const agreePadData = ref(null)
+const updateAgreePad = (data) => (agreePadData.value = data)
+
+//SUBMIT
+//FORM DATA REQUEST
+const formSubmitting = ref(false)
+const formSubmitted = ref(true)
+
+const formData = new FormData()
+function submit() {
+  // formSubmitting.value = true
+  // formSubmitted.value = true
+
+  let checkList = []
+
+  availableForms.usim.forEach((formName) => checkList.push(FIXED_FORMS[formName].value ? true : false))
+  availableForms.customer.forEach((formName) => checkList.push(FIXED_FORMS[formName].value ? true : false))
+  availableForms.payment.forEach((formName) => checkList.push(FIXED_FORMS[formName].value ? true : false))
+  availableForms.deputy.forEach((formName) => checkList.push(FIXED_FORMS[formName].value ? true : false))
+
+  console.log(availableForms.usim)
+  console.log(checkList)
+}
 </script>
 
 <style>
@@ -205,17 +389,15 @@ const inputBindings = (formName) => {
   box-sizing: border-box;
   display: flex;
   flex-flow: column;
+  gap: 30px;
 }
 
 .partition {
   display: flex;
   flex-flow: wrap;
-  /* flex-flow: column; */
   gap: 20px;
   margin-bottom: 30px;
-
   min-height: 100px;
-  background-color: #15ff0041;
 }
 
 .title {
@@ -229,5 +411,69 @@ const inputBindings = (formName) => {
 .group {
   width: 100%;
   /* background-color: aquamarine; */
+}
+
+.checkbox {
+  font-size: 16px;
+  font-weight: 500;
+}
+.left-margin {
+  margin-left: 15px;
+}
+.uploadedImagesRow {
+  display: flex;
+  flex-flow: wrap;
+  gap: 20px;
+  margin-top: 15px;
+}
+.uploadImageBox {
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+  align-items: center;
+  width: 150px;
+  height: 100px;
+  border-radius: 5px;
+  border: 1px dashed var(--main-color);
+  cursor: pointer;
+  position: relative;
+  background-color: #fff;
+}
+.uploadImageBox img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  box-sizing: border-box;
+}
+.delete-icon {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  color: #ff3535 !important;
+  cursor: pointer !important;
+  background-color: #ffffff;
+  padding: 2px;
+  border-radius: 20px;
+}
+
+.sing-name-pads {
+  display: flex;
+  flex-flow: column;
+  gap: 25px;
+  font-weight: 500;
+}
+.plan-not-found {
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  font-size: 25px;
+}
+.submit {
+  height: 45px;
+  margin-top: 30px;
+  max-width: 200px;
+  margin-bottom: 400px;
 }
 </style>
