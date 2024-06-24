@@ -1,114 +1,109 @@
-<template>
-  <template v-if="popup.active">
-    <div class="overlay">
-      <div class="popup-content">
-        <div class="innerHeader">
-          <h3 class="title">요금제선택</h3>
-          <span @click="popup.close" class="material-symbols-outlined close-button"> cancel </span>
+<!-- <template>
+  <div class="overlay">
+    <div class="popup-content">
+      <div class="innerHeader">
+        <h3 class="title">요금제선택</h3>
+        <span @click="popup.close" class="material-symbols-outlined close-button"> cancel </span>
+      </div>
+
+      <div class="scroll-content">
+        <div style="height: 30px"></div>
+
+        <div class="types">
+          <div
+            class="button"
+            v-for="(item, index) in PLANTYPES"
+            :key="index"
+            :class="{ selected: popup.type === item.cd }"
+            @click="updateType(item.cd)"
+          >
+            {{ item.label }}
+          </div>
         </div>
+        <div style="height: 30px"></div>
 
-        <div class="scroll-content">
-          <div style="height: 30px"></div>
+        <div class="inputRow">
+          <input
+            type="text"
+            id="search"
+            name="password"
+            placeholder="검색할 요금제명을 입력해주세요"
+            v-model="searchText"
+            @input="searchTextChange()"
+          />
+          <span v-if="popup.searchText" @click="popup.searchText = ''" class="icon material-symbols-outlined">
+            close
+          </span>
+        </div>
+        <div style="height: 30px"></div>
 
-          <div class="types">
-            <div
-              class="button"
-              v-for="(item, index) in PLANTYPES"
-              :key="index"
-              :class="{ selected: popup.type === item.cd }"
-              @click="updateType(item.cd)"
-            >
-              {{ item.label }}
-            </div>
-          </div>
-          <div style="height: 30px"></div>
-
-          <div class="inputRow">
-            <input
-              type="text"
-              id="search"
-              name="password"
-              placeholder="검색할 요금제명을 입력해주세요"
-              v-model="popup.searchText"
-              @input="searchTextChange()"
-            />
-            <span v-if="popup.searchText" @click="popup.searchText = ''" class="icon material-symbols-outlined">
-              close
-            </span>
-          </div>
-          <div style="height: 30px"></div>
-
-          <a-table class="table" :columns="columns" :data-source="dataList" bordered :pagination="false" size="middle">
-            <template #bodyCell="{ column, text, record }">
-              <template v-if="column.dataIndex === 'basic_fee' || column.dataIndex === 'sales_fee'">
-                <div>{{ text.toLocaleString() }}</div>
-              </template>
-
-              <template v-if="column.dataIndex === 'usim_plan_nm'">
-                <span class="linkText" @click="selectPlan(record)">
-                  {{ text }}
-                </span>
-              </template>
+        <a-table class="table" :columns="columns" :data-source="dataList" bordered :pagination="false" size="middle">
+          <template #bodyCell="{ column, text, record }">
+            <template v-if="column.dataIndex === 'basic_fee' || column.dataIndex === 'sales_fee'">
+              <div>{{ text.toLocaleString() }}</div>
             </template>
-          </a-table>
 
-          <div class="card" v-for="(item, index) in dataList" :key="index">
-            <div class="title" @click="selectPlan(item)">
-              <span>{{ item.usim_plan_nm }}</span>
-              <span class="icon material-symbols-outlined"> arrow_forward_ios </span>
+            <template v-if="column.dataIndex === 'usim_plan_nm'">
+              <span class="linkText" @click="selectPlan(record)">
+                {{ text }}
+              </span>
+            </template>
+          </template>
+        </a-table>
+
+        <div class="card" v-for="(item, index) in dataList" :key="index">
+          <div class="title" @click="selectPlan(item)">
+            <span>{{ item.usim_plan_nm }}</span>
+            <span class="icon material-symbols-outlined"> arrow_forward_ios </span>
+          </div>
+
+          <div class="body">
+            <div class="data">
+              <span class="icon material-symbols-outlined"> swap_vert </span>
+              <span> {{ item.cell_data }}{{ item.qos }} </span>
             </div>
 
-            <div class="body">
-              <div class="data">
-                <span class="icon material-symbols-outlined"> swap_vert </span>
-                <span> {{ item.cell_data }}{{ item.qos }} </span>
-              </div>
-
-              <div class="calls">
-                <span class="icon material-symbols-outlined"> call </span>
-                <span> {{ item.voice }} </span>
-              </div>
-
-              <div class="sms">
-                <span class="icon material-symbols-outlined"> mail </span>
-                <span> {{ item.message }} </span>
-              </div>
+            <div class="calls">
+              <span class="icon material-symbols-outlined"> call </span>
+              <span> {{ item.voice }} </span>
             </div>
 
-            <div class="price">
-              <span class="original">{{ item.basic_fee.toLocaleString() }} 원</span>
-              <span class="sale"> {{ item.sales_fee.toLocaleString() }} 원/월</span>
+            <div class="sms">
+              <span class="icon material-symbols-outlined"> mail </span>
+              <span> {{ item.message }} </span>
             </div>
           </div>
 
-          <div style="height: 100px"></div>
+          <div class="price">
+            <span class="original">{{ item.basic_fee.toLocaleString() }} 원</span>
+            <span class="sale"> {{ item.sales_fee.toLocaleString() }} 원/월</span>
+          </div>
         </div>
+
+        <div style="height: 100px"></div>
       </div>
     </div>
-  </template>
+  </div>
 </template>
 
 <script setup>
 import { useSnackbarStore } from '../stores/snackbar'
 import { useSelectPlansPopup } from '../stores/select-plans-popup'
-import { onMounted, onUnmounted, ref, watchEffect } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import { PLANTYPES } from '../assets/constants'
 import { fetchWithTokenRefresh } from '../utils/tokenUtils'
 import { useRouter } from 'vue-router'
-
-// const props = defineProps({
-//   type: { type: String, requierd: true },
-//   carrierCd: { type: String, requierd: true },
-//   mvnoCd: { type: String, requierd: true },
-// })
 
 const router = useRouter()
 const popup = useSelectPlansPopup()
 
 const dataList = ref([])
 
+const selectedType = ref(popup.type)
+const searchText = ref(popup.searchText)
+
 const updateType = (newType) => {
-  popup.type = newType
+  selectedType.value = newType
   fetchData()
 }
 
@@ -117,6 +112,8 @@ const searchTextChange = () => {
 }
 
 const selectPlan = (selectedPlan) => {
+  popup.type = selectedType.value
+  popup.searchText = searchText.value
   popup.close()
 
   router.push({
@@ -178,15 +175,15 @@ const fetchData = async () => {
     const response = await fetchWithTokenRefresh('agent/planlist', {
       method: 'POST',
       body: {
-        carrier_type: popup.type, // 선불:PR ,후불:PO
         carrier_cd: popup.carrierCd, // SKT : SK ,KT : KT,LG U+ : LG
         mvno_cd: popup.mvnoCd,
-        usim_plan_nm: popup.searchText,
+        carrier_type: selectedType.value, // 선불:PR ,후불:PO
+        usim_plan_nm: searchText.value,
       },
     })
-
     if (response.ok) {
       const decodedResponse = await response.json()
+
       if (decodedResponse.data && decodedResponse.data.info) {
         let list = decodedResponse.data.info
         dataList.value = list
@@ -208,16 +205,12 @@ function keydownHandle(event) {
 
 onMounted(() => {
   document.addEventListener('keydown', keydownHandle)
+  fetchData()
 })
 
 onUnmounted(() => {
   popup.close()
   document.removeEventListener('keydown', keydownHandle)
-})
-
-// watchs for changes in popup.active and fetchs data
-watchEffect(() => {
-  if (popup.active) fetchData()
 })
 </script>
 
@@ -390,4 +383,4 @@ watchEffect(() => {
     color: var(--main-color);
   }
 }
-</style>
+</style> -->

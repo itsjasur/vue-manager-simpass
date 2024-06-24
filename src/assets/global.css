@@ -53,8 +53,8 @@ button:hover:enabled {
 }
 
 .button:hover {
-  cursor: pointer;
   filter: brightness(0.6);
+  cursor: pointer;
 }
 
 .close-button:hover {

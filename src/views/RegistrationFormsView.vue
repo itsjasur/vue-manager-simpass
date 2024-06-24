@@ -48,7 +48,6 @@ const selectPlansPopup = useSelectPlansPopup()
 
 const selectedType = ref('PO')
 const selectedCarrierCd = ref('')
-const selectedMvnoCd = ref('')
 
 const types = ref(PLANTYPES)
 const carriers = ref(CARRIERS)
@@ -66,14 +65,12 @@ function changeCarrier(cd) {
 }
 
 function selectMvno(item) {
-  selectPlansPopup.type = selectedType.value
-  selectPlansPopup.carrierCd = item.carrier_cd
-  selectPlansPopup.mvnoCd = item.mvno_cd
+  selectPlansPopup.searchText = ''
+  selectPlansPopup.open(selectedType.value, item.carrier_cd, item.mvno_cd)
 
-  selectPlansPopup.mvnoName = item.mvno_nm
-  selectPlansPopup.carrierName = item.carrier_nm
-  selectPlansPopup.typeName = item.carrier_type_nm
-  selectPlansPopup.open()
+  // selectPlansPopup.mvnoName = item.mvno_nm
+  // selectPlansPopup.carrierName = item.carrier_nm
+  // selectPlansPopup.typeName = item.carrier_type_nm
 }
 
 async function fetchData() {
@@ -90,8 +87,6 @@ async function fetchData() {
       if (decodedResponse.data && decodedResponse.data.info) {
         let info = decodedResponse.data.info
         mvnos.value = info
-
-        console.log(info)
       }
     } else {
       throw new Error('Fetch data error')

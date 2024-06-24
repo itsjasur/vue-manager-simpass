@@ -19,6 +19,7 @@
   <Snackbar />
   <Warning />
   <SearchAddressPopup />
+  <SelectPlanPopup />
 </template>
 
 <script setup>
@@ -31,6 +32,7 @@ import { useAuthenticationStore } from './stores/authentication'
 import { useRouteMemoryStore } from './stores/router-memory-store'
 import { useSideMenuStore } from './stores/side-menu'
 import SearchAddressPopup from './components/SearchAddressPopup.vue'
+import SelectPlanPopup from './components/SelectPlanPopup.vue'
 
 const router = useRouter()
 const authStore = useAuthenticationStore()
