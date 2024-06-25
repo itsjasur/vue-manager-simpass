@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 export const useSearchaddressStore = defineStore('selectAddressPopup', {
   state: () => ({
     active: false,
-    address: '',
+    address: 'test address',
     buildingName: '',
   }),
 

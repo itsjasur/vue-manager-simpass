@@ -1,5 +1,5 @@
 <template>
-  <div class="overlay">
+  <div v-if="popup.active" class="overlay">
     <div class="popup-content">
       <div class="innerHeader">
         <h3 class="title">프린트</h3>
@@ -25,7 +25,7 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref, watchEffect } from 'vue'
 import { usePrintablePopup } from '../stores/printable-popup'
 import LoadingSpinner from '../components/Loader.vue'
 
@@ -61,9 +61,15 @@ function blobToURL(blob) {
   return URL.createObjectURL(blob)
 }
 
+// watchs for changes in popup.active and mounts
+watchEffect(() => {
+  if (popup.active) {
+    imageUrls.value = popup.images?.map((image) => blobToURL(base64ToBlob(image)))
+  }
+})
+
 // converts base64 to Blob URL
 onMounted(() => {
-  imageUrls.value = popup.images?.map((image) => blobToURL(base64ToBlob(image)))
   document.addEventListener('keydown', keydownHandle)
 })
 
@@ -84,6 +90,7 @@ function printContent() {
   isPrinting.value = true
 
   if (!printIframe.value) return
+
   const doc = printIframe.value.contentDocument
   doc.open()
   doc.write(`

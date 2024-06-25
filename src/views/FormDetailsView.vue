@@ -42,25 +42,9 @@
                   v-bind="inputBindings(formName)"
                 />
               </template>
-
-              <p v-if="formSubmitted && FIXED_FORMS[formName].errorMessage" class="input-error-message">
+              <p v-if="formSubmitted && !filledCheckValues[formName]" class="input-error-message">
                 {{ FIXED_FORMS[formName].errorMessage }}
               </p>
-
-              <!-- <p v-if="FIXED_FORMS[formName].errorMessages" class="input-error-message">
-                {{ FIXED_FORMS[formName].errorMessage }}
-              </p> -->
-
-              <!-- <p
-                v-if="
-                  formSubmitted &&
-                  !FIXED_FORMS[formName].value &&
-                  (formName !== 'usim_model_list' || serverData?.usim_plan_info?.chk_usim_model === 'Y')
-                "
-                class="input-error-message"
-              >
-                {{ FIXED_FORMS[formName].error }}
-              </p> -->
             </div>
           </template>
         </div>
@@ -155,9 +139,9 @@
 <script setup>
 import { useSnackbarStore } from '@/stores/snackbar'
 import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
-import { computed, onMounted, reactive, ref, watch, watchEffect } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { FORMS } from '../assets/constants2'
+import { FORMS } from '../assets/constants'
 import { PLANSINFO } from '../assets/constants'
 import _ from 'lodash'
 import SignImageRowContainer from '../components/SignImageRowContainer.vue'
@@ -188,7 +172,7 @@ onMounted(fetchData)
 //this watches route id (if plan id changed)
 watch(() => route.params.id, fetchData)
 
-// 1 first fetch data onMounted()
+// 1 first fetched data onMounted()
 const serverData = ref(null)
 
 // finding forms
@@ -207,6 +191,9 @@ async function fetchData() {
 
     //setting usim plan name everytime it refetches
     FIXED_FORMS.usim_plan_nm.value = serverData.value.usim_plan_info.usim_plan_nm
+
+    // usim list select required
+    FIXED_FORMS.usim_model_list.required = serverData.value?.chk_usim_model === 'Y'
 
     generateInitialForms()
   } catch (error) {
@@ -267,11 +254,25 @@ function generateInitialForms() {
   //settnig country code
   FIXED_FORMS.country.value = ''
   if (FIXED_FORMS?.cust_type_cd?.value !== 'MEA') FIXED_FORMS.country.value = '대한민국'
+
+  //checkable forms in order to submit or showing error
+  filledCheckValues.value = Object.fromEntries(
+    [
+      //
+      ...availableForms.usim,
+      ...availableForms.customer,
+      ...availableForms.payment,
+      ...availableForms.deputy,
+    ].map((formName) => [formName, FIXED_FORMS[formName]?.value ? true : !FIXED_FORMS[formName]?.required])
+  )
 }
 
 //sets default values
 function setDefault() {
   for (const formName in FIXED_FORMS) {
+    //setting empty default error messages
+    if (!FIXED_FORMS[formName].value) FIXED_FORMS[formName].errorMessage = FIXED_FORMS[formName].error
+
     if (
       FIXED_FORMS[formName].type === 'select' &&
       FIXED_FORMS[formName].hasDefault &&
@@ -299,12 +300,12 @@ const inputBindings = (formName) => {
     bindings.readonly = true
   }
 
-  if (/name/i.test(formName)) {
+  //checking all forms with name
+  if (['name', 'deputy_name', 'account_name'].includes(formName)) {
     bindings.onInput = (event) => {
       FIXED_FORMS[formName].value = event.target.value.toUpperCase()
-      // console.log('clicked')
     }
-  } //checking all forms with name
+  }
 
   if (formName === 'address') {
     bindings.onClick = (event) => selectAddressPopup.open()
@@ -313,6 +314,18 @@ const inputBindings = (formName) => {
   if (formName === 'account_number') {
     bindings.onInput = (event) => {
       FIXED_FORMS[formName].value = event.target.value.replace(/[^0-9]/g, '')
+    }
+  }
+
+  if (['birthday', 'deputy_birthday', 'account_birthday'].includes(formName)) {
+    bindings.onInput = () => {
+      if (FIXED_FORMS[formName]?.value?.replaceAll('-', '')?.length === 6) {
+        const date = new Date(FIXED_FORMS[formName]?.value)
+        const year = date.getFullYear().toString().slice(-2)
+        const month = (date.getMonth() + 1).toString().padStart(2, '0')
+        const day = date.getDate().toString().padStart(2, '0')
+        FIXED_FORMS[formName].value = `${year}-${month}-${day}`
+      }
     }
   }
 
@@ -394,182 +407,89 @@ const updatePads = ({ name, sign, type }) => {
 const agreePadData = ref(null)
 const updateAgreePad = (data) => (agreePadData.value = data)
 
-var submitCheckList = [false]
+const filledCheckValues = ref({})
 
-// checking and updateing error codes
 for (const formName in FIXED_FORMS) {
-  watchEffect(() => {
-    submitCheckList = []
-    if (!FIXED_FORMS[formName].required) return
+  watch(
+    () => FIXED_FORMS[formName].value,
+    (newValue, oldValue) => {
+      let field = FIXED_FORMS[formName]
+      let isValid = true
+      field.errorMessage = null
 
-    //resets to null here
-    FIXED_FORMS[formName].errorMessage = null
-
-    //setting special error
-    if (formName === 'deputy_contact' || formName === 'contact' || formName === 'phone_number') {
-      if (FIXED_FORMS[formName]?.value?.replaceAll('-', '').length < 10) {
-        FIXED_FORMS[formName].errorMessage = '전화번호를 정확하게 입력하세요.'
-        submitCheckList.push(false)
-      }
-    }
-
-    //setting special errors
-    if (formName === 'card_yy_mm' && FIXED_FORMS[formName]?.value?.replaceAll('/', '').length < 4) {
-      FIXED_FORMS[formName].errorMessage = '카드 만료일은 MM(월) 및 YY(년)여야 합니다.'
-      submitCheckList.push(false)
-    }
-
-    if (formName === 'birthday' || formName === 'deputy_birthday' || formName === 'account_birthday') {
-      if (FIXED_FORMS[formName]?.value?.replaceAll('-', '')?.length < 8) {
-        FIXED_FORMS[formName].errorMessage = '올바른 날짜를 입력하십시오'
-        submitCheckList.push(false)
-      }
-    }
-
-    if (serverData?.chk_usim_model === 'N') {
-      FIXED_FORMS[formName].errorMessage = FIXED_FORMS[formName].error
-    }
-
-    if (FIXED_FORMS[formName].value === null || FIXED_FORMS[formName].value === '') {
-      FIXED_FORMS[formName].errorMessage = FIXED_FORMS[formName].error
-      submitCheckList.push(false)
-      return
-    }
-
-    console.log(submitCheckList)
-
-    // console.log(submitCheckList)
-    // usim check required status
-    // FIXED_FORMS.usim_model_list.required = serverData?.chk_usim_model === 'Y'
-  })
-}
-
-function formValidate() {
-  submitCheckList = []
-
-  //if all avl forms are filled
-  for (let type in availableForms) {
-    availableForms[type].forEach((formName) => {
-      FIXED_FORMS[formName].errorMessage = null
-      if (!FIXED_FORMS[formName]?.required) return
-
-      if (FIXED_FORMS[formName].value === null || FIXED_FORMS[formName].value === '') {
-        FIXED_FORMS[formName].errorMessage = FIXED_FORMS[formName].error
-        submitCheckList.push(false)
-      }
-
-      //setting special error
-      if (formName === 'deputy_contact' || formName === 'contact' || formName === 'phone_number') {
-        if (FIXED_FORMS[formName]?.value?.replaceAll('-', '').length < 10) {
-          FIXED_FORMS[formName].errorMessage = '전화번호를 정확하게 입력하세요.'
-          submitCheckList.push(false)
+      // Phone number validation
+      if (['deputy_contact', 'contact', 'phone_number'].includes(formName)) {
+        if (newValue && newValue?.replaceAll('-', '')?.length < 10) {
+          field.errorMessage = '전화번호를 정확하게 입력하세요.'
+          isValid = false
         }
       }
 
-      //
-      //
-      //
-
-      if (formName === 'usim_model_list' && serverData.value.chk_usim_model === 'Y') {
-        FIXED_FORMS[formName].errorMessage = null
-        return
-      }
-      if (FIXED_FORMS[formName].error === null) {
-        submitCheckList.push(true)
-        FIXED_FORMS[formName].errorMessage = null
-        return
-      }
-      if (FIXED_FORMS[formName].value) {
-        submitCheckList.push(true)
-        FIXED_FORMS[formName].errorMessage = null
-        return
+      // Card expiry validation
+      else if (formName === 'card_yy_mm' && field.value?.replaceAll('/', '')?.length < 4) {
+        field.errorMessage = '카드 만료일은 MM(월) 및 YY(년)여야 합니다.'
+        isValid = false
       }
 
-      submitCheckList.push(false)
-    })
-  }
+      // Birthday validation
+      else if (
+        ['birthday', 'deputy_birthday', 'account_birthday'].includes(formName) &&
+        field.value?.replaceAll('-', '')?.length < 6
+      ) {
+        field.errorMessage = '올바른 날짜를 입력하십시오'
+        isValid = false
+      }
 
-  if (!signAfterPrintChecked.value) {
-    submitCheckList.push(nameImageData.value && signImageData.value ? true : false)
+      // Required field validation
+      if (field.required && !field.value) {
+        field.errorMessage = field.error
+        isValid = false
+      }
 
-    if (!selfRegisterChecked.value) {
-      submitCheckList.push(paymentNameImageData.value && paymentSignImageData.value ? true : false)
-    }
-
-    if (availableForms.deputy.length > 0) {
-      submitCheckList.push(deputyNameImageData.value && deputySignImageData.value ? true : false)
-    }
-
-    if (serverData.value?.usim_plan_info?.mvno_cd === 'UPM') {
-      submitCheckList.push(agreePadData.value ? true : false)
-    }
-  }
+      // Set filledCheckValues.value based on final validation state
+      filledCheckValues.value[formName] = Boolean(isValid)
+    },
+    { immediate: true }
+  )
 }
 
-//SUBMIT
-//FORM DATA REQUEST
+//SUBMIT //FORM DATA REQUEST
 const formSubmitting = ref(false)
-const formSubmitted = ref(true)
+const formSubmitted = ref(false)
 const formData = new FormData()
 
 async function submit() {
   formSubmitted.value = true
+  formSubmitting.value = true
 
-  // //if all avl forms are filled
-  // for (let type in availableForms) {
-  //   availableForms[type].forEach((formName) => {
-  //     FIXED_FORMS[formName].errorMessage = FIXED_FORMS[formName].error
+  //removing froms
+  delete filledCheckValues.value.formsSignPad
+  delete filledCheckValues.value.paymentSignPad
+  delete filledCheckValues.value.deputySignPad
+  delete filledCheckValues.value.agreeSignPad
 
-  //     if (formName === 'usim_model_list' && serverData.value.chk_usim_model === 'Y') {
-  //       submitCheckList.push(true)
-  //       FIXED_FORMS[formName].errorMessage = null
-  //       return
-  //     }
-  //     if (FIXED_FORMS[formName].error === null) {
-  //       submitCheckList.push(true)
-  //       FIXED_FORMS[formName].errorMessage = null
-  //       return
-  //     }
-  //     if (FIXED_FORMS[formName].value) {
-  //       submitCheckList.push(true)
-  //       FIXED_FORMS[formName].errorMessage = null
-  //       return
-  //     }
+  if (!signAfterPrintChecked.value) {
+    filledCheckValues.value.formsSignPad = Boolean(nameImageData.value && signImageData.value)
 
-  //     submitCheckList.push(false)
-  //   })
-  // }
+    if (!selfRegisterChecked.value)
+      filledCheckValues.value.paymentSignPad = Boolean(paymentNameImageData.value && paymentSignImageData.value)
 
-  // if (!signAfterPrintChecked.value) {
-  //   submitCheckList.push(nameImageData.value && signImageData.value ? true : false)
+    if (availableForms.deputy.length > 0)
+      filledCheckValues.value.deputySignPad = Boolean(deputyNameImageData.value && deputySignImageData.value)
 
-  //   if (!selfRegisterChecked.value) {
-  //     submitCheckList.push(paymentNameImageData.value && paymentSignImageData.value ? true : false)
-  //   }
-
-  //   if (availableForms.deputy.length > 0) {
-  //     submitCheckList.push(deputyNameImageData.value && deputySignImageData.value ? true : false)
-  //   }
-
-  //   if (serverData.value?.usim_plan_info?.mvno_cd === 'UPM') {
-  //     submitCheckList.push(agreePadData.value ? true : false)
-  //   }
-  // }
-
-  if (submitCheckList.every((item) => item === true)) {
-    await fetchForms()
-  } else {
-    useSnackbarStore().showSnackbar('채워지지 않은 필드가 있습니다.')
+    if (serverData.value?.usim_plan_info?.mvno_cd === 'UPM')
+      filledCheckValues.value.agreeSignPad = Boolean(agreePadData.value)
   }
 
-  console.log(availableForms.usim)
-  console.log(submitCheckList)
+  if (Object.values(filledCheckValues.value).every(Boolean)) await fetchForms()
+  else useSnackbarStore().showSnackbar('채워지지 않은 필드가 있습니다.')
+
+  formSubmitting.value = false
 }
 
 async function fetchForms() {
-  //adding files
   for (const file of fileObjects.value) {
-    formData.set('attach_files[]', file)
+    formData.set('attach_files[]', file) //adding files
   }
 
   formData.set('bill_sign', paymentNameImageData.value)
@@ -583,26 +503,66 @@ async function fetchForms() {
 
   formData.set('agree_sign', agreePadData.value)
 
-  formData.set('carrier_type', serverData.value?.value?.usim_plan_info?.carrier_type)
-  formData.set('carrier_cd', serverData.value?.value?.usim_plan_info?.carrier_cd)
-  formData.set('usim_plan_id', serverData.value?.value?.usim_plan_info?.id)
+  formData.set('carrier_type', serverData.value?.usim_plan_info?.carrier_type)
+  formData.set('carrier_cd', serverData.value?.usim_plan_info?.carrier_cd)
+  formData.set('usim_plan_id', serverData.value?.usim_plan_info?.id)
 
-  for (const form in FIXED_FORMS) {
-    formData.set(form, FIXED_FORMS[form].value)
+  for (const formName in FIXED_FORMS) {
+    if (
+      [
+        ...availableForms.usim,
+        ...availableForms.customer,
+        ...availableForms.deputy,
+        ...availableForms.payment,
+      ].includes(formName) //add to formData only if the form visible
+    ) {
+      if (['birthday', 'deputy_birthday', 'account_birthday'].includes(formName) && FIXED_FORMS[formName]?.value) {
+        formData.set(formName, FIXED_FORMS[formName]?.value.replaceAll('-', ''))
+        //
+      } else if (['deputy_contact', 'contact', 'phone_number'].includes(formName) && FIXED_FORMS[formName]?.value) {
+        formData.set(formName, FIXED_FORMS[formName]?.value.replaceAll('-', ''))
+
+        //
+      } else if (formName === 'wish_number' && FIXED_FORMS[formName]?.value) {
+        const wishList = FIXED_FORMS[formName]?.value.split(' / ')
+        wishList.forEach((item, index) => {
+          const key = 'request_no_' + (index + 1)
+          formData.set(key, item)
+        })
+        //
+      } else if (formName === 'country') {
+        formData.set('country_cd', FIXED_FORMS[formName].value)
+        //
+      } else if (formName === 'usim_model_list') {
+        formData.set('usim_model_no', FIXED_FORMS[formName].value)
+        //
+      } else if (formName === 'data_roming_block_cd') {
+        formData.set('data_roming_block', FIXED_FORMS[formName].value)
+        //
+      } else if (formName === 'phone_bill_block_cd') {
+        formData.set('phone_bill_block', FIXED_FORMS[formName].value)
+        //
+      } else if (formName === 'extra_service_cd') {
+        formData.set('extra_service', FIXED_FORMS[formName].value)
+        //
+      } else {
+        formData.set(formName, FIXED_FORMS[formName].value)
+      }
+    }
   }
-
+  for (const [key, value] of formData.entries()) {
+    console.log(key, value)
+  }
   try {
     const response = await fetchWithTokenRefresh('agent/actApply', { method: 'POST', body: formData })
 
-    if (response.ok) {
-      const decodedResponse = await response.json()
-      base64Images.value = decodedResponse.data.apply_forms_list
-      if (base64Images.value.length > 0) {
-        usePrintablePopup().open(base64Images.value)
-      }
-    } else {
-      throw new Error('Could not fetch image data')
-    }
+    if (!response.ok) throw new Error('Could not fetch image data')
+
+    const decodedResponse = await response.json()
+    const base64Images = decodedResponse.data.apply_forms_list
+    console.log(decodedResponse)
+
+    if (base64Images?.length > 0) usePrintablePopup().open(base64Images)
   } catch (error) {
     useSnackbarStore().showSnackbar(error.toString())
   }
@@ -703,5 +663,16 @@ async function fetchForms() {
   margin-top: 30px;
   max-width: 200px;
   margin-bottom: 400px;
+}
+
+@media (max-width: 600px) {
+  .container {
+    width: 100%;
+  }
+
+  .group {
+    width: auto;
+    /* max-width: 100% !important; */
+  }
 }
 </style>

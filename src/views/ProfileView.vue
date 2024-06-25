@@ -71,7 +71,7 @@
 
 //
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useSnackbarStore } from '../stores/snackbar'
 import { fetchWithTokenRefresh } from '../utils/tokenUtils'
 import SignImageRowContainer from '../components/SignImageRowContainer.vue'
@@ -158,6 +158,8 @@ async function submit() {
 }
 
 onMounted(fetchProfileData)
+
+onUnmounted(signStore.clear)
 </script>
 
 <style scoped>

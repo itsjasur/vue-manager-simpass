@@ -5,7 +5,7 @@
         menu_open
       </span>
       <span v-else @click="sideMenuStore.open()" class="material-symbols-outlined"> menu </span>
-      <div class="title"><MenuTitle /></div>
+      <MenuTitle class="header-title" />
     </div>
     <div class="button" @click="logout">Logout</div>
     <!-- <div class="button" @click="sideMenuStore.toggle()">Logout</div> -->
@@ -48,11 +48,13 @@ function logout() {
 .left {
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
-.title {
-  padding: 0 15px;
+.header-title {
+  margin-left: 10px;
   line-height: 1;
+  font-size: 17px;
 }
 
 .material-symbols-outlined {

@@ -123,8 +123,6 @@
       </div>
     </div>
   </div>
-
-  <PrintablePopup v-if="printPopup.active" />
 </template>
 
 <script setup>
@@ -133,7 +131,6 @@ import * as cleavePatterns from '../utils/cleavePatterns'
 import { formatDate } from '../utils/helpers'
 import { useSnackbarStore } from '../stores/snackbar'
 import { fetchWithTokenRefresh } from '../utils/tokenUtils'
-import PrintablePopup from '../components/PrintablePopup.vue'
 import { usePrintablePopup } from '../stores/printable-popup'
 
 const printPopup = usePrintablePopup()

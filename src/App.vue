@@ -20,6 +20,7 @@
   <Warning />
   <SearchAddressPopup />
   <SelectPlanPopup />
+  <PrintablePopup />
 </template>
 
 <script setup>
@@ -33,6 +34,7 @@ import { useRouteMemoryStore } from './stores/router-memory-store'
 import { useSideMenuStore } from './stores/side-menu'
 import SearchAddressPopup from './components/SearchAddressPopup.vue'
 import SelectPlanPopup from './components/SelectPlanPopup.vue'
+import PrintablePopup from './components/PrintablePopup.vue'
 
 const router = useRouter()
 const authStore = useAuthenticationStore()

@@ -10,7 +10,8 @@ export const birthdayPattern = () => {
   return {
     date: true,
     delimiter: '-',
-    datePattern: ['Y', 'm', 'd'],
+    datePattern: ['y', 'm', 'd'],
+    // datePattern: ['Y', 'm', 'd'],
     // dateMin: '1930-01-01',
     // dateMax: getTodaysDate(),
   }
@@ -20,7 +21,7 @@ export const datePattern = () => {
   return {
     date: true,
     delimiter: '-',
-    datePattern: ['Y', 'm', 'd'],
+    datePattern: ['y', 'm', 'd'],
     // dateMin: '1930-01-01',
     // dateMax: getTodaysDate(),
   }
