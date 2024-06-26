@@ -165,7 +165,7 @@ onUnmounted(signStore.clear)
 <style scoped>
 .container {
   max-width: 1000px;
-  margin: 20px;
+  margin-top: 20px;
   box-sizing: border-box;
   display: flex;
   flex-flow: column;

@@ -73,7 +73,7 @@ button:hover:enabled {
 .card:hover {
   /* opacity: 0.5; */
   cursor: pointer;
-  background-color: #b5b5b5;
+  background-color: #cfcfcf;
 }
 
 label {

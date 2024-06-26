@@ -329,8 +329,8 @@ export const FORMS = reactive({
   },
 
   account_birthday: {
-    // value: null,
-    value: '91-01-31',
+    value: null,
+    // value: '91-01-31',
     type: 'cleave',
     pattern: cleavePatterns.birthdayPattern(),
     maxwidth: '200px',
@@ -651,8 +651,8 @@ export const FORMS = reactive({
     errorMessage: null,
     error: '생년월일 입력하세요.',
     placeholder: '91-01-31',
-    // value: null,
-    value: '99-01-12',
+    value: null,
+    // value: '99-01-12',
     label: '생년월일',
   },
 

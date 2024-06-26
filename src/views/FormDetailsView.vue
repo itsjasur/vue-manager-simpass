@@ -37,7 +37,8 @@
               <!-- cleave -->
               <template v-if="FIXED_FORMS[formName].type === 'cleave'">
                 <input
-                  v-model="FIXED_FORMS[formName].value"
+                  :value="FIXED_FORMS[formName].value"
+                  @cleave:input="handleCleaveInput($event, formName)"
                   v-cleave="FIXED_FORMS[formName].pattern"
                   v-bind="inputBindings(formName)"
                 />
@@ -139,7 +140,7 @@
 <script setup>
 import { useSnackbarStore } from '@/stores/snackbar'
 import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
-import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { computed, onMounted, reactive, ref, watch, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 import { FORMS } from '../assets/constants'
 import { PLANSINFO } from '../assets/constants'
@@ -160,11 +161,10 @@ const route = useRoute()
 const FIXED_FORMS = reactive(_.cloneDeep(FORMS))
 
 //setting address and addressdetail to store value
-//addressdetail needs get and set in order to be editable
-FIXED_FORMS.address.value = computed(() => selectAddressPopup.address)
-FIXED_FORMS.addressdetail.value = computed({
-  get: () => selectAddressPopup.buildingName,
-  set: (newValue) => (selectAddressPopup.buildingName = newValue),
+watchEffect(() => {
+  console.log('address changed', selectAddressPopup.address)
+  FIXED_FORMS.address.value = selectAddressPopup.address
+  FIXED_FORMS.addressdetail.value = selectAddressPopup.buildingName
 })
 
 //this inits page
@@ -317,23 +317,44 @@ const inputBindings = (formName) => {
     }
   }
 
-  if (['birthday', 'deputy_birthday', 'account_birthday'].includes(formName)) {
-    bindings.onInput = () => {
-      if (FIXED_FORMS[formName]?.value?.replaceAll('-', '')?.length === 6) {
-        const date = new Date(FIXED_FORMS[formName]?.value)
-        const year = date.getFullYear().toString().slice(-2)
-        const month = (date.getMonth() + 1).toString().padStart(2, '0')
-        const day = date.getDate().toString().padStart(2, '0')
-        FIXED_FORMS[formName].value = `${year}-${month}-${day}`
-      }
-    }
-  }
-
   return bindings
 }
 
 // weather the registerer is owner or somebody else
-const selfRegisterChecked = ref(false)
+const selfRegisterChecked = ref(true)
+
+watchEffect(() => {
+  if (selfRegisterChecked.value) {
+    FIXED_FORMS.account_name.value = FIXED_FORMS.name.value
+    FIXED_FORMS.account_birthday.value = FIXED_FORMS.birthday.value
+  } else {
+    FIXED_FORMS.account_name.value = ''
+    FIXED_FORMS.account_birthday.value = ''
+  }
+})
+
+//this handles cleave input updates. it has raw values!
+const handleCleaveInput = (event, formName) => {
+  let rawValue = event.detail.raw
+  let formattedValue = event.detail.formatted
+
+  if (['birthday', 'deputy_birthday', 'account_birthday'].includes(formName)) {
+    const today = new Date()
+    const currYear = today.getFullYear() % 100
+
+    if (rawValue.length === 6) {
+      const [yy, mm, dd] = formattedValue.split('-')
+      if (yy > currYear) formattedValue = '19' + formattedValue
+      else formattedValue = '20' + formattedValue
+
+      const date = new Date(formattedValue)
+      const year = date.getFullYear().toString().slice(-2)
+      const month = (date.getMonth() + 1).toString().padStart(2, '0')
+      const day = date.getDate().toString().padStart(2, '0')
+      FIXED_FORMS[formName].value = `${year}-${month}-${day}`
+    }
+  }
+}
 
 //supported docs checkbox and handler
 const supportedImagesChecked = ref(true)
@@ -538,6 +559,9 @@ async function fetchForms() {
         //
       } else if (formName === 'data_roming_block_cd') {
         formData.set('data_roming_block', FIXED_FORMS[formName].value)
+        //
+      } else if (formName === 'data_block_cd') {
+        formData.set('data_block', FIXED_FORMS[formName].value)
         //
       } else if (formName === 'phone_bill_block_cd') {
         formData.set('phone_bill_block', FIXED_FORMS[formName].value)
