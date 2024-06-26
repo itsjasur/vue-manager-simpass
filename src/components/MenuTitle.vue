@@ -40,14 +40,12 @@ const title = computed(() => {
     return SIDEMENUNAMES[2]
   }
 
+  if (route.name === 'business-request') {
+    return '거래요청'
+  }
+
   return 'Nothing'
 })
 </script>
 
-<style scoped>
-span {
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 1;
-}
-</style>
+<style scoped></style>

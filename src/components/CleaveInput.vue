@@ -53,8 +53,8 @@ export default {
 </script>
 
 <!-- <CleaveInput
-                  v-model="FIXED_FORMS[formName].value"
-                  :options="FIXED_FORMS[formName].pattern"
-                  :rawValue="false"
-                  v-bind="inputBindings(formName)"
-                /> -->
+  v-model="FIXED_FORMS[formName].value"
+  :options="FIXED_FORMS[formName].pattern"
+  :rawValue="false"
+  v-bind="inputBindings(formName)"
+/> -->

@@ -12,6 +12,7 @@ import NotFoundView from '../views/NotFoundView.vue'
 import RentalRegistrationView from '../views/RentalFormsView.vue'
 import ApplicationsView from '../views/ApplicationsView.vue'
 import DownloadForms from '../views/DownloadForms.vue'
+import BusinessRequest from '../views/BusinessRequestView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -37,7 +38,6 @@ const router = createRouter({
       path: '/',
       name: 'dashboard',
       redirect: '/home',
-
       component: DashBaordView,
       meta: {
         requiresAuth: true,
@@ -97,6 +97,15 @@ const router = createRouter({
           path: '/download-forms',
           name: 'download-forms',
           component: DownloadForms,
+          meta: {
+            requiresAuth: true,
+          },
+        },
+
+        {
+          path: '/business-request',
+          name: 'business-request',
+          component: BusinessRequest,
           meta: {
             requiresAuth: true,
           },

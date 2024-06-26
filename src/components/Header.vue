@@ -55,6 +55,7 @@ function logout() {
   margin-left: 10px;
   line-height: 1;
   font-size: 17px;
+  font-weight: 600;
 }
 
 .material-symbols-outlined {

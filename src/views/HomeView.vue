@@ -19,7 +19,7 @@
           <p class="primaryT">정책보기</p>
         </div>
       </div>
-      <div class="card">
+      <div class="card" @click="router.push('/business-request')">
         <div class="img">
           <img src="../assets/icons/handshake.png" alt="" />
         </div>
