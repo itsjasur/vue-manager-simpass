@@ -316,8 +316,8 @@ export const FORMS = reactive({
   },
 
   account_name: {
-    // value: null,
-    value: 'TEST 예금주명',
+    value: null,
+    // value: 'TEST 예금주명',
     type: 'input',
     maxwidth: '300px',
     error: '예금주명 입력하세요.',
@@ -344,7 +344,7 @@ export const FORMS = reactive({
 
   account_agency: {
     value: null,
-    value: 'TEST AGENCY',
+    // value: 'TEST AGENCY',
     type: 'input',
     maxwidth: '300px',
     error: '은행(카드사)명 입력하세요.',
@@ -356,8 +356,8 @@ export const FORMS = reactive({
   },
 
   account_number: {
-    // value: null,
-    value: '289347298372',
+    value: null,
+    // value: '289347298372',
     type: 'input',
     maxwidth: '300px',
     error: '계좌번호(카드번호) 입력하세요.',
@@ -412,8 +412,8 @@ export const FORMS = reactive({
   },
 
   usim_no: {
-    // value: null,
-    value: '12312312',
+    value: null,
+    // value: '12312312',
     type: 'input',
     maxwidth: '300px',
     error: '일련번호 입력하세요.',
@@ -584,8 +584,8 @@ export const FORMS = reactive({
   },
 
   contact: {
-    // value: null,
-    value: '010-1234-1234',
+    value: null,
+    // value: '010-1234-1234',
     type: 'cleave',
     pattern: {
       phone: true,
@@ -619,8 +619,8 @@ export const FORMS = reactive({
     maxwidth: '200px',
     error: '신분증번호/여권번호 입력하세요.',
     placeholder: '910131-0000000',
-    // value: null,
-    value: '123214323',
+    value: null,
+    // value: '123214323',
     hasDefault: true,
     required: true,
     errorMessage: null,
@@ -636,9 +636,9 @@ export const FORMS = reactive({
     hasDefault: true,
     required: true,
     errorMessage: null,
-    // value: null,
     label: '가입자명',
-    value: 'TEST NAME',
+    value: null,
+    // value: 'TEST NAME',
   },
 
   birthday: {

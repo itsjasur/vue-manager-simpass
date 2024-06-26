@@ -245,8 +245,9 @@ function generateInitialForms() {
   if (FIXED_FORMS?.paid_transfer_cd?.value === 'C') availableForms.payment.push('card_yy_mm')
 
   //adding deputy forms
-  if (FIXED_FORMS?.cust_type_cd?.value === 'COL')
+  if (FIXED_FORMS?.cust_type_cd?.value === 'COL') {
     availableForms.deputy.push('deputy_name', 'deputy_birthday', 'relationship_cd', 'deputy_contact')
+  }
 
   //after extra forms added, set default should be called again!
   setDefault()
@@ -337,6 +338,10 @@ watchEffect(() => {
 const handleCleaveInput = (event, formName) => {
   let rawValue = event.detail.raw
   let formattedValue = event.detail.formatted
+
+  // console.log(formName, rawValue)
+
+  FIXED_FORMS[formName].value = formattedValue
 
   if (['birthday', 'deputy_birthday', 'account_birthday'].includes(formName)) {
     const today = new Date()

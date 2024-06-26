@@ -151,6 +151,7 @@ onMounted(fetchData)
 
 .column-card .title-text {
   font-weight: 600;
+
   /* background-color: aquamarine; */
 }
 
