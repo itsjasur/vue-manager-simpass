@@ -1,6 +1,6 @@
 <template>
-  <div class="main">
-    <div class="container">
+  <div class="home-main">
+    <div class="home-container">
       <div class="card" @click="router.push('/registration-forms')">
         <div class="img">
           <img src="../assets/icons/sim.png" alt="" />
@@ -45,17 +45,16 @@ const router = useRouter()
 </script>
 
 <style scoped>
-.main {
+.home-main {
   display: flex;
   flex-direction: column;
   height: 100%;
   justify-content: center;
   align-items: center;
-  /* margin: 0 20px; */
-  padding: 0 20px;
+  padding: 20px;
   box-sizing: border-box;
 }
-.container {
+.home-container {
   width: 100%;
   display: flex;
   flex-flow: wrap;

@@ -28,6 +28,16 @@ export const CHECKBOXES = [
   { name: '신청서 프린트 인쇄후 서명/사인 자필', type: 'signAfterPrint', value: false },
 ]
 
+export const EMAILOPTIONS = [
+  { value: '', label: '직접입력' },
+  { value: '@naver.com', label: '@naver.com' },
+  { value: '@daum.net', label: '@daum.net' },
+  { value: '@kakao.com', label: '@kakao.com' },
+  { value: '@gmail.com', label: '@gmail.com' },
+  { value: '@hanmail.net', label: '@hanmail.net' },
+  { value: '@hotmail.com', label: '@hotmail.com' },
+]
+
 export const PLANSINFO = [
   {
     code: 'PR',
@@ -332,7 +342,7 @@ export const FORMS = reactive({
     value: null,
     // value: '91-01-31',
     type: 'cleave',
-    pattern: cleavePatterns.birthdayPattern(),
+    pattern: cleavePatterns.birthdayPattern,
     maxwidth: '200px',
     error: '생년월일 입력하세요.',
     placeholder: '91-01-31',
@@ -644,7 +654,7 @@ export const FORMS = reactive({
   birthday: {
     //
     type: 'cleave',
-    pattern: cleavePatterns.birthdayPattern(),
+    pattern: cleavePatterns.birthdayPattern,
     maxwidth: '200px',
     hasDefault: true,
     required: true,
@@ -708,7 +718,7 @@ export const FORMS = reactive({
 
   deputy_birthday: {
     type: 'cleave',
-    pattern: cleavePatterns.birthdayPattern(),
+    pattern: cleavePatterns.birthdayPattern,
     maxwidth: '200px',
     hasDefault: true,
     required: true,

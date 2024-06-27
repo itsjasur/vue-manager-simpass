@@ -1,34 +1,36 @@
 <template>
   <div class="menu">
     <div class="logo">
-      <router-link to="/home"><img src="../assets/logo.png" alt="Logo" style="width: 200px" /> </router-link>
+      <router-link @click="sideMenuClose" to="/home"
+        ><img src="../assets/logo.png" alt="Logo" style="width: 200px" />
+      </router-link>
     </div>
-    <router-link to="/home" class="menu-item">
+    <router-link @click="sideMenuClose" to="/home" class="menu-item">
       <span class="material-symbols-outlined"> home </span>
       <span class="menu-title">{{ SIDEMENUNAMES[0] }}</span>
     </router-link>
 
-    <router-link to="/profile" class="menu-item">
+    <router-link @click="sideMenuClose" to="/profile" class="menu-item">
       <span class="material-symbols-outlined"> person </span>
       <span class="menu-title">{{ SIDEMENUNAMES[1] }}</span>
     </router-link>
 
-    <router-link to="/registration-forms" class="menu-item">
+    <router-link @click="sideMenuClose" to="/registration-forms" class="menu-item">
       <span class="material-symbols-outlined"> description </span>
       <span class="menu-title">{{ SIDEMENUNAMES[2] }}</span>
     </router-link>
 
-    <router-link to="/rental-forms" class="menu-item">
+    <router-link @click="sideMenuClose" to="/rental-forms" class="menu-item">
       <span class="material-symbols-outlined"> demography </span>
       <span class="menu-title">{{ SIDEMENUNAMES[3] }}</span>
     </router-link>
 
-    <router-link to="/applications" class="menu-item">
+    <router-link @click="sideMenuClose" to="/applications" class="menu-item">
       <span class="material-symbols-outlined"> checklist_rtl </span>
       <span class="menu-title">{{ SIDEMENUNAMES[4] }}</span>
     </router-link>
 
-    <router-link to="/download-forms" class="menu-item">
+    <router-link @click="sideMenuClose" to="/download-forms" class="menu-item">
       <span class="material-symbols-outlined"> file_save </span>
       <span class="menu-title">{{ SIDEMENUNAMES[5] }}</span>
     </router-link>
@@ -39,6 +41,12 @@
 import MenuTitle from '../components/MenuTitle.vue'
 import { SIDEMENUNAMES } from '../assets/constants'
 import { useSideMenuStore } from '../stores/side-menu'
+
+const sideMenuStore = useSideMenuStore()
+
+function sideMenuClose() {
+  if (!sideMenuStore.isDesktop) sideMenuStore.close()
+}
 </script>
 
 <style scoped>

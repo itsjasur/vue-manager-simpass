@@ -39,15 +39,22 @@
         </div>
       </template>
 
-      <button>거래요청</button>
+      <!-- <button @click="router.push({ name: '/business-request-form', params: { id: 1 } })">거래요청</button> -->
+      <button @click="router.push({ path: '/business-request-form', query: { agent: 1 } })">거래요청</button>
     </div>
   </div>
+
+  <BusinessRequestPopup agentCd="SP" />
 </template>
 
 <script setup>
 import { useSnackbarStore } from '@/stores/snackbar'
 import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
 import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import BusinessRequestPopup from '../components/BusinessRequestPopup.vue'
+
+const router = useRouter()
 
 const data = ref()
 

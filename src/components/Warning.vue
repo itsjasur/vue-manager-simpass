@@ -28,6 +28,7 @@ const store = useWarningStore()
   justify-content: center;
   align-items: center;
   background-color: rgba(0, 0, 0, 0.552);
+  z-index: 3000;
 }
 
 .popup-content {
@@ -36,9 +37,7 @@ const store = useWarningStore()
   box-sizing: border-box;
   max-width: 400px;
   width: 90%;
-
   min-height: 200px;
-
   display: flex;
   flex-flow: column;
   gap: 5px;

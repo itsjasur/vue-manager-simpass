@@ -81,11 +81,11 @@ async function login(event) {
         password: password.value,
       }),
     })
+
     if (response.ok) {
       const data = await response.json()
       useAuthenticationStore().login(data['accessToken'], data['refreshToken'], data['id'], data['username'])
 
-      console.log('intended router: ', useRouteMemoryStore().intendedRoute)
       //checks if user had intended route, and push that route. if not push '/'
       if (useRouteMemoryStore().intendedRoute) {
         let url = useRouteMemoryStore().intendedRoute
@@ -179,7 +179,7 @@ hr {
 
 .signup-button {
   width: 100%;
-  background-color: #4471ca;
+  background-color: #ffb428;
   margin-bottom: 30px;
 }
 

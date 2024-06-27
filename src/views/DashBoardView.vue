@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard-container">
-    <div :class="['dashboard-side-menu', { open: sideMenuStore.isOpen }]">
+    <div v-if="sideMenuStore.isDesktop" :class="['dashboard-side-menu', { open: sideMenuStore.isOpen }]">
       <SideMenu />
     </div>
 
@@ -15,19 +15,34 @@
     </div>
   </div>
 
-  <div v-if="sideMenuStore.isOpen" @click="sideMenuStore.close()" class="m-dashboard-side-menu-overlay"></div>
-  <div :class="['m-dashboard-side-menu', { closed: !sideMenuStore.isOpen }]">
-    <SideMenu />
-  </div>
+  <template v-if="!sideMenuStore.isDesktop">
+    <div v-if="sideMenuStore.isOpen" @click="sideMenuStore.close()" class="m-dashboard-side-menu-overlay"></div>
+    <div :class="['m-dashboard-side-menu', { closed: !sideMenuStore.isOpen }]">
+      <SideMenu />
+    </div>
+  </template>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import SideMenu from '../components/SideMenu.vue'
 import Header from '../components/Header.vue'
 import { useSideMenuStore } from '../stores/side-menu'
 
 const sideMenuStore = useSideMenuStore()
+
+const handleResize = () => {
+  sideMenuStore.updateIsDesktop()
+}
+
+onMounted(() => {
+  sideMenuStore.updateIsDesktop()
+  window.addEventListener('resize', handleResize)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
+})
 </script>
 
 <style scoped>
@@ -37,13 +52,11 @@ const sideMenuStore = useSideMenuStore()
   height: 100vh;
   width: 100vw;
   z-index: 1000;
-
   background-color: #ffc0cb76;
 }
 
 .dashboard-side-menu {
   height: 100%;
-  /* width: 300px; */
   width: 0px;
   transition: width 0.3s ease;
   z-index: 1001;
@@ -52,10 +65,6 @@ const sideMenuStore = useSideMenuStore()
 .dashboard-side-menu.open {
   width: 300px;
 }
-
-/* .dashboard-side-menu.closed {
-  width: 0px;
-} */
 
 .dashboard-view-content {
   flex: 1;
@@ -87,42 +96,30 @@ const sideMenuStore = useSideMenuStore()
   font-size: 30px;
 }
 
-.m-dashboard-side-menu-overlay,
-.m-dashboard-side-menu {
-  display: none;
+.m-dashboard-side-menu-overlay {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #00000047;
+  z-index: 1100;
 }
 
-/* Media query for mobile devices */
-@media (max-width: 960px) {
-  .dashboard-side-menu {
-    display: none;
-  }
+.m-dashboard-side-menu {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 300px;
+  z-index: 1101;
+  transition: width 0.3s ease;
+  overflow: hidden;
+}
 
-  .m-dashboard-side-menu-overlay {
-    display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: #00000047;
-    z-index: 1100;
-  }
-
-  .m-dashboard-side-menu {
-    display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    width: 300px;
-    z-index: 1101;
-    transition: width 0.3s ease;
-    overflow: hidden;
-  }
-
-  .m-dashboard-side-menu.closed {
-    width: 0;
-  }
+.m-dashboard-side-menu.closed {
+  width: 0;
 }
 </style>

@@ -55,7 +55,7 @@
             @change="validateEmail"
             :style="{ minWidth: '140px' }"
             placeholder=""
-            :options="emailOptions"
+            :options="EMAILOPTIONS"
           >
           </a-select>
         </div>
@@ -182,6 +182,7 @@ import * as helpers from '@/utils/helpers'
 import { useRouter } from 'vue-router'
 import LoadingSpinner from '../components/Loader.vue'
 import { useWarningStore } from '../stores/warning'
+import { EMAILOPTIONS } from '../assets/constants'
 
 const warningStore = useWarningStore()
 
@@ -199,16 +200,6 @@ watch(
     addressDetails.value = searchAddressPopup.buildingName
   }
 )
-
-const emailOptions = [
-  { value: '', label: '직접입력' },
-  { value: '@naver.com', label: '@naver.com' },
-  { value: '@daum.net', label: '@daum.net' },
-  { value: '@kakao.com', label: '@kakao.com' },
-  { value: '@gmail.com', label: '@gmail.com' },
-  { value: '@hanmail.net', label: '@hanmail.net' },
-  { value: '@hotmail.com', label: '@hotmail.com' },
-]
 
 async function checkUsername() {
   isUsernameOk.value = false

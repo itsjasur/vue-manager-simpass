@@ -7,7 +7,7 @@
       <span v-else @click="sideMenuStore.open()" class="material-symbols-outlined"> menu </span>
       <MenuTitle class="header-title" />
     </div>
-    <div class="button" @click="logout">Logout</div>
+    <div class="button" @click="logout">로그 아웃</div>
     <!-- <div class="button" @click="sideMenuStore.toggle()">Logout</div> -->
   </div>
 </template>

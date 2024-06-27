@@ -49,13 +49,13 @@
 
       <div class="group">
         <label>본인명의 휴대폰번호</label>
-        <input v-model="phoneNumber" placeholder="010-1234-5678" v-cleave="cleavePatterns.phoneNumberPattern()" />
+        <input v-model="phoneNumber" placeholder="010-1234-5678" v-cleave="cleavePatterns.phoneNumberPattern" />
         <p v-if="isSubmitted && !phoneNumber" class="input-error-message">휴대폰번호를 정확하게 입력하세요.</p>
       </div>
 
       <div class="group">
         <label>생년월일</label>
-        <input v-model="birthday" placeholder="1981-01-31" v-cleave="cleavePatterns.birthdayPattern()" />
+        <input v-model="birthday" placeholder="1981-01-31" v-cleave="cleavePatterns.birthdayPatternFull" />
         <p v-if="isSubmitted && !birthday" class="input-error-message">올바른 날짜를 입력하십시오.</p>
       </div>
     </div>

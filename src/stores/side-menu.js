@@ -4,6 +4,7 @@ export const useSideMenuStore = defineStore('sidemenu', {
   state: () => ({
     isSideMenuOpen: true,
     isOpen: true,
+    isDesktop: false,
   }),
 
   actions: {
@@ -19,6 +20,10 @@ export const useSideMenuStore = defineStore('sidemenu', {
     open() {
       this.isOpen = true
       // this.isSideMenuOpen = true
+    },
+
+    updateIsDesktop() {
+      this.isDesktop = window.innerWidth > 960
     },
   },
 })

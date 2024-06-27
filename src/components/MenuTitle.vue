@@ -43,6 +43,9 @@ const title = computed(() => {
   if (route.name === 'business-request') {
     return '거래요청'
   }
+  if (route.name === 'business-request-form') {
+    return '거래요청 양식 제출'
+  }
 
   return 'Nothing'
 })

@@ -21,12 +21,12 @@
       <template v-else>
         <div class="group" style="max-width: 180px">
           <label>개통일자 (From)</label>
-          <input v-model="fromDate" v-cleave="cleavePatterns.datePattern()" />
+          <input v-model="fromDate" v-cleave="cleavePatterns.datePattern" />
         </div>
 
         <div class="group" style="max-width: 180px">
           <label>개통일자 (To)</label>
-          <input v-model="toDate" v-cleave="cleavePatterns.datePattern()" />
+          <input v-model="toDate" v-cleave="cleavePatterns.datePattern" />
         </div>
       </template>
       <button @click="fetchDate()" style="min-width: 100px; width: auto">선택</button>

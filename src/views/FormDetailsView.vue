@@ -162,7 +162,6 @@ const FIXED_FORMS = reactive(_.cloneDeep(FORMS))
 
 //setting address and addressdetail to store value
 watchEffect(() => {
-  console.log('address changed', selectAddressPopup.address)
   FIXED_FORMS.address.value = selectAddressPopup.address
   FIXED_FORMS.addressdetail.value = selectAddressPopup.buildingName
 })
@@ -579,9 +578,10 @@ async function fetchForms() {
       }
     }
   }
-  for (const [key, value] of formData.entries()) {
-    console.log(key, value)
-  }
+  // for (const [key, value] of formData.entries()) {
+  //   console.log(key, value)
+  // }
+
   try {
     const response = await fetchWithTokenRefresh('agent/actApply', { method: 'POST', body: formData })
 
@@ -589,7 +589,6 @@ async function fetchForms() {
 
     const decodedResponse = await response.json()
     const base64Images = decodedResponse.data.apply_forms_list
-    console.log(decodedResponse)
 
     if (base64Images?.length > 0) usePrintablePopup().open(base64Images)
   } catch (error) {
@@ -598,7 +597,7 @@ async function fetchForms() {
 }
 </script>
 
-<style>
+<style scoped>
 .container {
   max-width: 1400px;
   width: 100%;

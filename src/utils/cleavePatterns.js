@@ -6,29 +6,36 @@ export const getTodaysDate = () => {
   return `${year}-${month}-${day}`
 }
 
-export const birthdayPattern = () => {
-  return {
-    date: true,
-    delimiter: '-',
-    datePattern: ['y', 'm', 'd'],
-    strictDate: true,
-  }
+export const birthdayPattern = {
+  date: true,
+  delimiter: '-',
+  datePattern: ['y', 'm', 'd'],
+  strictDate: true,
 }
 
-export const datePattern = () => {
-  return {
-    date: true,
-    delimiter: '-',
-    datePattern: ['Y', 'm', 'd'],
-    // dateMin: '1930-01-01',
-    // dateMax: getTodaysDate(),
-  }
+export const birthdayPatternFull = {
+  date: true,
+  delimiter: '-',
+  datePattern: ['Y', 'm', 'd'],
+  strictDate: true,
 }
 
-export const phoneNumberPattern = () => {
-  return {
-    phone: true,
-    phoneRegionCode: 'KR',
-    delimiter: '-',
-  }
+export const datePattern = {
+  date: true,
+  delimiter: '-',
+  datePattern: ['Y', 'm', 'd'],
+  // dateMin: '1930-01-01',
+  // dateMax: getTodaysDate(),
+}
+
+export const phoneNumberPattern = {
+  phone: true,
+  phoneRegionCode: 'KR',
+  delimiter: '-',
+}
+
+export const businessNumberPattern = {
+  delimiter: '-',
+  blocks: [3, 2, 5],
+  numericOnly: true,
 }
