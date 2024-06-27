@@ -3,7 +3,7 @@
     <div class="popup-content">
       <div class="fixed-header">
         <h3 class="title">판매점 계약 동의 및 계약내용 확인</h3>
-        <span @click="popup.close" class="material-symbols-outlined close-button"> cancel </span>
+        <span @click="$emit('closePopup')" class="material-symbols-outlined close-button"> cancel </span>
       </div>
 
       <div class="scrollable-content">
@@ -291,7 +291,6 @@ const formData = new FormData()
 
 async function submit() {
   submitted.value = true
-  isSubmitting.value = true
 
   if (!agreeToContracTerms.value) {
     useSnackbarStore().showSnackbar('판매점 계약서 내용에 동의해주세요.')
@@ -347,6 +346,8 @@ async function submit() {
     formData.set('receipt_id', serverData.value.receipt_id)
 
     try {
+      isSubmitting.value = true
+
       const response = await fetchWithTokenRefresh('agent/contract', { method: 'POST', body: formData })
 
       if (!response.ok) {
@@ -359,6 +360,7 @@ async function submit() {
       const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
       await delay(2000)
 
+      emit('closePopup')
       warning.open('성공', [decodedResponse?.message ?? 'Success'])
       router.push('/')
     } catch (error) {

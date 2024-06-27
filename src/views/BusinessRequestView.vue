@@ -40,11 +40,15 @@
       </template>
 
       <!-- <button @click="router.push({ name: '/business-request-form', params: { id: 1 } })">거래요청</button> -->
-      <button @click="router.push({ path: '/business-request-form', query: { agent: 1 } })">거래요청</button>
+      <button @click="openPopup(agent.agent_cd)">거래요청</button>
     </div>
   </div>
 
-  <BusinessRequestPopup agentCd="SP" />
+  <BusinessRequestPopup
+    v-if="businessRequestPopup"
+    :agentCd="selectedAgentCd"
+    @closePopup="businessRequestPopup = false"
+  />
 </template>
 
 <script setup>
@@ -55,6 +59,15 @@ import { useRouter } from 'vue-router'
 import BusinessRequestPopup from '../components/BusinessRequestPopup.vue'
 
 const router = useRouter()
+
+//business request popup
+const businessRequestPopup = ref(false)
+const selectedAgentCd = ref()
+
+function openPopup(agentCd) {
+  businessRequestPopup.value = true
+  selectedAgentCd.value = agentCd
+}
 
 const data = ref()
 
