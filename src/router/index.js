@@ -13,6 +13,7 @@ import RentalRegistrationView from '../views/RentalFormsView.vue'
 import ApplicationsView from '../views/ApplicationsView.vue'
 import DownloadForms from '../views/DownloadForms.vue'
 import BusinessRequest from '../views/BusinessRequestView.vue'
+import BusinessPartners from '../views/BusinessPartnersView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -106,6 +107,15 @@ const router = createRouter({
           path: '/business-request',
           name: 'business-request',
           component: BusinessRequest,
+          meta: {
+            requiresAuth: true,
+          },
+        },
+
+        {
+          path: '/business-partners',
+          name: 'business-partners',
+          component: BusinessPartners,
           meta: {
             requiresAuth: true,
           },

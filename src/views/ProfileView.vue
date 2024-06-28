@@ -170,6 +170,7 @@ onUnmounted(signStore.clear)
   display: flex;
   flex-flow: column;
   gap: 30px;
+  padding: 0 20px;
 }
 
 .groups {

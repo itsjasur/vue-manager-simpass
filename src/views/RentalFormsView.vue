@@ -12,7 +12,7 @@
 
       <div class="group" style="max-width: 200px">
         <label>생년월일</label>
-        <input v-model="registrerBirthday" placeholder="1991-01-31" v-cleave="cleavePatterns.birthdayPattern" />
+        <input v-model="registrerBirthday" placeholder="91-01-31" v-cleave="cleavePatterns.birthdayPattern" />
         <p v-if="!registrerBirthday && submitted" class="input-error-message">생년월일 입력하세요.</p>
       </div>
 

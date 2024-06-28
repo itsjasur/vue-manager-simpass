@@ -27,7 +27,7 @@
           <p class="primaryT">거래요청</p>
         </div>
       </div>
-      <div class="card">
+      <div class="card" @click="router.push('/business-partners')">
         <div class="img">
           <img src="../assets/icons/store.png" alt="" />
         </div>

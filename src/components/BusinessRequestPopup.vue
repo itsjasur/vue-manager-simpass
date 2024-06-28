@@ -265,6 +265,8 @@ async function fetchData() {
     forms.faxNumber = info.store_fax
     forms.address = info.address
     forms.addressAdditions = info.dtl_address
+    forms.accountNumber = info.bank_num
+    forms.bankName = info.bank_nm
 
     imageUploads.businessLicence.initial = info.bs_reg_no
     imageUploads.directorId.initial = info.id_card

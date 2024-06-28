@@ -22,7 +22,7 @@
         <span v-if="isLoading">
           <LoadingSpinner height="20px" color="#ffffff" />
         </span>
-        <span v-else>Login</span>
+        <span v-else>로그인</span>
       </button>
       <hr />
 
