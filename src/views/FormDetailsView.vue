@@ -110,7 +110,7 @@
       />
       <!-- partner sign pad -->
       <SignImageRowContainer
-        v-if="serverData?.chk_partner_sign === 'N'"
+        v-if="serverData?.chk_partner_sign === 'N' && serverData?.usim_plan_info?.mvno_cd === 'UPM'"
         type="partner"
         @updated="updatePads"
         title="판매자 서명"
@@ -141,7 +141,7 @@
 import { useSnackbarStore } from '@/stores/snackbar'
 import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
 import { computed, onMounted, reactive, ref, watch, watchEffect } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { FORMS } from '../assets/constants'
 import { PLANSINFO } from '../assets/constants'
 import _ from 'lodash'
@@ -156,6 +156,16 @@ import { useSelectPlansPopup } from '../stores/select-plans-popup'
 const selectAddressPopup = useSearchaddressStore()
 
 const route = useRoute()
+const router = useRouter()
+
+const printablePopup = usePrintablePopup()
+//watches printable active status and then redirects to home
+watch(
+  () => printablePopup.active,
+  (newV, oldV) => {
+    if (newV === false && oldV === true) router.push('/')
+  }
+)
 
 //need to make deep copy in order to reset when page reloads
 const FIXED_FORMS = reactive(_.cloneDeep(FORMS))
@@ -588,9 +598,9 @@ async function fetchForms() {
     if (!response.ok) throw new Error('Could not fetch image data')
 
     const decodedResponse = await response.json()
-    const base64Images = decodedResponse.data.apply_forms_list
+    const base64Images = decodedResponse?.data?.apply_forms_list ?? []
 
-    if (base64Images?.length > 0) usePrintablePopup().open(base64Images)
+    if (base64Images?.length > 0) printablePopup.open(base64Images)
   } catch (error) {
     useSnackbarStore().showSnackbar(error.toString())
   }
@@ -599,27 +609,28 @@ async function fetchForms() {
 
 <style scoped>
 .container {
-  max-width: 1400px;
+  max-width: 1200px;
   width: 100%;
   padding: 0 15px;
   box-sizing: border-box;
   display: flex;
   flex-flow: column;
-  gap: 30px;
+  gap: 20px;
 }
 
 .partition {
   display: flex;
   flex-flow: wrap;
-  gap: 20px;
-  margin-bottom: 30px;
+  gap: 15px;
+  margin-bottom: 10px;
   min-height: 100px;
 }
 
 .title {
   font-size: 18px;
   font-weight: 600;
-  margin-top: 20px;
+  padding: 0;
+  margin-top: 10px;
   margin-bottom: 0px;
   width: 100%;
 }

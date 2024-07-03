@@ -63,8 +63,8 @@ const router = useRouter()
 }
 
 .card {
-  height: 170px;
-  width: 170px;
+  height: 200px;
+  width: 200px;
   padding: 10px;
   box-sizing: border-box;
   align-content: center;

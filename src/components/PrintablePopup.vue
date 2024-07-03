@@ -6,10 +6,13 @@
         <span @click="popup.close()" class="material-symbols-outlined close-button"> cancel </span>
       </div>
 
-      <div class="scrollable-content">
+      <div v-if="imageUrls.length > 0" class="scrollable-content">
         <img v-for="(image, index) in imageUrls" :key="index" class="image" :src="image" alt="" loading="lazy" />
       </div>
-      <button v-if="popup.images" @click="printContent" :disabled="isPrinting" class="print-button">
+
+      <div class="empty-content" v-else>인쇄할 내용이 없습니다.</div>
+
+      <button v-if="imageUrls.length > 0" @click="printContent" :disabled="isPrinting" class="print-button">
         <template v-if="isPrinting">
           <LoadingSpinner height="20px" color="#ffffff" />
         </template>
@@ -200,6 +203,12 @@ function printContent() {
   gap: 30px;
   padding: 0 20px;
   height: 100%;
+}
+
+.empty-content {
+  height: 100%;
+  align-self: center;
+  align-content: center;
 }
 
 .close-button {

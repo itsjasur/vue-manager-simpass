@@ -15,7 +15,7 @@
   >
   </a-config-provider>
   <router-view />
-
+  <Loading />
   <Snackbar />
   <Warning />
   <SearchAddressPopup />
@@ -27,7 +27,6 @@
 import { onMounted, onUnmounted, watch } from 'vue'
 import Snackbar from './components/Snackbar.vue'
 import Warning from './components/Warning.vue'
-// import router from './router'
 import { useRouter } from 'vue-router'
 import { useAuthenticationStore } from './stores/authentication'
 import { useRouteMemoryStore } from './stores/router-memory-store'
@@ -35,6 +34,7 @@ import { useSideMenuStore } from './stores/side-menu'
 import SearchAddressPopup from './components/SearchAddressPopup.vue'
 import SelectPlanPopup from './components/SelectPlanPopup.vue'
 import PrintablePopup from './components/PrintablePopup.vue'
+import Loading from './components/Loading.vue'
 
 const router = useRouter()
 const authStore = useAuthenticationStore()

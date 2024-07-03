@@ -8,7 +8,7 @@
 
       <template v-if="searchType === 'status'">
         <div class="group" style="max-width: 180px">
-          <label>Status</label>
+          <label>상태</label>
           <a-select
             v-model:value="selectedStatus"
             :style="{ width: '100%' }"
@@ -29,7 +29,7 @@
           <input v-model="toDate" v-cleave="cleavePatterns.datePattern" />
         </div>
       </template>
-      <button @click="fetchDate()" style="min-width: 100px; width: auto">선택</button>
+      <button @click="fetchData" style="min-width: 100px; width: auto">선택</button>
     </div>
 
     <!-- table -->
@@ -59,11 +59,20 @@
         :showSorterTooltip="false"
       >
         <template #bodyCell="{ column, text, record }">
+          <span v-if="column.dataIndex === 'mvno_cd'">
+            {{ record.mvno_cd_nm }}
+          </span>
+
           <template v-if="column.dataIndex === 'usim_act_status'">
             <span :class="['status-' + text, 'status-default']">
               {{ record.usim_act_status_nm }}
             </span>
           </template>
+
+          <span v-if="column.dataIndex === 'apply_date' || column.dataIndex === 'act_date'">
+            {{ text?.split(' ')[0] }}
+          </span>
+
           <template v-if="column.dataIndex === 'reg_form'">
             <span
               v-if="record.apply_forms === 'Y'"
@@ -132,6 +141,7 @@ import { formatDate } from '../utils/helpers'
 import { useSnackbarStore } from '../stores/snackbar'
 import { fetchWithTokenRefresh } from '../utils/tokenUtils'
 import { usePrintablePopup } from '../stores/printable-popup'
+import { usePageLoadingStore } from '@/stores/page-loading-store'
 
 const printPopup = usePrintablePopup()
 
@@ -143,7 +153,7 @@ const types = ref([
   { value: 'regis-date', label: '개통일자' },
 ])
 
-const selectedStatus = ref('A')
+const selectedStatus = ref('')
 const statuses = ref([])
 const totalCount = ref(0)
 const currentPage = ref(1)
@@ -175,6 +185,13 @@ const columns = ref([
     dataIndex: 'usim_act_status',
     key: 'usim_act_status',
     sorter: (a, b) => (a.usim_act_status ?? '').localeCompare(b.usim_act_status ?? ''),
+  },
+
+  {
+    title: '통신사',
+    dataIndex: 'mvno_cd',
+    key: 'mvno_cd',
+    sorter: (a, b) => (a.mvno_cd ?? '').localeCompare(b.mvno_cd ?? ''),
   },
   {
     title: '고객명',
@@ -214,7 +231,7 @@ const fetchData = async () => {
     const response = await fetchWithTokenRefresh('agent/actStatus', {
       method: 'POST',
       body: {
-        usim_act_status: '',
+        usim_act_status: searchType.value === 'status' ? selectedStatus.value : '',
         apply_fr_date: searchType.value === 'apply-date' ? fromDate.value : '',
         apply_to_date: searchType.value === 'apply-date' ? toDate.value : '',
         act_fr_date: searchType.value === 'regis-date' ? fromDate.value : '',
@@ -227,7 +244,9 @@ const fetchData = async () => {
       const decodedResponse = await response.json()
       if (decodedResponse.data) {
         dataList.value = decodedResponse?.data?.act_list ?? [{}]
-        statuses.value = decodedResponse?.data?.usim_act_status_code ?? [{}]
+
+        statuses.value = [{ cd: '', value: '잔체' }]
+        decodedResponse?.data?.usim_act_status_code.forEach((item) => statuses.value.push(item))
         totalCount.value = decodedResponse?.data?.totalNum ?? 0
       }
     } else {
@@ -239,6 +258,7 @@ const fetchData = async () => {
 }
 
 const fetchAndOpenFile = async (actNo) => {
+  usePageLoadingStore().start()
   //here fetches files
   try {
     const response = await fetchWithTokenRefresh('agent/actForms', {
@@ -257,6 +277,8 @@ const fetchAndOpenFile = async (actNo) => {
     }
   } catch (error) {
     useSnackbarStore().showSnackbar(error.toString())
+  } finally {
+    usePageLoadingStore().stop()
   }
 
   //here printable popup opens

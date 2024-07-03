@@ -67,30 +67,18 @@ function changeCarrier(cd) {
 function selectMvno(item) {
   selectPlansPopup.searchText = ''
   selectPlansPopup.open(selectedType.value, item.carrier_cd, item.mvno_cd)
-
-  // selectPlansPopup.mvnoName = item.mvno_nm
-  // selectPlansPopup.carrierName = item.carrier_nm
-  // selectPlansPopup.typeName = item.carrier_type_nm
 }
 
 async function fetchData() {
   try {
     const response = await fetchWithTokenRefresh('agent/applyCarrier', {
       method: 'POST',
-      body: {
-        carrier_type: selectedType.value,
-        carrier_cd: selectedCarrierCd.value,
-      },
+      body: { carrier_type: selectedType.value, carrier_cd: selectedCarrierCd.value },
     })
-    if (response.ok) {
-      const decodedResponse = await response.json()
-      if (decodedResponse.data && decodedResponse.data.info) {
-        let info = decodedResponse.data.info
-        mvnos.value = info
-      }
-    } else {
-      throw new Error('Fetch data error')
-    }
+
+    const decodedResponse = await response.json()
+    if (!response.ok) throw decodedResponse?.message ?? 'Fetch data error'
+    if (decodedResponse.data && decodedResponse.data.info) mvnos.value = decodedResponse.data.info
   } catch (error) {
     useSnackbarStore().showSnackbar(error.toString())
   }
@@ -170,16 +158,6 @@ onMounted(fetchData)
     flex: 1 0 calc(50% - 20px); /* each item takes half of the container width with a gap of 20px */
     max-width: calc(50% - 10px); /* ensures items don't exceed half of the container width */
     padding: 8vw 8vw;
-  }
-
-  .textbox {
-    margin-left: 10px;
-    width: 100%;
-    text-align: start;
-  }
-
-  .primaryT {
-    margin-bottom: 10px;
   }
 }
 </style>

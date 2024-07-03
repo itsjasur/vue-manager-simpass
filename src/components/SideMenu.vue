@@ -1,39 +1,17 @@
 <template>
   <div class="menu">
     <div class="logo">
-      <router-link @click="sideMenuClose" to="/home"
+      <router-link @click="sideMenuClose" to="/profile"
         ><img src="../assets/logo.png" alt="Logo" style="width: 200px" />
       </router-link>
     </div>
-    <router-link @click="sideMenuClose" to="/home" class="menu-item">
-      <span class="material-symbols-outlined"> home </span>
-      <span class="menu-title">{{ SIDEMENUNAMES[0] }}</span>
-    </router-link>
 
-    <router-link @click="sideMenuClose" to="/profile" class="menu-item">
-      <span class="material-symbols-outlined"> person </span>
-      <span class="menu-title">{{ SIDEMENUNAMES[1] }}</span>
-    </router-link>
-
-    <router-link @click="sideMenuClose" to="/registration-forms" class="menu-item">
-      <span class="material-symbols-outlined"> description </span>
-      <span class="menu-title">{{ SIDEMENUNAMES[2] }}</span>
-    </router-link>
-
-    <router-link @click="sideMenuClose" to="/rental-forms" class="menu-item">
-      <span class="material-symbols-outlined"> demography </span>
-      <span class="menu-title">{{ SIDEMENUNAMES[3] }}</span>
-    </router-link>
-
-    <router-link @click="sideMenuClose" to="/applications" class="menu-item">
-      <span class="material-symbols-outlined"> checklist_rtl </span>
-      <span class="menu-title">{{ SIDEMENUNAMES[4] }}</span>
-    </router-link>
-
-    <router-link @click="sideMenuClose" to="/download-forms" class="menu-item">
-      <span class="material-symbols-outlined"> file_save </span>
-      <span class="menu-title">{{ SIDEMENUNAMES[5] }}</span>
-    </router-link>
+    <template v-for="(item, index) in menuItems" :key="index">
+      <div @click="router.push(item.path)" class="menu-item" :class="{ currentlyOpen: isActive(item.path) }">
+        <span class="material-symbols-outlined"> {{ item.icon }} </span>
+        <span class="menu-title">{{ item.name }}</span>
+      </div>
+    </template>
   </div>
 </template>
 
@@ -41,11 +19,28 @@
 import MenuTitle from '../components/MenuTitle.vue'
 import { SIDEMENUNAMES } from '../assets/constants'
 import { useSideMenuStore } from '../stores/side-menu'
+import { ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 const sideMenuStore = useSideMenuStore()
 
 function sideMenuClose() {
   if (!sideMenuStore.isDesktop) sideMenuStore.close()
+}
+
+const router = useRouter()
+const route = useRoute()
+const menuItems = ref([
+  { name: SIDEMENUNAMES[0], path: '/home', icon: 'home' },
+  { name: SIDEMENUNAMES[1], path: '/profile', icon: 'person' },
+  { name: SIDEMENUNAMES[2], path: '/registration-forms', icon: 'description' },
+  { name: SIDEMENUNAMES[3], path: '/rental-forms', icon: 'demography' },
+  { name: SIDEMENUNAMES[4], path: '/applications', icon: 'checklist_rtl' },
+  { name: SIDEMENUNAMES[5], path: '/download-forms', icon: 'file_save' },
+])
+function isActive(path) {
+  if (path === '/select-mvno' && route.path === '/applications') return true
+  if (path === route.path) return true
 }
 </script>
 
@@ -99,7 +94,7 @@ a {
   background-color: #ffffff57;
 }
 
-.menu-item.router-link-active {
+.currentlyOpen {
   background-color: #ffffff25;
 }
 </style>

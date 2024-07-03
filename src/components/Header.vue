@@ -7,7 +7,8 @@
       <span v-else @click="sideMenuStore.open()" class="material-symbols-outlined"> menu </span>
       <MenuTitle class="header-title" />
     </div>
-    <div class="button" @click="logout">로그 아웃</div>
+
+    <button @click="logout">로그 아웃</button>
     <!-- <div class="button" @click="sideMenuStore.toggle()">Logout</div> -->
   </div>
 </template>
@@ -39,11 +40,15 @@ function logout() {
   box-sizing: border-box;
   /* background-color: #fff; */
 }
-.button {
-  font-size: 14px;
+
+.header-row button {
   padding: 10px;
-  box-sizing: border-box;
-  right: 20px;
+  text-align: center;
+  min-height: unset;
+  height: auto;
+  line-height: 1;
+  width: auto;
+  background-color: #b2b2b2;
 }
 .left {
   display: flex;

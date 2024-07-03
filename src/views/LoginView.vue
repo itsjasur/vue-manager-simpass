@@ -82,20 +82,18 @@ async function login(event) {
       }),
     })
 
-    if (response.ok) {
-      const data = await response.json()
-      useAuthenticationStore().login(data['accessToken'], data['refreshToken'], data['id'], data['username'])
+    if (!response.ok) throw '로그인정보가 없거나 일치하지 않습니다.'
 
-      //checks if user had intended route, and push that route. if not push '/'
-      if (useRouteMemoryStore().intendedRoute) {
-        let url = useRouteMemoryStore().intendedRoute
-        useRouteMemoryStore().clear() //clearing intended route afters redirected
-        router.push(url)
-      } else {
-        router.push('/')
-      }
+    const data = await response.json()
+    useAuthenticationStore().login(data['accessToken'], data['refreshToken'], data['id'], data['username'])
+
+    //checks if user had intended route, and push that route. if not push '/'
+    if (useRouteMemoryStore().intendedRoute) {
+      let url = useRouteMemoryStore().intendedRoute
+      useRouteMemoryStore().clear() //clearing intended route afters redirected
+      router.push(url)
     } else {
-      useSnackbarStore().showSnackbar('Invalid credentials') // show snackbar with a success message
+      router.push('/')
     }
   } catch (err) {
     useSnackbarStore().showSnackbar(err.toString())
@@ -193,14 +191,13 @@ hr {
     box-shadow: none;
 
     width: 100%;
-    height: 100%;
     display: flex;
     flex-flow: column;
     justify-content: center;
   }
 
   .foot-note {
-    width: 100%;
+    width: 90%;
   }
 }
 </style>

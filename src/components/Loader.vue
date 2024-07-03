@@ -5,19 +5,19 @@
 </template>
 
 <script setup>
-import { computed, defineProps } from 'vue'
+import { computed } from 'vue'
 
 const props = defineProps({
   height: { type: String, default: '40px' },
   color: { type: String, default: '#ffffff' },
-  thickness: { type: String, default: '4px' }
+  thickness: { type: String, default: '4px' },
 })
 
 const loaderStyle = computed(() => {
   return {
     height: props.height,
     padding: props.thickness,
-    background: props.color
+    background: props.color,
   }
 })
 </script>

@@ -12,7 +12,12 @@
 
       <div class="group" style="max-width: 200px">
         <label>생년월일</label>
-        <input v-model="registrerBirthday" placeholder="91-01-31" v-cleave="cleavePatterns.birthdayPattern" />
+        <input
+          v-model="registrerBirthday"
+          placeholder="91-01-31"
+          name="birthday"
+          v-cleave="{ ...cleavePatterns.birthdayPattern, onValueChanged }"
+        />
         <p v-if="!registrerBirthday && submitted" class="input-error-message">생년월일 입력하세요.</p>
       </div>
 
@@ -21,14 +26,20 @@
         <input
           v-model="registrerPhoneNumber"
           placeholder="010-0000-0000"
-          v-cleave="cleavePatterns.phoneNumberPattern"
+          name="phoneNumber"
+          v-cleave="{ ...cleavePatterns.phoneNumberPattern, onValueChanged }"
         />
         <p v-if="!registrerPhoneNumber && submitted" class="input-error-message">연락처 입력하세요.</p>
       </div>
 
       <div class="group" style="max-width: 500px">
         <label>주소</label>
-        <input @click="addressPopup.active = true" v-model="address" placeholder="서울시 구로구 디지털로33길 28" />
+        <input
+          @click="addressPopup.active = true"
+          v-model="address"
+          placeholder="서울시 구로구 디지털로33길 28"
+          readonly
+        />
         <p v-if="!address && submitted" class="input-error-message">주소 입력하세요.</p>
       </div>
 
@@ -69,14 +80,17 @@
     >
 
     <!-- partner sign container -->
-    <div v-if="registererSignChecked">
+    <div v-if="!registererSignChecked">
       <SignImageRowContainer type="self" :placeholder="registrer" @updated="updatePads" title="가입자서명" />
       <p v-if="!nameImageData && !signImageData && submitted" class="input-error-message">
         판매자서명을 하지 않았습니다.
       </p>
     </div>
 
-    <button @click="submit">접수하기</button>
+    <button class="submit" @click="submit" :disabled="isLoading">
+      <LoadingSpinner v-if="isLoading" height="20px" color="#ffffff" />
+      <span v-else> 접수하기</span>
+    </button>
   </div>
 </template>
 
@@ -88,8 +102,15 @@ import { useSearchaddressStore } from '../stores/select-address-popup'
 import { useSnackbarStore } from '../stores/snackbar'
 import { fetchWithTokenRefresh } from '../utils/tokenUtils'
 import SignImageRowContainer from '../components/SignImageRowContainer.vue'
+import { usePrintablePopup } from '../stores/printable-popup'
+import LoadingSpinner from '../components/Loader.vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const addressPopup = useSearchaddressStore()
+const printablePopup = usePrintablePopup()
+
 const registrer = ref('')
 const registrerBirthday = ref('')
 const registrerPhoneNumber = ref('')
@@ -100,7 +121,7 @@ const usimNumber = ref('')
 const submitted = ref(false)
 
 //sign checker
-const registererSignChecked = ref(true)
+const registererSignChecked = ref(false)
 const nameImageData = ref(null)
 const signImageData = ref(null)
 
@@ -109,11 +130,42 @@ const updatePads = ({ name, sign, type }) => {
   signImageData.value = sign
 }
 
+//cleave value change callback
+function onValueChanged(event) {
+  if (event.target.name === 'phoneNumber') registrerPhoneNumber.value = event.target.value
+
+  if (event.target.name === 'birthday') {
+    const today = new Date()
+    const currYear = today.getFullYear() % 100
+
+    let formattedValue = event.target.value
+    if (event.target.rawValue.length === 6) {
+      const [yy, mm, dd] = formattedValue.split('-')
+      if (yy > currYear) formattedValue = '19' + formattedValue
+      else formattedValue = '20' + formattedValue
+
+      const date = new Date(formattedValue)
+      const year = date.getFullYear().toString().slice(-2)
+      const month = (date.getMonth() + 1).toString().padStart(2, '0')
+      const day = date.getDate().toString().padStart(2, '0')
+
+      registrerBirthday.value = `${year}-${month}-${day}`
+    }
+  }
+}
+
 watch(
   () => addressPopup.address,
   () => {
     address.value = addressPopup.address
     addressDetails.value = addressPopup.buildingName
+  }
+)
+
+watch(
+  () => printablePopup.active,
+  (newV, oldV) => {
+    if (newV === false && oldV === true) router.push('/')
   }
 )
 
@@ -147,6 +199,7 @@ const deleteDocImages = (index) => {
 
 //FORM DATA REQUEST
 const formData = new FormData()
+const isLoading = ref(false)
 
 async function submit() {
   submitted.value = true
@@ -160,7 +213,7 @@ async function submit() {
   formData.set('apply_seal', signImageData.value)
 
   formData.set('name', registrer.value)
-  formData.set('birthday', registrerBirthday?.value?.substring(2))
+  formData.set('birthday', registrerBirthday.value)
   formData.set('contact', registrerPhoneNumber.value)
   formData.set('address', address.value + addressDetails.value)
   formData.set('usim_no', usimNumber.value)
@@ -169,17 +222,23 @@ async function submit() {
   const checklist = [registrer.value, registrerBirthday.value, registrerPhoneNumber.value, address.value]
 
   //form signs
-  if (registererSignChecked.value) checklist.push([nameImageData.value, signImageData.value].every(Boolean))
+  if (!registererSignChecked.value) checklist.push([nameImageData.value, signImageData.value].every(Boolean))
 
   if (checklist.every(Boolean)) {
     try {
+      isLoading.value = true
       const response = await fetchWithTokenRefresh('agent/rentalApply', { method: 'POST', body: formData })
-      if (response.ok) {
-        const decodedResponse = await response.json()
-        useSnackbarStore().showSnackbar(decodedResponse.message)
-      }
+
+      const decodedResponse = await response.json()
+
+      const base64Images = decodedResponse?.data?.apply_forms_list ?? []
+      if (base64Images?.length > 0) usePrintablePopup().open(base64Images)
+
+      useSnackbarStore().showSnackbar(decodedResponse?.message ?? 'Update error')
     } catch (error) {
       useSnackbarStore().showSnackbar(error.toString())
+    } finally {
+      isLoading.value = false
     }
   } else {
     useSnackbarStore().showSnackbar('채워지지 않은 필드가 있습니다.')
