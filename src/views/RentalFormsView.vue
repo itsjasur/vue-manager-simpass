@@ -254,7 +254,7 @@ async function submit() {
   display: flex;
   flex-flow: column;
   gap: 30px;
-  padding: 15px;
+  padding: 20px;
 }
 .title {
   font-size: 18px;

@@ -90,7 +90,7 @@ onMounted(fetchData)
 <style scoped>
 .container {
   margin-top: 20px;
-  padding: 0 15px;
+  padding: 0 20px;
   display: flex;
   flex-flow: column;
   gap: 40px;
