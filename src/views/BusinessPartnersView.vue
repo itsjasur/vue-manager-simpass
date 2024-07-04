@@ -42,6 +42,12 @@
         </div>
       </template>
     </div>
+
+    <div v-if="!data" class="not-found-cont">
+      <div>거래가 진행중인 대리점이 존재하지 않습니다.</div>
+      <button @click="router.push('/business-request')">거래요청으로 가기</button>
+      <button @click="router.push('/home')">홈으로 가기</button>
+    </div>
   </div>
 
   <BusinessRequestPopup
@@ -69,7 +75,7 @@ function openPopup(agentCd) {
   selectedAgentCd.value = agentCd
 }
 
-const data = ref()
+const data = ref([])
 
 async function fetchData() {
   try {
@@ -231,5 +237,17 @@ onMounted(fetchData)
 .info-title {
   font-weight: 600;
   white-space: nowrap;
+}
+.not-found-cont {
+  display: flex;
+  flex-flow: column;
+  gap: 20px;
+  align-items: center;
+  max-width: 300px;
+  text-align: center;
+}
+.not-found-cont button {
+  width: auto;
+  min-width: 150px;
 }
 </style>

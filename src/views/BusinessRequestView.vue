@@ -42,6 +42,11 @@
       <!-- <button @click="router.push({ name: '/business-request-form', params: { id: 1 } })">거래요청</button> -->
       <button @click="openPopup(agent.agent_cd)">거래요청</button>
     </div>
+
+    <div v-if="!data" class="not-found-cont">
+      <div>모든 대리점에 대해 거래요청 및 거래완료가 되었습니다.</div>
+      <button @click="router.push('/home')">홈으로 가기</button>
+    </div>
   </div>
 
   <BusinessRequestPopup
@@ -79,7 +84,7 @@ async function fetchData() {
 
     const decodedResponse = await response.json()
     data.value = decodedResponse.data
-    // console.log(data.value)
+    console.log(data.value)
   } catch (error) {
     useSnackbarStore().showSnackbar(error.toString())
   }
@@ -223,5 +228,19 @@ button {
   width: auto;
   min-width: 100px;
   align-self: center;
+}
+
+.not-found-cont {
+  display: flex;
+  flex-flow: column;
+  gap: 20px;
+  align-items: center;
+  max-width: 300px;
+  text-align: center;
+}
+
+.not-found-cont button {
+  width: auto;
+  min-width: 150px;
 }
 </style>

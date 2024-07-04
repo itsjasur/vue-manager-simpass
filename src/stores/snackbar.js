@@ -3,16 +3,17 @@ import { defineStore } from 'pinia'
 export const useSnackbarStore = defineStore('snackbar', {
   state: () => ({
     active: false,
+    type: '',
     message: '',
     timeout: null,
   }),
 
   actions: {
-    showSnackbar(message) {
+    showSnackbar(message, type = '') {
       if (message) {
         this.message = message
-
         this.active = true
+        this.type = type
 
         // clearing any existing timeout
         if (this.timeout) {
@@ -31,6 +32,7 @@ export const useSnackbarStore = defineStore('snackbar', {
       this.message = ''
       this.timeout = null
       this.active = false
+      this.type = ''
     },
   },
 })

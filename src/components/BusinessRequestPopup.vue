@@ -62,7 +62,7 @@
             <label>이메일주소*</label>
 
             <div class="group-inner-row">
-              <input :value="serverData.email" readonly />
+              <input v-model="forms.email" @input="validateForms" />
               <!-- <a-select
                 v-model:value="forms.emailAddition"
                 :style="{ minWidth: '140px' }"
@@ -71,8 +71,7 @@
               >
               </a-select> -->
             </div>
-            <p v-if="submitted && !serverData.email" class="input-error-message">이메일주소를 입력해주세요.</p>
-            <!-- <p v-if="forms.email && emailError" class="input-error-message">올바른 이메일 주소를 입력해주세요.</p> -->
+            <p v-if="submitted && errors.email" class="input-error-message">{{ errors.email }}</p>
           </div>
         </div>
         <div class="group-row">
@@ -100,14 +99,14 @@
         <div class="group-row">
           <div class="group">
             <label>주소*</label>
-            <input v-model="forms.address" @click="searchAddressPopup.open()" readonly />
-            <p v-if="submitted && !forms.address" class="input-error-message">주소를 입력하세요.</p>
+            <input v-model="forms.address" @input="validateForms" @click="searchAddressPopup.open()" readonly />
+            <p v-if="submitted && errors.address" class="input-error-message">{{ errors.address }}</p>
           </div>
 
           <div class="group" style="width: 70%">
             <label>상세주소*</label>
-            <input v-model="forms.addressAdditions" />
-            <p v-if="submitted && !forms.addressAdditions" class="input-error-message">상세주소를 입력하세요.</p>
+            <input v-model="forms.addressAdditions" @input="validateForms" />
+            <p v-if="submitted && errors.addressAdditions" class="input-error-message">{{ errors.addressAdditions }}</p>
           </div>
         </div>
 
@@ -137,14 +136,14 @@
         <div class="group-row">
           <div class="group">
             <label>은행명 (첨부할 자료와 동일)*</label>
-            <input v-model="forms.bankName" />
-            <p v-if="submitted && !forms.bankName" class="input-error-message">은행명를 입력하세요.</p>
+            <input v-model="forms.bankName" @input="validateForms" />
+            <p v-if="submitted && errors.bankName" class="input-error-message">{{ errors.bankName }}</p>
           </div>
 
           <div class="group">
             <label>계좌번호 (첨부할 자료와 동일)*</label>
-            <input v-model="forms.accountNumber" />
-            <p v-if="submitted && !forms.accountNumber" class="input-error-message">계좌번호를 입력하세요.</p>
+            <input v-model="forms.accountNumber" @input="validateForms" />
+            <p v-if="submitted && errors.accountNumber" class="input-error-message">{{ errors.accountNumber }}</p>
           </div>
         </div>
 
@@ -207,6 +206,7 @@ import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
 import { useRouter } from 'vue-router'
 import { useWarningStore } from '@/stores/warning'
 import LoadingSpinner from '../components/Loader.vue'
+import * as VALIDATOR from '../utils/validators'
 
 const router = useRouter()
 const warning = useWarningStore()
@@ -226,12 +226,31 @@ const agreeToContracTerms = ref(false)
 const forms = reactive({
   telNumber: '',
   faxNumber: '',
+  email: '',
   address: '',
   addressAdditions: '',
-
   bankName: '',
   accountNumber: '',
 })
+
+const errors = reactive({
+  email: '',
+  address: '',
+  addressAdditions: '',
+  bankName: '',
+  accountNumber: '',
+})
+
+function validateForms() {
+  const res = [
+    (errors.email = VALIDATOR.validateEmail(forms.email)),
+    (errors.address = forms.address ? '' : '주소를 입력하세요.'),
+    (errors.addressAdditions = forms.addressAdditions ? '' : '상세주소를 입력하세요.'),
+    (errors.bankName = forms.bankName ? '' : '은행명를 입력하세요.'),
+    (errors.accountNumber = forms.accountNumber ? '' : '계좌번호를 입력하세요.'),
+  ]
+  return res.every((value) => value === null || value === '')
+}
 
 const serverData = ref({})
 
@@ -239,7 +258,7 @@ const serverData = ref({})
 const imageUploads = reactive({
   businessLicence: { initial: null, new: null, required: true, title: '사업자 등록증 (필수)' },
   directorId: { initial: null, new: null, required: true, title: '대표자 신분증 (필수)' },
-  bankBook: { initial: null, new: null, required: true, title: '통잔 사본 (필수)' },
+  bankBook: { initial: null, new: null, required: true, title: '통장 사본 (필수)' },
   shopBanner: { initial: null, new: null, required: false, title: '매장간판사진 (선택)' },
   shopInterior: { initial: null, new: null, required: false, title: '매장내부사진 (선택)' },
 })
@@ -267,6 +286,7 @@ async function fetchData() {
     forms.addressAdditions = info.dtl_address
     forms.accountNumber = info.bank_num
     forms.bankName = info.bank_nm
+    forms.email = info.email
 
     imageUploads.businessLicence.initial = info.bs_reg_no
     imageUploads.directorId.initial = info.id_card
@@ -299,77 +319,72 @@ async function submit() {
     return
   }
 
-  const formstruthy = Object.values(forms).every((item) => item)
-  const imagestruthy = Object.values(imageUploads).every((item) => !item.required || item.initial || item.new)
+  const imagesFilled = Object.values(imageUploads).every((item) => !item.required || item.initial || item.new)
 
-  let result = [formstruthy, imagestruthy].every(Boolean)
-
-  if (!result) {
+  if (!validateForms() || !imagesFilled) {
     useSnackbarStore().showSnackbar('채워지지 않은 필드가 있습니다.')
     return
   }
 
-  if (result) {
-    if (imageUploads.businessLicence.new && imageUploads.businessLicence.new instanceof File)
-      formData.set('bs_reg_no_attach', imageUploads.businessLicence.new, imageUploads.businessLicence.new.name)
+  if (imageUploads.businessLicence.new && imageUploads.businessLicence.new instanceof File)
+    formData.set('bs_reg_no_attach', imageUploads.businessLicence.new, imageUploads.businessLicence.new.name)
 
-    if (imageUploads.directorId.new && imageUploads.directorId.new instanceof File)
-      formData.set('id_card_attach', imageUploads.directorId.new, imageUploads.directorId.new.name)
+  if (imageUploads.directorId.new && imageUploads.directorId.new instanceof File)
+    formData.set('id_card_attach', imageUploads.directorId.new, imageUploads.directorId.new.name)
 
-    if (imageUploads.bankBook.new && imageUploads.bankBook.new instanceof File)
-      formData.set('bank_book_attach', imageUploads.bankBook.new, imageUploads.bankBook.new.name)
+  if (imageUploads.bankBook.new && imageUploads.bankBook.new instanceof File)
+    formData.set('bank_book_attach', imageUploads.bankBook.new, imageUploads.bankBook.new.name)
 
-    if (imageUploads.shopBanner.new && imageUploads.shopBanner.new instanceof File)
-      formData.set('shop_info_1_attach', imageUploads.shopBanner.new, imageUploads.shopBanner.new.name)
+  if (imageUploads.shopBanner.new && imageUploads.shopBanner.new instanceof File)
+    formData.set('shop_info_1_attach', imageUploads.shopBanner.new, imageUploads.shopBanner.new.name)
 
-    if (imageUploads.shopInterior.new && imageUploads.shopInterior.new instanceof File)
-      formData.set('shop_info_2_attach', imageUploads.shopInterior.new, imageUploads.shopInterior.new.name)
+  if (imageUploads.shopInterior.new && imageUploads.shopInterior.new instanceof File)
+    formData.set('shop_info_2_attach', imageUploads.shopInterior.new, imageUploads.shopInterior.new.name)
 
-    formData.set('agent_cd', props.agentCd)
+  formData.set('agent_cd', props.agentCd)
 
-    formData.set('contractor', serverData.value.contractor)
-    formData.set('birthday', serverData.value.birthday)
-    formData.set('partner_nm', serverData.value.partner_nm)
+  formData.set('contractor', serverData.value.contractor)
+  formData.set('birthday', serverData.value.birthday)
+  formData.set('partner_nm', serverData.value.partner_nm)
 
-    formData.set('business_num', serverData.value.business_num)
-    formData.set('phone_number', serverData.value.phone_number)
-    formData.set('email', serverData.value.email)
+  formData.set('business_num', serverData.value.business_num)
+  formData.set('phone_number', serverData.value.phone_number)
+  formData.set('email', serverData.value.email)
 
-    formData.set('store_contact', forms.telNumber)
-    formData.set('store_fax', forms.faxNumber)
+  formData.set('store_contact', forms.telNumber)
+  formData.set('store_fax', forms.faxNumber)
 
-    formData.set('address', forms.address)
-    formData.set('dtl_address', forms.addressAdditions)
+  formData.set('address', forms.address)
+  formData.set('dtl_address', forms.addressAdditions)
 
-    formData.set('bank_nm', forms.bankName)
-    formData.set('bank_num', forms.accountNumber)
+  formData.set('bank_nm', forms.bankName)
+  formData.set('bank_num', forms.accountNumber)
 
-    formData.set('id_cert_type', serverData.value.id_cert_type)
-    formData.set('receipt_id', serverData.value.receipt_id)
+  formData.set('id_cert_type', serverData.value.id_cert_type)
+  formData.set('receipt_id', serverData.value.receipt_id)
 
-    try {
-      isSubmitting.value = true
+  try {
+    isSubmitting.value = true
 
-      const response = await fetchWithTokenRefresh('agent/contract', { method: 'POST', body: formData })
+    const response = await fetchWithTokenRefresh('agent/contract', { method: 'POST', body: formData })
 
-      if (!response.ok) {
-        const decodedResponse = await response.json()
-        throw decodedResponse?.message ?? 'Request'
-      }
-
+    if (!response.ok) {
       const decodedResponse = await response.json()
-
-      const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
-      await delay(2000)
-
-      emit('closePopup')
-      warning.open('성공', [decodedResponse?.message ?? 'Success'])
-      router.push('/')
-    } catch (error) {
-      useSnackbarStore().showSnackbar(error.toString())
-    } finally {
-      isSubmitting.value = false
+      throw decodedResponse?.message ?? 'Request'
     }
+
+    const decodedResponse = await response.json()
+
+    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+    await delay(2000)
+
+    emit('closePopup')
+    warning.open('접수완료', ['정상적으로 거래접수가 완료되었습니다.'])
+    router.push('/')
+  } catch (error) {
+    useSnackbarStore().showSnackbar(error.toString())
+  } finally {
+    isSubmitting.value = false
   }
 }
 

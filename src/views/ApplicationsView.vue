@@ -29,7 +29,7 @@
           <input v-model="toDate" v-cleave="cleavePatterns.datePattern" />
         </div>
       </template>
-      <button @click="fetchData" style="min-width: 100px; width: auto">선택</button>
+      <button @click="fetchData" style="min-width: 100px; width: auto">조희</button>
     </div>
 
     <!-- table -->
@@ -245,7 +245,7 @@ const fetchData = async () => {
       if (decodedResponse.data) {
         dataList.value = decodedResponse?.data?.act_list ?? [{}]
 
-        statuses.value = [{ cd: '', value: '잔체' }]
+        statuses.value = [{ cd: '', value: '전체' }]
         decodedResponse?.data?.usim_act_status_code.forEach((item) => statuses.value.push(item))
         totalCount.value = decodedResponse?.data?.totalNum ?? 0
       }

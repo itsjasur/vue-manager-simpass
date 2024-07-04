@@ -191,6 +191,9 @@ const fetchData = async () => {
         let list = decodedResponse.data.info
         dataList.value = list
       }
+      const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+      await delay(1000)
+      useSnackbarStore().showSnackbar('가입신청  접수할 요금제를 선택해주세요', 'warning')
     } else {
       throw new Error('Fetch data error')
     }

@@ -79,6 +79,10 @@ async function fetchData() {
     const decodedResponse = await response.json()
     if (!response.ok) throw decodedResponse?.message ?? 'Fetch data error'
     if (decodedResponse.data && decodedResponse.data.info) mvnos.value = decodedResponse.data.info
+
+    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+    await delay(1000)
+    useSnackbarStore().showSnackbar('가입신청  접수할 통신사를 선택해주세요', 'warning')
   } catch (error) {
     useSnackbarStore().showSnackbar(error.toString())
   }
