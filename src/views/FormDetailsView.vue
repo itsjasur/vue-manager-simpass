@@ -12,6 +12,8 @@
             <a-checkbox class="checkbox left-margin" v-model:checked="selfRegisterChecked">가입자와 동일</a-checkbox>
           </div>
 
+          <!-- <button v-if="index === 'usim'" class="change-plan-button" style="width: 100px">Change</button> -->
+
           <template v-for="(formName, index) in typeFormNames" :key="index">
             <!-- <div>{{ FIXED_FORMS[formName] }}</div> -->
             <div class="group" :style="{ maxWidth: FIXED_FORMS[formName].maxwidth }">
@@ -19,7 +21,12 @@
 
               <!-- input -->
               <template v-if="FIXED_FORMS[formName].type === 'input'">
-                <input v-model="FIXED_FORMS[formName].value" v-bind="inputBindings(formName)" />
+                <div class="group-input-moon" v-if="formName === 'usim_plan_nm'">
+                  <input v-model="FIXED_FORMS[formName].value" v-bind="inputBindings(formName)" />
+                  <button @click="changeUsimPlan">변경</button>
+                </div>
+
+                <input v-else v-model="FIXED_FORMS[formName].value" v-bind="inputBindings(formName)" />
               </template>
 
               <!-- select -->
@@ -43,6 +50,7 @@
                   v-bind="inputBindings(formName)"
                 />
               </template>
+
               <p v-if="formSubmitted && !filledCheckValues[formName]" class="input-error-message">
                 {{ FIXED_FORMS[formName].errorMessage }}
               </p>
@@ -292,6 +300,14 @@ function setDefault() {
   }
 }
 
+function changeUsimPlan() {
+  useSelectPlansPopup().open(
+    serverData.value?.usim_plan_info?.carrier_type,
+    serverData.value?.usim_plan_info?.carrier_cd,
+    serverData.value?.usim_plan_info?.mvno_cd
+  )
+}
+
 //creating extra bindings for forms
 const inputBindings = (formName) => {
   let bindings = {
@@ -300,13 +316,14 @@ const inputBindings = (formName) => {
 
   //usim plan name is readonly
   if (formName === 'usim_plan_nm') {
-    bindings.onClick = (event) => {
-      useSelectPlansPopup().open(
-        serverData.value?.usim_plan_info?.carrier_type,
-        serverData.value?.usim_plan_info?.carrier_cd,
-        serverData.value?.usim_plan_info?.mvno_cd
-      )
+    bindings.style = {
+      // borderColor: 'var(--main-color)',
+      // color: 'var(--main-color)',
+      // fontWeight: '600',
+      // backgroundColor: 'var(--main-color-20)',
+      // cursor: 'pointer',
     }
+    bindings.onClick = changeUsimPlan
     bindings.readonly = true
   }
 
@@ -702,6 +719,17 @@ async function fetchForms() {
   margin-top: 30px;
   max-width: 200px;
   margin-bottom: 400px;
+}
+
+.group-input-moon {
+  display: flex;
+  flex-flow: row;
+  gap: 20px;
+}
+
+.group-input-moon button {
+  width: auto;
+  min-width: 70px;
 }
 
 @media (max-width: 600px) {

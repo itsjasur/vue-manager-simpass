@@ -8,7 +8,6 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
 import { useSnackbarStore } from '../stores/snackbar'
 
 const snackbarStore = useSnackbarStore()
@@ -17,7 +16,7 @@ const snackbarStore = useSnackbarStore()
 <style scoped>
 .snackbar {
   position: fixed;
-  top: 20px;
+  top: 30px;
   left: 50%;
   transform: translateX(-50%); /* this takes the snackbar width into account*/
   background-color: #212121;
@@ -32,7 +31,6 @@ const snackbarStore = useSnackbarStore()
   align-items: center;
   justify-content: space-between;
   z-index: 1200;
-
   box-shadow: 0 0 20px #00000042;
 }
 
