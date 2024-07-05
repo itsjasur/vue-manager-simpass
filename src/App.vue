@@ -19,7 +19,6 @@
   <Snackbar />
   <Warning />
   <SearchAddressPopup />
-  <SelectPlanPopup />
   <PrintablePopup />
 </template>
 
@@ -32,7 +31,6 @@ import { useAuthenticationStore } from './stores/authentication'
 import { useRouteMemoryStore } from './stores/router-memory-store'
 import { useSideMenuStore } from './stores/side-menu'
 import SearchAddressPopup from './components/SearchAddressPopup.vue'
-import SelectPlanPopup from './components/SelectPlanPopup.vue'
 import PrintablePopup from './components/PrintablePopup.vue'
 import Loading from './components/Loading.vue'
 
@@ -73,5 +71,6 @@ body {
   margin: 0;
   padding: 0;
   background-color: var(--main-background-color);
+  z-index: 1;
 }
 </style>

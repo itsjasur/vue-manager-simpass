@@ -12,7 +12,12 @@
 
       <div class="empty-content" v-else>인쇄할 내용이 없습니다.</div>
 
-      <button v-if="imageUrls.length > 0" @click="printContent" :disabled="isPrinting" class="print-button">
+      <button
+        v-if="popup.canPrint && imageUrls.length > 0"
+        @click="printContent"
+        :disabled="isPrinting"
+        class="print-button"
+      >
         <template v-if="isPrinting">
           <LoadingSpinner height="20px" color="#ffffff" />
         </template>

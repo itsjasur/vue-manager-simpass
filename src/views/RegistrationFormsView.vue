@@ -1,6 +1,4 @@
 <template>
-  <SelectPlanPopup v-if="selectPlansPopup.active" />
-
   <div class="container">
     <div class="types">
       <div
@@ -41,7 +39,6 @@ import { useSelectPlansPopup } from '../stores/select-plans-popup'
 import { fetchWithTokenRefresh } from '../utils/tokenUtils'
 import { logoFinder } from '../utils/logoFinder'
 import { onMounted, ref } from 'vue'
-import SelectPlanPopup from '../components/SelectPlanPopup.vue'
 import { CARRIERS, PLANTYPES } from '../assets/constants'
 
 const selectPlansPopup = useSelectPlansPopup()
@@ -70,6 +67,7 @@ function selectMvno(item) {
 }
 
 async function fetchData() {
+  console.log('fetch caled')
   try {
     const response = await fetchWithTokenRefresh('agent/applyCarrier', {
       method: 'POST',
@@ -79,16 +77,18 @@ async function fetchData() {
     const decodedResponse = await response.json()
     if (!response.ok) throw decodedResponse?.message ?? 'Fetch data error'
     if (decodedResponse.data && decodedResponse.data.info) mvnos.value = decodedResponse.data.info
-
-    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
-    await delay(1000)
-    useSnackbarStore().showSnackbar('가입신청  접수할 통신사를 선택해주세요', 'warning')
   } catch (error) {
     useSnackbarStore().showSnackbar(error.toString())
   }
 }
 
-onMounted(fetchData)
+onMounted(async () => {
+  fetchData()
+  useSnackbarStore().hideSnackbar()
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+  await delay(1000)
+  useSnackbarStore().showSnackbar('가입신청  접수할 통신사를 선택해주세요', 'warning')
+})
 </script>
 
 <style scoped>
@@ -124,11 +124,10 @@ onMounted(fetchData)
 }
 
 .card {
+  position: relative;
   width: 200px;
   padding: 50px 30px;
-  box-sizing: border-box;
-  font-size: 20px;
-  position: relative;
+  z-index: 1;
 }
 
 .card .logo {

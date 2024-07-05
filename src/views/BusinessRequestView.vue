@@ -110,18 +110,13 @@ onMounted(fetchData)
 .container {
   padding: 40px 20px;
   box-sizing: border-box;
-  min-height: 100%;
-  min-width: 100%;
-
+  height: 100%;
   display: flex;
   flex-flow: wrap;
   gap: 30px;
-
   justify-content: center;
-  align-items: center;
-
+  align-items: flex-start;
   overflow-y: auto;
-  /* background-color: aquamarine; */
 }
 
 .agent-card {

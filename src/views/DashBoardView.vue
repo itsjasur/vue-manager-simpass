@@ -21,13 +21,19 @@
       <SideMenu />
     </div>
   </template>
+
+  <SelectPlanPopup v-if="selectPlansPopup.active" />
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 import SideMenu from '../components/SideMenu.vue'
 import Header from '../components/Header.vue'
 import { useSideMenuStore } from '../stores/side-menu'
+import SelectPlanPopup from '@/components/SelectPlanPopup.vue'
+import { useSelectPlansPopup } from '@/stores/select-plans-popup'
+
+const selectPlansPopup = useSelectPlansPopup()
 
 const sideMenuStore = useSideMenuStore()
 
@@ -51,7 +57,6 @@ onUnmounted(() => {
   flex-flow: row;
   height: 100vh;
   width: 100vw;
-  z-index: 1000;
   background-color: #ffc0cb76;
 }
 
@@ -80,14 +85,13 @@ onUnmounted(() => {
   height: 65px;
   width: 100%;
   box-shadow: 0 2px 4px #00000010;
-  /* z-index: 1002; */
+  z-index: 1002;
 }
 
 .scrollable-view {
   display: flex;
   flex-flow: column;
   height: 100%;
-  /* width: 100%; */
   overflow-y: scroll;
 }
 
@@ -114,9 +118,9 @@ onUnmounted(() => {
   left: 0;
   height: 100vh;
   width: 300px;
-  z-index: 1101;
   transition: width 0.3s ease;
   overflow: hidden;
+  z-index: 1101;
 }
 
 .m-dashboard-side-menu.closed {

@@ -30,7 +30,7 @@ const snackbarStore = useSnackbarStore()
   min-width: 40%;
   align-items: center;
   justify-content: space-between;
-  z-index: 1200;
+  z-index: 5000;
   box-shadow: 0 0 20px #00000042;
 }
 

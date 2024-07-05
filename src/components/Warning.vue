@@ -28,7 +28,7 @@ const store = useWarningStore()
   justify-content: center;
   align-items: center;
   background-color: rgba(0, 0, 0, 0.552);
-  z-index: 3000;
+  z-index: 5000;
 }
 
 .popup-content {

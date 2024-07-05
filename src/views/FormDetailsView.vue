@@ -1,5 +1,19 @@
 <template>
   <div v-if="serverData" class="container">
+    <div v-if="serverData.chk_agent_role_info !== 'Y'" class="info-note">
+      <div class="notes">
+        <span> * {{ serverData?.agent_role_message_1 ?? '' }}</span>
+        <span> * {{ serverData?.agent_role_message_2 ?? '' }} </span>
+      </div>
+
+      <button v-if="serverData.chk_agent_role_info === 'W'" @click="router.push('/business-partners')">
+        거래요청 상태으로 가기
+      </button>
+      <button v-if="serverData.chk_agent_role_info !== 'W'" @click="router.push('/business-request')">
+        거래요청으로 가기
+      </button>
+    </div>
+
     <!-- FORMS -->
     <template v-for="(typeFormNames, index) of availableForms" :key="index">
       <template v-if="typeFormNames.length > 0">
@@ -11,8 +25,6 @@
             <span> 자동이체 </span>
             <a-checkbox class="checkbox left-margin" v-model:checked="selfRegisterChecked">가입자와 동일</a-checkbox>
           </div>
-
-          <!-- <button v-if="index === 'usim'" class="change-plan-button" style="width: 100px">Change</button> -->
 
           <template v-for="(formName, index) in typeFormNames" :key="index">
             <!-- <div>{{ FIXED_FORMS[formName] }}</div> -->
@@ -148,7 +160,7 @@
 <script setup>
 import { useSnackbarStore } from '@/stores/snackbar'
 import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
-import { computed, onMounted, reactive, ref, watch, watchEffect } from 'vue'
+import { computed, onMounted, onUnmounted, reactive, ref, watch, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { FORMS } from '../assets/constants'
 import { PLANSINFO } from '../assets/constants'
@@ -167,6 +179,7 @@ const route = useRoute()
 const router = useRouter()
 
 const printablePopup = usePrintablePopup()
+
 //watches printable active status and then redirects to home
 watch(
   () => printablePopup.active,
@@ -186,6 +199,13 @@ watchEffect(() => {
 
 //this inits page
 onMounted(fetchData)
+
+//clearing up the address store once unmounted
+onUnmounted(() => {
+  selectAddressPopup.address = ''
+  selectAddressPopup.buildingName = ''
+})
+
 //this watches route id (if plan id changed)
 watch(() => route.params.id, fetchData)
 
@@ -316,13 +336,6 @@ const inputBindings = (formName) => {
 
   //usim plan name is readonly
   if (formName === 'usim_plan_nm') {
-    bindings.style = {
-      // borderColor: 'var(--main-color)',
-      // color: 'var(--main-color)',
-      // fontWeight: '600',
-      // backgroundColor: 'var(--main-color-20)',
-      // cursor: 'pointer',
-    }
     bindings.onClick = changeUsimPlan
     bindings.readonly = true
   }
@@ -617,7 +630,7 @@ async function fetchForms() {
     const decodedResponse = await response.json()
     const base64Images = decodedResponse?.data?.apply_forms_list ?? []
 
-    if (base64Images?.length > 0) printablePopup.open(base64Images)
+    if (base64Images?.length > 0) printablePopup.open(base64Images, serverData.value?.chk_agent_role_info === 'Y')
   } catch (error) {
     useSnackbarStore().showSnackbar(error.toString())
   }
@@ -732,6 +745,31 @@ async function fetchForms() {
   min-width: 70px;
 }
 
+.info-note {
+  margin-top: 20px;
+  background-color: #ff353521;
+  padding: 10px;
+  border-radius: 4px;
+  display: flex;
+  flex-flow: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+.info-note .notes {
+  display: flex;
+  flex-flow: column;
+  gap: 10px;
+  align-items: start;
+  font-weight: 600;
+}
+
+.info-note button {
+  width: auto;
+  padding: 0 10px;
+  white-space: nowrap;
+}
+
 @media (max-width: 600px) {
   .container {
     width: 100%;
@@ -740,6 +778,10 @@ async function fetchForms() {
   .group {
     width: auto;
     /* max-width: 100% !important; */
+  }
+
+  .info-note {
+    flex-flow: column;
   }
 }
 </style>
