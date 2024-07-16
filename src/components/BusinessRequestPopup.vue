@@ -14,7 +14,7 @@
 
         <div>
           <a-checkbox class="checkbox" v-model:checked="agreeToContracTerms">판매점 계약서 내용 동의 (필수)</a-checkbox>
-          <span @click="agreementPopupIsOpen = true" class="agree-view">계약서 확인</span>
+          <span @click="contractPopup = true" class="agree-view">계약서 확인</span>
         </div>
 
         <div class="part-title">판매점 정보</div>
@@ -194,6 +194,8 @@
       </div>
     </div>
   </div>
+
+  <ContractPdfViewPoup v-if="contractPopup" :partnerNm="serverData.partner_nm" @closePopup="contractPopup = false" />
 </template>
 
 <script setup>
@@ -207,6 +209,7 @@ import { useRouter } from 'vue-router'
 import { useWarningStore } from '@/stores/warning'
 import LoadingSpinner from '../components/Loader.vue'
 import * as VALIDATOR from '../utils/validators'
+import ContractPdfViewPoup from '../components/ContractPdfViewPopup.vue'
 
 const router = useRouter()
 const warning = useWarningStore()
@@ -214,6 +217,8 @@ const warning = useWarningStore()
 const emit = defineEmits(['closePopup'])
 
 const props = defineProps({ agentCd: { type: String, required: true } })
+
+const contractPopup = ref(false)
 
 //cleave value change callback
 function onValueChanged(event) {
@@ -388,18 +393,20 @@ async function submit() {
   }
 }
 
-onUnmounted(() => {
-  document.removeEventListener('keydown', keydownHandle)
-})
+// onUnmounted(() => {
+//   document.removeEventListener('keydown', keydownHandle)
+// })
 
-function keydownHandle(event) {
-  if (event.key === 'Escape') emit('closePopup')
-}
+// function keydownHandle(event) {
+//   if (event.key === 'Escape') emit('closePopup')
+// }
 
-onMounted(() => {
-  fetchData()
-  document.addEventListener('keydown', keydownHandle)
-})
+// onMounted(() => {
+//   fetchData()
+//   document.addEventListener('keydown', keydownHandle)
+// })
+
+onMounted(fetchData)
 </script>
 
 <style scoped>
@@ -415,6 +422,7 @@ onMounted(() => {
   align-items: center;
   background-color: #000000b2;
   padding: 20px;
+  z-index: 2000;
 }
 
 .popup-content {

@@ -293,6 +293,14 @@ function generateInitialForms() {
   FIXED_FORMS.country.value = ''
   if (FIXED_FORMS?.cust_type_cd?.value !== 'MEA') FIXED_FORMS.country.value = '대한민국'
 
+  //removing gender if not underage for KTM HVS
+  if (['KTM', 'HVS'].includes(serverData.value['usim_plan_info']['mvno_cd'])) {
+    if (FIXED_FORMS?.cust_type_cd?.value != 'COL') {
+      const index = availableForms.customer.indexOf('gender_cd')
+      if (index !== -1) availableForms.customer.splice(index, 1)
+    }
+  }
+
   //checkable forms in order to submit or showing error
   filledCheckValues.value = Object.fromEntries(
     [
@@ -600,6 +608,9 @@ async function fetchForms() {
         //
       } else if (formName === 'usim_model_list') {
         formData.set('usim_model_no', FIXED_FORMS[formName].value)
+        //
+      } else if (formName === 'gender_cd') {
+        formData.set('gender', FIXED_FORMS[formName].value)
         //
       } else if (formName === 'data_roming_block_cd') {
         formData.set('data_roming_block', FIXED_FORMS[formName].value)

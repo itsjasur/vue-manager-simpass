@@ -33,7 +33,7 @@
           </div>
 
           <div class="group" style="width: 300px">
-            <label>요금제명을</label>
+            <label>요금제명</label>
             <div class="inputRow">
               <input type="text" id="search" name="password" placeholder="검색할 요금제명" v-model="popup.searchText" />
               <span v-if="popup.searchText" @click="popup.searchText = ''" class="icon material-symbols-outlined">

@@ -1,13 +1,13 @@
 <template>
   <div class="menu">
     <div class="logo">
-      <router-link @click="sideMenuClose" to="/profile"
+      <router-link @click="sideMenuChoose" to="/profile"
         ><img src="../assets/logo.png" alt="Logo" style="width: 200px" />
       </router-link>
     </div>
 
     <template v-for="(item, index) in menuItems" :key="index">
-      <div @click="router.push(item.path)" class="menu-item" :class="{ currentlyOpen: isActive(item.path) }">
+      <div @click="sideMenuChoose(item)" class="menu-item" :class="{ currentlyOpen: isActive(item.path) }">
         <span class="material-symbols-outlined"> {{ item.icon }} </span>
         <span class="menu-title">{{ item.name }}</span>
       </div>
@@ -16,7 +16,6 @@
 </template>
 
 <script setup>
-import MenuTitle from '../components/MenuTitle.vue'
 import { SIDEMENUNAMES } from '../assets/constants'
 import { useSideMenuStore } from '../stores/side-menu'
 import { ref } from 'vue'
@@ -24,7 +23,8 @@ import { useRoute, useRouter } from 'vue-router'
 
 const sideMenuStore = useSideMenuStore()
 
-function sideMenuClose() {
+function sideMenuChoose(item) {
+  router.push(item.path)
   if (!sideMenuStore.isDesktop) sideMenuStore.close()
 }
 
