@@ -6,13 +6,17 @@
         <span @click="$emit('closePopup')" class="material-symbols-outlined close-button"> cancel </span>
       </div>
 
-      <!-- <div v-if="images.length > 0" class="scrollable-content">
-        <img v-for="(image, index) in images" :key="index" class="image" :src="image" alt="" loading="lazy" />
-    </div> -->
       <div class="scrollable-content">
-        <!-- <img class="background-image" src="/src/assets/j1.png" alt="" /> -->
-        <img v-for="(image, index) in images" :key="index" class="background-image" :src="image" alt="" />
-        <div class="text-overlay">{{ props.partnerNm }}</div>
+        <template v-if="props.agentCd == 'SJ'">
+          <img v-for="(image, index) in jImages" :key="index" class="background-image" :src="image" alt="" />
+          <div class="sj-text-overlay">{{ props.partnerNm }}</div>
+        </template>
+
+        <!-- Simpass contract -->
+        <template v-else>
+          <img v-for="(image, index) in sImages" :key="index" class="background-image" :src="image" alt="" />
+          <div class="sp-text-overlay">{{ props.partnerNm }}</div>
+        </template>
       </div>
     </div>
   </div>
@@ -20,18 +24,24 @@
 
 <script setup>
 import { ref } from 'vue'
+import j1 from '../assets/contracts/j/j1.jpg'
+import j2 from '../assets/contracts/j/j2.jpg'
+import j3 from '../assets/contracts/j/j3.jpg'
+import j4 from '../assets/contracts/j/j4.jpg'
+import j5 from '../assets/contracts/j/j5.jpg'
+import j6 from '../assets/contracts/j/j6.jpg'
 
-const images = ref([
-  //
-  '/src/assets/contracts/j/j1.jpg',
-  '/src/assets/contracts/j/j2.jpg',
-  '/src/assets/contracts/j/j3.jpg',
-  '/src/assets/contracts/j/j4.jpg',
-  '/src/assets/contracts/j/j5.jpg',
-  '/src/assets/contracts/j/j6.jpg',
-])
+import s1 from '../assets/contracts/s/s1.png'
+import s2 from '../assets/contracts/s/s2.png'
+import s3 from '../assets/contracts/s/s3.png'
+import s4 from '../assets/contracts/s/s4.png'
+import s5 from '../assets/contracts/s/s5.png'
+import s6 from '../assets/contracts/s/s6.png'
 
-const props = defineProps({ partnerNm: { type: String, required: true } })
+const jImages = ref([j1, j2, j3, j4, j5, j6])
+const sImages = ref([s1, s2, s3, s4, s5, s6])
+
+const props = defineProps({ partnerNm: { type: String, required: true }, agentCd: { type: String, required: true } })
 const emit = defineEmits(['closePopup'])
 
 // Function to print the content
@@ -92,12 +102,22 @@ const emit = defineEmits(['closePopup'])
   height: auto;
 }
 
-.text-overlay {
-  top: 82px;
-  left: 450px;
+.sj-text-overlay {
+  top: 81px;
+  left: 420px;
   position: absolute;
   font-size: 12px;
-  color: #707070;
+  font-weight: 600;
+  color: #474747;
+}
+
+.sp-text-overlay {
+  top: 260px;
+  left: 440px;
+  position: absolute;
+  font-size: 18px;
+  font-weight: 700;
+  color: #646464;
 }
 
 .close-button {

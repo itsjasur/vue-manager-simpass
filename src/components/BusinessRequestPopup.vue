@@ -195,7 +195,12 @@
     </div>
   </div>
 
-  <ContractPdfViewPoup v-if="contractPopup" :partnerNm="serverData.partner_nm" @closePopup="contractPopup = false" />
+  <ContractPdfViewPoup
+    v-if="contractPopup"
+    :partnerNm="serverData.partner_nm"
+    :agentCd="props.agentCd"
+    @closePopup="contractPopup = false"
+  />
 </template>
 
 <script setup>
