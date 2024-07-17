@@ -2,19 +2,19 @@ import { defineStore } from 'pinia'
 
 export const useNameSignDataStore = defineStore('nameSignDataStore', {
   state: () => ({
-    nameData: '',
     signData: '',
+    sealData: '',
   }),
 
   actions: {
-    save(nameData, signData) {
-      this.nameData = nameData
+    save(signData, sealData) {
       this.signData = signData
+      this.sealData = sealData
     },
 
     clear() {
-      this.nameData = ''
       this.signData = ''
+      this.sealData = ''
     },
   },
 })

@@ -3,11 +3,8 @@
     <div class="counts-container">
       <div class="counts-header">
         <div class="counts-header-text">
-          <div>
-            <span>서류접수 </span>
-            <span style="font-weight: 800">진행상태</span>
-          </div>
-          <div style="font-size: 18px">Progress</div>
+          <span>가입접수 </span>
+          <span style="font-weight: 800">진행상태</span>
         </div>
 
         <span @click="goToApplicationsWithStatus('')" class="material-symbols-outlined">arrow_right_alt</span>
@@ -17,9 +14,10 @@
         <template v-for="(item, index) in dataList" :key="index">
           <div @click="goToApplicationsWithStatus(item.usim_act_status)" class="count-box">
             <div>{{ item.usim_act_status_nm }}</div>
-
-            <span style="font-size: 20px; font-weight: 700; color: #fff">{{ item.cnt }}</span>
-            <span> 건</span>
+            <div>
+              <span style="font-size: 20px; font-weight: 700; color: #fff">{{ item.cnt }}</span>
+              <span> 건</span>
+            </div>
           </div>
           <div v-if="index !== dataList.length - 1" class="vert-divider"></div>
         </template>
@@ -136,7 +134,6 @@ onMounted(fetchData)
 
 .counts-header-text {
   display: flex;
-  flex-flow: column;
   gap: 5px;
 }
 

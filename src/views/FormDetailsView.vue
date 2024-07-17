@@ -301,6 +301,19 @@ function generateInitialForms() {
     }
   }
 
+  if (serverData.value['usim_plan_info']['mvno_cd'] === 'SVM') {
+    const index = availableForms.payment.indexOf('account_birthday')
+    if (index !== -1) {
+      availableForms.payment.splice(index, 1)
+      availableForms.payment.push('account_birthday_full')
+    }
+    const index1 = availableForms.deputy.indexOf('deputy_birthday')
+    if (index1 !== -1) {
+      availableForms.deputy.splice(index1, 1)
+      availableForms.deputy.push('deputy_birthday_full')
+    }
+  }
+
   //checkable forms in order to submit or showing error
   filledCheckValues.value = Object.fromEntries(
     [
@@ -338,9 +351,7 @@ function changeUsimPlan() {
 
 //creating extra bindings for forms
 const inputBindings = (formName) => {
-  let bindings = {
-    placeholder: FIXED_FORMS[formName].placeholder,
-  }
+  let bindings = { placeholder: FIXED_FORMS[formName].placeholder }
 
   //usim plan name is readonly
   if (formName === 'usim_plan_nm') {
@@ -353,6 +364,10 @@ const inputBindings = (formName) => {
     bindings.onInput = (event) => {
       FIXED_FORMS[formName].value = event.target.value.toUpperCase()
     }
+  }
+
+  if (['account_name', 'account_birthday', 'account_birthday_full'].includes(formName)) {
+    bindings.readonly = selfRegisterChecked.value
   }
 
   if (formName === 'address') {
@@ -375,9 +390,11 @@ watchEffect(() => {
   if (selfRegisterChecked.value) {
     FIXED_FORMS.account_name.value = FIXED_FORMS.name.value
     FIXED_FORMS.account_birthday.value = FIXED_FORMS.birthday.value
+    FIXED_FORMS.account_birthday_full.value = FIXED_FORMS.birthday_full.value
   } else {
     FIXED_FORMS.account_name.value = ''
     FIXED_FORMS.account_birthday.value = ''
+    FIXED_FORMS.account_birthday_full.value = ''
   }
 })
 
@@ -578,70 +595,89 @@ async function fetchForms() {
 
   formData.set('carrier_type', serverData.value?.usim_plan_info?.carrier_type)
   formData.set('carrier_cd', serverData.value?.usim_plan_info?.carrier_cd)
+  formData.set('mvno_cd', serverData.value?.usim_plan_info?.mvno_cd)
   formData.set('usim_plan_id', serverData.value?.usim_plan_info?.id)
 
-  for (const formName in FIXED_FORMS) {
-    if (
-      [
-        ...availableForms.usim,
-        ...availableForms.customer,
-        ...availableForms.deputy,
-        ...availableForms.payment,
-      ].includes(formName) //add to formData only if the form visible
-    ) {
-      if (['birthday', 'deputy_birthday', 'account_birthday'].includes(formName) && FIXED_FORMS[formName]?.value) {
-        formData.set(formName, FIXED_FORMS[formName]?.value.replaceAll('-', ''))
-        //
-      } else if (['deputy_contact', 'contact', 'phone_number'].includes(formName) && FIXED_FORMS[formName]?.value) {
-        formData.set(formName, FIXED_FORMS[formName]?.value.replaceAll('-', ''))
+  const removables = [
+    'birthday',
+    'deputy_birthday',
+    'account_birthday',
+    'birthday_full',
+    'deputy_birthday_full',
+    'account_birthday_full',
+    'deputy_contact',
+    'contact',
+    'phone_number',
+  ]
 
-        //
-      } else if (formName === 'wish_number' && FIXED_FORMS[formName]?.value) {
-        const wishList = FIXED_FORMS[formName]?.value.split(' / ')
-        wishList.forEach((item, index) => {
-          const key = 'request_no_' + (index + 1)
-          formData.set(key, item)
-        })
-        //
-      } else if (formName === 'country') {
-        formData.set('country_cd', FIXED_FORMS[formName].value)
-        //
-      } else if (formName === 'usim_model_list') {
-        formData.set('usim_model_no', FIXED_FORMS[formName].value)
-        //
-      } else if (formName === 'gender_cd') {
-        formData.set('gender', FIXED_FORMS[formName].value)
-        //
-      } else if (formName === 'data_roming_block_cd') {
-        formData.set('data_roming_block', FIXED_FORMS[formName].value)
-        //
-      } else if (formName === 'data_block_cd') {
-        formData.set('data_block', FIXED_FORMS[formName].value)
-        //
-      } else if (formName === 'phone_bill_block_cd') {
-        formData.set('phone_bill_block', FIXED_FORMS[formName].value)
-        //
-      } else if (formName === 'extra_service_cd') {
-        formData.set('extra_service', FIXED_FORMS[formName].value)
-        //
-      } else {
-        formData.set(formName, FIXED_FORMS[formName].value)
-      }
+  const avlFormNames = [
+    ...availableForms.usim,
+    ...availableForms.customer,
+    ...availableForms.deputy,
+    ...availableForms.payment,
+  ]
+  for (var formName of avlFormNames) {
+    // console.log(formName)
+    if (removables.includes(formName) && FIXED_FORMS[formName].value) {
+      FIXED_FORMS[formName].value = FIXED_FORMS?.[formName]?.value?.replaceAll('-', '')
+    }
+
+    if (formName === 'wish_number' && FIXED_FORMS[formName]?.value) {
+      const wishList = FIXED_FORMS[formName]?.value.split(' / ')
+      wishList.forEach((item, index) => {
+        const key = 'request_no_' + (index + 1)
+        formData.set(key, item)
+      })
+      //
+    } else if (formName === 'country') {
+      formData.set('country_cd', FIXED_FORMS[formName].value)
+      //
+    } else if (formName === 'usim_model_list') {
+      formData.set('usim_model_no', FIXED_FORMS[formName].value)
+      //
+    } else if (formName === 'gender_cd') {
+      formData.set('gender', FIXED_FORMS[formName].value)
+      //
+    } else if (formName === 'data_roming_block_cd') {
+      formData.set('data_roming_block', FIXED_FORMS[formName].value)
+      //
+    } else if (formName === 'data_block_cd') {
+      formData.set('data_block', FIXED_FORMS[formName].value)
+      //
+    } else if (formName === 'phone_bill_block_cd') {
+      formData.set('phone_bill_block', FIXED_FORMS[formName].value)
+      //
+    } else if (formName === 'extra_service_cd') {
+      formData.set('extra_service', FIXED_FORMS[formName].value)
+      //
+    } else if (formName === 'birthday_full') {
+      formData.set('birthday', FIXED_FORMS[formName].value)
+      //
+    } else if (formName === 'deputy_birthday_full') {
+      formData.set('deputy_birthday', FIXED_FORMS[formName].value)
+      //
+    } else if (formName === 'account_birthday_full') {
+      formData.set('account_birthday', FIXED_FORMS[formName].value)
+      //
+    } else if (formName === 'usim_plan_nm') {
+    } else {
+      formData.set(formName, FIXED_FORMS[formName].value)
     }
   }
-  // for (const [key, value] of formData.entries()) {
-  //   console.log(key, value)
-  // }
+
+  for (const [key, value] of formData.entries()) {
+    console.log(key, value)
+  }
 
   try {
     const response = await fetchWithTokenRefresh('agent/actApply', { method: 'POST', body: formData })
 
-    if (!response.ok) throw new Error('Could not fetch image data')
-
     const decodedResponse = await response.json()
+    console.log(decodedResponse)
     const base64Images = decodedResponse?.data?.apply_forms_list ?? []
 
     if (base64Images?.length > 0) printablePopup.open(base64Images, serverData.value?.chk_agent_role_info === 'Y')
+    else throw decodedResponse?.message ?? 'Could not fetch image data'
   } catch (error) {
     useSnackbarStore().showSnackbar(error.toString())
   }

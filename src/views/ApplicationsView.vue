@@ -135,7 +135,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import * as cleavePatterns from '../utils/cleavePatterns'
 import { formatDate } from '../utils/helpers'
 import { useSnackbarStore } from '../stores/snackbar'
@@ -287,6 +287,10 @@ onMounted(() => {
   //if status provided when mounted, it should search with that value
   selectedStatus.value = useHomeStatusHolder().status
   fetchData()
+})
+
+onUnmounted(() => {
+  useHomeStatusHolder().clear()
 })
 </script>
 

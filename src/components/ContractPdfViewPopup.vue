@@ -2,7 +2,7 @@
   <div class="overlay">
     <div class="popup-content">
       <div class="innerHeader">
-        <h3 class="title">Hanpass</h3>
+        <h3 class="title">계약서 내용</h3>
         <span @click="$emit('closePopup')" class="material-symbols-outlined close-button"> cancel </span>
       </div>
 

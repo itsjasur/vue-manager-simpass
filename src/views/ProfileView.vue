@@ -61,9 +61,7 @@
       </div>
     </div>
 
-    <div class="title">판매자 서명</div>
-
-    <SignImageRowContainer type="self" :placeholder="data.contractor" @updated="updatePads" title="" />
+    <SignImageRowContainer type="self" :placeholder="data.contractor" @updated="updatePads" title="판매자 서명" />
 
     <button @click="submit">사인 저장</button>
   </div>
@@ -91,12 +89,14 @@ const storeDetailAddress = ref('')
 const contractDate = ref('')
 const status = ref('')
 
-const nameImageData = ref(null)
-const signImageData = ref(null)
+const signData = ref(null)
+const sealData = ref(null)
 
 const updatePads = ({ name, sign, type }) => {
-  nameImageData.value = name
-  signImageData.value = sign
+  console.log('type')
+  console.log(type)
+  signData.value = name
+  sealData.value = sign
 }
 
 async function fetchProfileData() {
@@ -119,7 +119,7 @@ async function fetchProfileData() {
         storeDetailAddress.value = info.dtl_address
         contractDate.value = new Date(info.apply_date).toLocaleString()
         status.value = info.status_nm
-        signStore.save(info.partner_seal, info.partner_sign)
+        signStore.save(info.partner_sign, info.partner_seal)
       }
     } else {
       throw new Error('Fetch profile data error')
@@ -134,18 +134,15 @@ const formData = new FormData()
 
 async function submit() {
   //adding sign images data
-  formData.set('partner_sign', nameImageData.value)
-  formData.set('partner_seal', signImageData.value)
+  formData.set('partner_sign', signData.value)
+  formData.set('partner_seal', sealData.value)
 
   // //checks if all values are filled
 
   try {
     const response = await fetchWithTokenRefresh('agent/setActSign', {
       method: 'POST',
-      body: {
-        partner_sign: nameImageData.value,
-        partner_seal: signImageData.value,
-      },
+      body: { partner_sign: signData.value, partner_seal: sealData.value },
     })
 
     if (response.ok) {

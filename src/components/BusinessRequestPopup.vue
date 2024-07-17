@@ -187,6 +187,13 @@
           </p>
         </div>
 
+        <SignImageRowContainer
+          type="self"
+          :placeholder="serverData.contractor"
+          @updated="updatePads"
+          title="판매자 서명"
+        />
+
         <button @click="submit" :disabled="isSubmitting">
           <LoadingSpinner v-if="isSubmitting" height="20px" color="#ffffff" />
           <span v-else> 온라인 판매점 계약신청 </span>
@@ -215,6 +222,8 @@ import { useWarningStore } from '@/stores/warning'
 import LoadingSpinner from '../components/Loader.vue'
 import * as VALIDATOR from '../utils/validators'
 import ContractPdfViewPoup from '../components/ContractPdfViewPopup.vue'
+import SignImageRowContainer from '../components/SignImageRowContainer.vue'
+import { useNameSignDataStore } from '@/stores/name-sign-data-store'
 
 const router = useRouter()
 const warning = useWarningStore()
@@ -224,6 +233,15 @@ const emit = defineEmits(['closePopup'])
 const props = defineProps({ agentCd: { type: String, required: true } })
 
 const contractPopup = ref(false)
+
+const signStore = useNameSignDataStore()
+const signData = ref(null)
+const sealData = ref(null)
+
+const updatePads = ({ name, sign, type }) => {
+  signData.value = name
+  sealData.value = sign
+}
 
 //cleave value change callback
 function onValueChanged(event) {
@@ -269,8 +287,6 @@ const imageUploads = reactive({
   businessLicence: { initial: null, new: null, required: true, title: '사업자 등록증 (필수)' },
   directorId: { initial: null, new: null, required: true, title: '대표자 신분증 (필수)' },
   bankBook: { initial: null, new: null, required: true, title: '통장 사본 (필수)' },
-  shopBanner: { initial: null, new: null, required: false, title: '매장간판사진 (선택)' },
-  shopInterior: { initial: null, new: null, required: false, title: '매장내부사진 (선택)' },
 })
 
 //setting address and addressdetail to store value
@@ -301,8 +317,10 @@ async function fetchData() {
     imageUploads.businessLicence.initial = info.bs_reg_no
     imageUploads.directorId.initial = info.id_card
     imageUploads.bankBook.initial = info.bank_book
-    imageUploads.shopBanner.initial = info.shop_info_1
-    imageUploads.shopInterior.initial = info.shop_info_2
+
+    signStore.save(info.partner_sign, info.partner_seal)
+    signData.value = info.partner_sign
+    sealData.value = info.partner_seal
   } catch (error) {
     useSnackbarStore().showSnackbar(error.toString())
   }
@@ -313,8 +331,6 @@ const handleFileUpload = async (event, itemName) => {
   if (itemName === 'businessLicence') imageUploads.businessLicence.new = event.target.files[0]
   if (itemName === 'directorId') imageUploads.directorId.new = event.target.files[0]
   if (itemName === 'bankBook') imageUploads.bankBook.new = event.target.files[0]
-  if (itemName === 'shopBanner') imageUploads.shopBanner.new = event.target.files[0]
-  if (itemName === 'shopInterior') imageUploads.shopInterior.new = event.target.files[0]
 }
 
 const submitted = ref(false)
@@ -345,12 +361,6 @@ async function submit() {
   if (imageUploads.bankBook.new && imageUploads.bankBook.new instanceof File)
     formData.set('bank_book_attach', imageUploads.bankBook.new, imageUploads.bankBook.new.name)
 
-  if (imageUploads.shopBanner.new && imageUploads.shopBanner.new instanceof File)
-    formData.set('shop_info_1_attach', imageUploads.shopBanner.new, imageUploads.shopBanner.new.name)
-
-  if (imageUploads.shopInterior.new && imageUploads.shopInterior.new instanceof File)
-    formData.set('shop_info_2_attach', imageUploads.shopInterior.new, imageUploads.shopInterior.new.name)
-
   formData.set('agent_cd', props.agentCd)
 
   formData.set('contractor', serverData.value.contractor)
@@ -359,8 +369,8 @@ async function submit() {
 
   formData.set('business_num', serverData.value.business_num)
   formData.set('phone_number', serverData.value.phone_number)
-  formData.set('email', serverData.value.email)
 
+  formData.set('email', forms.email)
   formData.set('store_contact', forms.telNumber)
   formData.set('store_fax', forms.faxNumber)
 
@@ -372,6 +382,9 @@ async function submit() {
 
   formData.set('id_cert_type', serverData.value.id_cert_type)
   formData.set('receipt_id', serverData.value.receipt_id)
+
+  formData.set('partner_sign', signData.value)
+  formData.set('partner_seal', sealData.value)
 
   try {
     isSubmitting.value = true
@@ -398,20 +411,8 @@ async function submit() {
   }
 }
 
-// onUnmounted(() => {
-//   document.removeEventListener('keydown', keydownHandle)
-// })
-
-// function keydownHandle(event) {
-//   if (event.key === 'Escape') emit('closePopup')
-// }
-
-// onMounted(() => {
-//   fetchData()
-//   document.addEventListener('keydown', keydownHandle)
-// })
-
 onMounted(fetchData)
+onUnmounted(signStore.clear)
 </script>
 
 <style scoped>
@@ -431,7 +432,7 @@ onMounted(fetchData)
 }
 
 .popup-content {
-  background-color: white;
+  background-color: var(--main-background-color);
   border-radius: 8px;
   height: 100%;
   max-width: 900px;

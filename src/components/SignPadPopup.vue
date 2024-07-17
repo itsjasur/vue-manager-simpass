@@ -82,7 +82,7 @@ const setNameStyle = () => {
 
     if (length <= 4) {
       nameStyle.value = {
-        fontSize: '20vw',
+        fontSize: '22vw',
         letterSpacing: '12px',
       }
     }
@@ -109,10 +109,11 @@ const setNameStyle = () => {
     }
 
     if (length <= 4) {
-      nameStyle.value = {
-        fontSize: '150px',
-        letterSpacing: '10px',
-      }
+      ;(signPenSickness.value = 5),
+        (nameStyle.value = {
+          fontSize: '180px',
+          letterSpacing: '10px',
+        })
     }
 
     if (length > 4 && length < 20) {

@@ -2,14 +2,14 @@
   <div class="sign-container">
     <!-- partner sign container -->
     <p class="sign-title">{{ props.title }}</p>
-    <div v-if="!nameData && !signData" @click="isDrawPadOpen = true" class="singImagesBox">
+    <div v-if="!signData && !sealData" @click="isDrawPadOpen = true" class="singImagesBox">
       <span class="inner-icon material-symbols-outlined"> stylus_note </span>
     </div>
     <div v-else class="singImagesBox">
       <span @click="deletePads()" class="delete-icon material-symbols-outlined"> delete </span>
       <div class="images-row">
-        <img class="image" :src="nameData" alt="오류 이미지" @error="deletePads" />
-        <img class="image" :src="signData" alt="오류 이미지" />
+        <img class="image" :src="signData" alt="오류 이미지" @error="deletePads" />
+        <img class="image" :src="sealData" alt="오류 이미지" />
       </div>
     </div>
     <p v-if="props.errorMessage" class="input-error-message">{{ props.errorMessage }}</p>
@@ -42,26 +42,26 @@ const props = defineProps({
 const emit = defineEmits(['updated']) // emits with a data object
 
 const isDrawPadOpen = ref(false)
-const nameData = ref(signStore.nameData)
 const signData = ref(signStore.signData)
+const sealData = ref(signStore.sealData)
 
 const deletePads = () => {
-  nameData.value = null
   signData.value = null
-  emit('updated', { nameData: null, signData: null, type: props.type }) // emits cleared data
+  sealData.value = null
+  emit('updated', { signData: null, sealData: null, type: props.type }) // emits cleared data
 }
 
 const savePads = (name, sign) => {
-  nameData.value = name
-  signData.value = sign
+  signData.value = name
+  sealData.value = sign
   emit('updated', { name, sign, type: props.type }) // emits saved data
 }
 
 watch(
-  () => [signStore.nameData, signStore.signData],
+  () => [signStore.signData, signStore.sealData],
   () => {
-    nameData.value = signStore.nameData
     signData.value = signStore.signData
+    sealData.value = signStore.sealData
   }
 )
 onUnmounted(signStore.clear)
@@ -116,5 +116,11 @@ onUnmounted(signStore.clear)
   background-color: #ffffff;
   padding: 2px;
   border-radius: 20px;
+}
+
+.sign-title {
+  /* font-size: 16; */
+  font-weight: 500;
+  margin-bottom: 10px;
 }
 </style>
