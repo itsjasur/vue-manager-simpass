@@ -293,8 +293,8 @@ function generateInitialForms() {
   FIXED_FORMS.country.value = ''
   if (FIXED_FORMS?.cust_type_cd?.value !== 'MEA') FIXED_FORMS.country.value = '대한민국'
 
-  //removing gender if not underage for KTM HVS
-  if (['KTM', 'HVS'].includes(serverData.value['usim_plan_info']['mvno_cd'])) {
+  //removing gender if not underage for HVS
+  if (serverData.value['usim_plan_info']['mvno_cd'] === 'HVS') {
     if (FIXED_FORMS?.cust_type_cd?.value != 'COL') {
       const index = availableForms.customer.indexOf('gender_cd')
       if (index !== -1) availableForms.customer.splice(index, 1)

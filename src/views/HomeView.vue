@@ -10,17 +10,16 @@
           <div style="font-size: 18px">Progress</div>
         </div>
 
-        <span @click="router.push('/applications')" class="material-symbols-outlined">arrow_right_alt</span>
+        <span @click="goToApplicationsWithStatus('')" class="material-symbols-outlined">arrow_right_alt</span>
       </div>
 
       <div class="counts-data-list">
         <template v-for="(item, index) in dataList" :key="index">
-          <div class="count-box">
+          <div @click="goToApplicationsWithStatus(item.usim_act_status)" class="count-box">
             <div>{{ item.usim_act_status_nm }}</div>
-            <div>
-              <span style="font-size: 20px; font-weight: 700; color: #fff">{{ item.cnt }}</span>
-              <span> 건</span>
-            </div>
+
+            <span style="font-size: 20px; font-weight: 700; color: #fff">{{ item.cnt }}</span>
+            <span> 건</span>
           </div>
           <div v-if="index !== dataList.length - 1" class="vert-divider"></div>
         </template>
@@ -67,6 +66,7 @@
 </template>
 
 <script setup>
+import { useHomeStatusHolder } from '@/stores/page-loading-store copy'
 import { useSnackbarStore } from '@/stores/snackbar'
 import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
 import { onMounted, ref } from 'vue'
@@ -74,6 +74,12 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 
 const dataList = ref([])
+
+function goToApplicationsWithStatus(status) {
+  if (!status) status = ''
+  useHomeStatusHolder().save(status)
+  router.push('/applications')
+}
 
 async function fetchData() {
   try {
@@ -161,6 +167,7 @@ onMounted(fetchData)
   flex-flow: column;
   gap: 5px;
   align-items: center;
+  cursor: pointer;
 }
 
 .home-container {

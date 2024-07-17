@@ -92,6 +92,7 @@ const router = createRouter({
           meta: {
             requiresAuth: true,
           },
+          // props: true,
         },
 
         {

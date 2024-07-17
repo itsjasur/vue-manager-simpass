@@ -142,6 +142,7 @@ import { useSnackbarStore } from '../stores/snackbar'
 import { fetchWithTokenRefresh } from '../utils/tokenUtils'
 import { usePrintablePopup } from '../stores/printable-popup'
 import { usePageLoadingStore } from '@/stores/page-loading-store'
+import { useHomeStatusHolder } from '@/stores/page-loading-store copy'
 
 const printPopup = usePrintablePopup()
 
@@ -231,7 +232,7 @@ const fetchData = async () => {
     const response = await fetchWithTokenRefresh('agent/actStatus', {
       method: 'POST',
       body: {
-        usim_act_status: searchType.value === 'status' ? selectedStatus.value : '',
+        usim_act_status: searchType.value === 'status' ? selectedStatus.value ?? '' : '',
         apply_fr_date: searchType.value === 'apply-date' ? fromDate.value : '',
         apply_to_date: searchType.value === 'apply-date' ? toDate.value : '',
         act_fr_date: searchType.value === 'regis-date' ? fromDate.value : '',
@@ -280,11 +281,13 @@ const fetchAndOpenFile = async (actNo) => {
   } finally {
     usePageLoadingStore().stop()
   }
-
-  //here printable popup opens
 }
 
-onMounted(fetchData)
+onMounted(() => {
+  //if status provided when mounted, it should search with that value
+  selectedStatus.value = useHomeStatusHolder().status
+  fetchData()
+})
 </script>
 
 <style scoped>

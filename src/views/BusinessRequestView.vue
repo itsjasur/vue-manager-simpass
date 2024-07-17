@@ -54,8 +54,6 @@
     :agentCd="selectedAgentCd"
     @closePopup="businessRequestPopup = false"
   />
-
-  <!-- <ContractPdfViewPoup v-if="true" :agentCd="selectedAgentCd ?? ''" @closePopup="console.log('asdas')" /> -->
 </template>
 
 <script setup>
@@ -64,7 +62,6 @@ import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import BusinessRequestPopup from '../components/BusinessRequestPopup.vue'
-import ContractPdfViewPoup from '../components/ContractPdfViewPopup.vue'
 
 const router = useRouter()
 
