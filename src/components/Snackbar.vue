@@ -24,14 +24,13 @@ const snackbarStore = useSnackbarStore()
   padding: 10px 15px;
   border-radius: 4px;
   display: flex;
-  font-size: 15px;
-  font-weight: 600;
   max-width: 80%; /* mobile default */
   min-width: 40%;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   z-index: 5000;
   box-shadow: 0 0 20px #00000042;
+  /* font-weight: 600; */
 }
 
 .snackbar.warning {
@@ -39,6 +38,7 @@ const snackbarStore = useSnackbarStore()
 }
 
 .snackbar-content {
+  font-size: 15px;
   flex-grow: 1;
   text-align: center;
   white-space: pre-line;

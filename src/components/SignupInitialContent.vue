@@ -170,6 +170,9 @@ async function submit(event) {
       }),
     })
     const data = await response.json()
+
+    console.log(data)
+
     if (data.result === 'ERROR') throw data.message
     if (data.result === 'SUCCESS') {
       receiptId.value = data.receipt_id

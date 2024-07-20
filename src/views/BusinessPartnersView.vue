@@ -41,6 +41,8 @@
           </template>
         </div>
       </template>
+      <button v-if="agent.status === 'P'" @click="openPopup(agent.agent_cd)">거래요청</button>
+      <!-- <button @click="openPopup(agent.agent_cd)">거래요청</button> -->
     </div>
 
     <div v-if="!data" class="not-found-cont">
@@ -50,10 +52,10 @@
     </div>
   </div>
 
-  <BusinessRequestPopup
-    v-if="businessRequestPopup"
+  <BusinessPartnersPopup
+    v-if="businessPartnersPopup"
     :agentCd="selectedAgentCd"
-    @closePopup="businessRequestPopup = false"
+    @closePopup="businessPartnersPopup = false"
   />
 </template>
 
@@ -62,16 +64,16 @@ import { useSnackbarStore } from '@/stores/snackbar'
 import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import BusinessRequestPopup from '../components/BusinessRequestPopup.vue'
+import BusinessPartnersPopup from '../components/BusinessPartnersPopup.vue'
 
 const router = useRouter()
 
 //business request popup
-const businessRequestPopup = ref(false)
+const businessPartnersPopup = ref(false)
 const selectedAgentCd = ref()
 
 function openPopup(agentCd) {
-  businessRequestPopup.value = true
+  businessPartnersPopup.value = true
   selectedAgentCd.value = agentCd
 }
 
@@ -244,5 +246,11 @@ onMounted(fetchData)
 .not-found-cont button {
   width: auto;
   min-width: 150px;
+}
+
+button {
+  width: auto;
+  min-width: 100px;
+  align-self: center;
 }
 </style>

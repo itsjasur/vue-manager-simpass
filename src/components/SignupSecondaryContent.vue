@@ -76,7 +76,6 @@
               delimiter: '-',
             }"
           />
-          <p v-if="!shopPhoneNumber && isSubmitted" class="input-error-message">매장 전화번호를 입력하세요.</p>
         </div>
 
         <div class="group" style="max-width: 200px">
@@ -297,7 +296,6 @@ async function submit() {
   const isAllfilled = [
     companyName.value,
     companyRegNumber.value,
-    shopPhoneNumber.value,
     address.value,
     username.value,
     password.value,
@@ -351,13 +349,20 @@ async function submit() {
 
     const data = await response.json()
 
+    // console.log(data)
+
     if (data.result === 'SUCCESS') {
       //success redirect to login
 
       const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
       await delay(2000)
-
-      warningStore.open('등록이 성공적으로 완료되었습니다', ['아이디와 비밀번호로 로그인해주세요.'])
+      if (data.data.status === 'W')
+        warningStore.open('판매점가입 접수완료', [
+          '가입내용 검토 후 신속하게 승인 처리 진행하도록 하겠습니다.',
+          '승인완료시 인증휴대폰번호로 승인완료 문자를 전송합니다.',
+          '이용해 주셔서 감사합니다.',
+        ])
+      else warningStore.open('등록이 성공적으로 완료되었습니다', ['아이디와 비밀번호로 로그인해주세요.'])
 
       signUpStore.clear()
       router.push('login')

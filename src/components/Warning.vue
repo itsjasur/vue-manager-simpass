@@ -35,7 +35,7 @@ const store = useWarningStore()
   background-color: white;
   border-radius: 8px;
   box-sizing: border-box;
-  max-width: 400px;
+  max-width: 450px;
   width: 90%;
   min-height: 200px;
   display: flex;

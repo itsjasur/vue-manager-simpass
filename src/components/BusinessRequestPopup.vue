@@ -213,7 +213,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted, reactive, watchEffect } from 'vue'
 import * as cleavePatterns from '../utils/cleavePatterns'
-import { EMAILOPTIONS } from '../assets/constants'
 import { useSearchaddressStore } from '@/stores/select-address-popup'
 import { useSnackbarStore } from '@/stores/snackbar'
 import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
