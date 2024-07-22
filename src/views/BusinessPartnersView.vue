@@ -41,8 +41,12 @@
           </template>
         </div>
       </template>
-      <button v-if="agent.status === 'P'" @click="openPopup(agent.agent_cd)">거래요청</button>
-      <!-- <button @click="openPopup(agent.agent_cd)">거래요청</button> -->
+      <button v-if="agent.status === 'P'" @click="openPopup(agent.agent_cd)">계약서명</button>
+
+      <button v-if="agent.status === 'Y'" @click="fetchContractPDF(agent.agent_cd)">
+        <span class="material-symbols-outlined print-contract"> print </span>
+        <span> 계약서 출력</span>
+      </button>
     </div>
 
     <div v-if="!data" class="not-found-cont">
@@ -57,6 +61,8 @@
     :agentCd="selectedAgentCd"
     @closePopup="businessPartnersPopup = false"
   />
+
+  <PrintablePdfPopup v-if="printablePdfPopup.active" />
 </template>
 
 <script setup>
@@ -65,8 +71,12 @@ import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import BusinessPartnersPopup from '../components/BusinessPartnersPopup.vue'
+import { usePrintablePdfPopup } from '@/stores/printable-pdf-popup'
+import PrintablePdfPopup from '../components/PrintablePdfPopup.vue'
 
 const router = useRouter()
+
+const printablePdfPopup = usePrintablePdfPopup()
 
 //business request popup
 const businessPartnersPopup = ref(false)
@@ -101,12 +111,51 @@ function generateCarrierList(list) {
       else return
     })
   }
-
-  //   console.log('list ', carriers)
   return carriers
 }
 
-onMounted(fetchData)
+const profileData = ref()
+
+async function fetchProfileData() {
+  try {
+    const response = await fetchWithTokenRefresh('agent/partnerInfo', { method: 'GET' })
+
+    if (!response.ok) throw 'Fetch profile data error'
+
+    const decodedResponse = await response.json()
+    profileData.value = decodedResponse.data.info
+    console.log(profileData)
+  } catch (error) {
+    useSnackbarStore().showSnackbar(error.toString())
+  }
+}
+
+//print contract
+
+async function fetchContractPDF(agentCd) {
+  try {
+    const response = await fetchWithTokenRefresh('agent/viewContract', {
+      method: 'POST',
+      body: { agent_cd: agentCd, partner_cd: profileData.partner_cd },
+    })
+
+    if (!response.ok) throw 'Fetch contract PDF data error'
+
+    const pdfData = await response.blob()
+    const blob = new Blob([pdfData], { type: 'application/pdf' })
+
+    // a URL for the Blob
+    const url = URL.createObjectURL(blob)
+    printablePdfPopup.open(url)
+  } catch (error) {
+    useSnackbarStore().showSnackbar(error.toString())
+  }
+}
+
+onMounted(() => {
+  fetchData()
+  fetchProfileData()
+})
 </script>
 
 <style scoped>
@@ -197,7 +246,6 @@ onMounted(fetchData)
 
 .column-card .title-text {
   font-weight: 600;
-
   /* background-color: aquamarine; */
 }
 
@@ -252,5 +300,11 @@ button {
   width: auto;
   min-width: 100px;
   align-self: center;
+  padding: 0 10px;
+  display: flex;
+  flex-flow: row;
+  gap: 5px;
+  align-items: center;
+  justify-content: center;
 }
 </style>

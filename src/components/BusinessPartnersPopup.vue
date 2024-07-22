@@ -2,15 +2,20 @@
   <div class="overlay">
     <div class="popup-content">
       <div class="fixed-header">
-        <h3 class="title">판매점 계약 동의 및 계약내용 확인</h3>
+        <h3 class="title">판매점 계약 서명</h3>
         <span @click="$emit('closePopup')" class="material-symbols-outlined close-button"> cancel </span>
       </div>
 
       <div class="scrollable-content">
-        <!-- <span class="title-note"
+        <span class="title-note"
           >본 신청서는 심패스에서 직접 운영하는 판매점 전자계약서이며 고객님에 소중한 개인정보는 암호화되어 안전하게
           보호됩니다.
-        </span> -->
+        </span>
+
+        <div>
+          <a-checkbox class="checkbox" v-model:checked="agreeToContracTerms">판매점 계약서 내용 동의 (필수)</a-checkbox>
+          <span @click="contractPopup = true" class="agree-view">계약서 확인</span>
+        </div>
 
         <div class="part-title">판매점 정보</div>
 
@@ -54,10 +59,17 @@
       </div>
     </div>
   </div>
+
+  <ContractPdfViewPoup
+    v-if="contractPopup"
+    :partnerNm="serverData.partner_nm"
+    :agentCd="props.agentCd"
+    @closePopup="contractPopup = false"
+  />
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, reactive, watchEffect } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import * as cleavePatterns from '../utils/cleavePatterns'
 import { useSnackbarStore } from '@/stores/snackbar'
 import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
@@ -66,6 +78,7 @@ import { useWarningStore } from '@/stores/warning'
 import LoadingSpinner from './Loader.vue'
 import SignImageRowContainer from './SignImageRowContainer.vue'
 import { useNameSignDataStore } from '@/stores/name-sign-data-store'
+import ContractPdfViewPoup from '../components/ContractPdfViewPopup.vue'
 
 const router = useRouter()
 const warning = useWarningStore()
@@ -73,6 +86,9 @@ const warning = useWarningStore()
 const emit = defineEmits(['closePopup'])
 
 const props = defineProps({ agentCd: { type: String, required: true } })
+
+const agreeToContracTerms = ref(false)
+const contractPopup = ref(false)
 
 const signStore = useNameSignDataStore()
 const signData = ref(null)
@@ -95,9 +111,9 @@ async function fetchData() {
     const info = decodedResponse.data.info
     serverData.value = info
 
-    // signStore.save(info.partner_sign, info.partner_seal)
-    // signData.value = info.partner_sign
-    // sealData.value = info.partner_seal
+    signStore.save(info.partner_sign, info.partner_seal)
+    signData.value = info.partner_sign
+    sealData.value = info.partner_seal
   } catch (error) {
     useSnackbarStore().showSnackbar(error.toString())
   }
@@ -107,9 +123,14 @@ const submitted = ref(false)
 const isSubmitting = ref(false)
 
 async function submit() {
-  submitted.value = true
-
   try {
+    submitted.value = true
+
+    if (!agreeToContracTerms.value) {
+      useSnackbarStore().showSnackbar('판매점 계약서 내용에 동의해주세요.')
+      return
+    }
+
     isSubmitting.value = true
 
     const response = await fetchWithTokenRefresh('agent/setContractSign', {
@@ -200,7 +221,6 @@ onUnmounted(signStore.clear)
 .scrollable-content {
   padding: 25px;
   box-sizing: border-box;
-
   display: flex;
   flex-flow: column;
   gap: 30px;
@@ -213,6 +233,15 @@ onUnmounted(signStore.clear)
   line-height: 1.5;
   font-weight: 500;
   margin-top: 10px;
+}
+
+.agree-view {
+  color: #0365e6;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 3px;
+  font-size: 15px;
+  border: 1.5px solid var(--main-color);
 }
 
 .group-row {

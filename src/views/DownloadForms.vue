@@ -19,7 +19,7 @@
     </div>
   </div>
 
-  <PrintablePdfPopup v-if="usePrintablePdfPopup().active" />
+  <PrintablePdfPopup v-if="printablePdfPopup.active" />
 </template>
 
 <script setup>
@@ -34,6 +34,8 @@ import PrintablePdfPopup from '../components/PrintablePdfPopup.vue'
 const isMobile = ref(false)
 const router = useRouter()
 const forms = ref([])
+
+const printablePdfPopup = usePrintablePdfPopup()
 
 async function fetchData() {
   try {
@@ -91,7 +93,7 @@ const downloadPdf = async (form) => {
 const printPdf = async (form) => {
   try {
     const url = await fetchPdfBlob(form)
-    usePrintablePdfPopup().open(url)
+    printablePdfPopup.open(url)
   } catch (error) {
     useSnackbarStore().showSnackbar(error.toString())
   }

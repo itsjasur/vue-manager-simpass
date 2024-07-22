@@ -17,8 +17,7 @@
 </template>
 
 <script setup>
-import { nextTick, onMounted, onUnmounted, ref } from 'vue'
-import LoadingSpinner from '../components/Loader.vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 
 import { usePrintablePdfPopup } from '../stores/printable-pdf-popup'
 
@@ -74,7 +73,7 @@ onUnmounted(() => {
 .innerHeader {
   position: sticky;
   top: 0;
-  height: 60px;
+  height: 50px;
   padding: 0 20px;
   align-items: center;
   display: flex;

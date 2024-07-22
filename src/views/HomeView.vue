@@ -61,6 +61,13 @@
       </div>
     </div>
   </div>
+
+  <HomePagePopup
+    v-if="homePagePopupOpen"
+    :contractStatus="homeInfo?.contract_status ?? 'NA'"
+    :agentsInfo="homeInfo?.agent_info_list ?? []"
+    @closePopup="homePagePopupOpen = false"
+  />
 </template>
 
 <script setup>
@@ -68,7 +75,9 @@ import { useHomeStatusHolder } from '@/stores/page-loading-store copy'
 import { useSnackbarStore } from '@/stores/snackbar'
 import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
 import { onMounted, ref } from 'vue'
+import HomePagePopup from '../components/HomePagePopup.vue'
 import { useRouter } from 'vue-router'
+
 const router = useRouter()
 
 const dataList = ref([])
@@ -91,7 +100,29 @@ async function fetchData() {
   }
 }
 
-onMounted(fetchData)
+const homePagePopupOpen = ref(true)
+const homeInfo = ref({})
+
+async function fetchHomeInfo() {
+  try {
+    const response = await fetchWithTokenRefresh('agent/homeInfo', { method: 'GET' })
+
+    const decodedResponse = await response.json()
+    if (!response.ok) throw decodedResponse?.message ?? 'Fetch data error'
+
+    homeInfo.value = decodedResponse?.data
+    homePagePopupOpen.value = homeInfo.value.contract_status === 'P' || homeInfo.value.contract_status === 'N'
+
+    // console.log(homePagePopupOpen.value)
+  } catch (error) {
+    useSnackbarStore().showSnackbar(error.toString())
+  }
+}
+
+onMounted(() => {
+  fetchHomeInfo()
+  fetchData()
+})
 </script>
 
 <style scoped>

@@ -276,7 +276,7 @@ onUnmounted(() => {
 .innerHeader {
   position: sticky;
   top: 0;
-  height: 60px;
+  height: 50px;
   padding: 0 20px;
   align-items: center;
   display: flex;
