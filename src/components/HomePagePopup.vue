@@ -7,8 +7,6 @@
         <span @click="$emit('closePopup')" class="material-symbols-outlined close-button"> cancel </span>
       </div>
 
-      <!--  -->
-
       <div v-if="contractStatus === 'P'" class="scrollable-content">
         <span class="text-content">
           현재, 아래 대리점과 자동거래승인이 되어 대리점과 거래계약서에 자필서명을 완료해 주시면 정상적으로 서비스를

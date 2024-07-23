@@ -96,7 +96,7 @@ async function fetchData() {
     if (!response.ok) throw decodedResponse?.message ?? 'Fetch data error'
     dataList.value = decodedResponse?.data?.act_status_cnt ?? []
   } catch (error) {
-    useSnackbarStore().showSnackbar(error.toString())
+    useSnackbarStore().show(error.toString())
   }
 }
 
@@ -115,7 +115,7 @@ async function fetchHomeInfo() {
 
     // console.log(homePagePopupOpen.value)
   } catch (error) {
-    useSnackbarStore().showSnackbar(error.toString())
+    useSnackbarStore().show(error.toString())
   }
 }
 

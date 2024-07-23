@@ -254,7 +254,7 @@ const fetchData = async () => {
       throw new Error('Fetch data error')
     }
   } catch (error) {
-    useSnackbarStore().showSnackbar(error.toString())
+    useSnackbarStore().show(error.toString())
   }
 }
 
@@ -277,7 +277,7 @@ const fetchAndOpenFile = async (actNo) => {
       throw new Error('Fetch data error')
     }
   } catch (error) {
-    useSnackbarStore().showSnackbar(error.toString())
+    useSnackbarStore().show(error.toString())
   } finally {
     usePageLoadingStore().stop()
   }

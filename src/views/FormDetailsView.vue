@@ -6,12 +6,13 @@
         <span> * {{ serverData?.agent_role_message_2 ?? '' }} </span>
       </div>
 
-      <button v-if="serverData.chk_agent_role_info === 'W'" @click="router.push('/business-partners')">
+      <button
+        v-if="serverData.chk_agent_role_info === 'W' || serverData.chk_agent_role_info === 'P'"
+        @click="router.push('/business-partners')"
+      >
         거래요청 상태으로 가기
       </button>
-      <button v-if="serverData.chk_agent_role_info !== 'W'" @click="router.push('/business-request')">
-        거래요청으로 가기
-      </button>
+      <button v-else @click="router.push('/business-request')">거래요청으로 가기</button>
     </div>
 
     <!-- FORMS -->
@@ -234,7 +235,7 @@ async function fetchData() {
 
     generateInitialForms()
   } catch (error) {
-    useSnackbarStore().showSnackbar(error.toString())
+    useSnackbarStore().show(error.toString())
   }
 }
 
@@ -489,7 +490,7 @@ const updatePads = ({ name, sign, type }) => {
       partnerSignImageData.value = sign
       break
     default:
-      useSnackbarStore().showSnackbar('Invalid pad type')
+      useSnackbarStore().show('Invalid pad type')
   }
 }
 
@@ -572,7 +573,7 @@ async function submit() {
   }
 
   if (Object.values(filledCheckValues.value).every(Boolean)) await fetchForms()
-  else useSnackbarStore().showSnackbar('채워지지 않은 필드가 있습니다.')
+  else useSnackbarStore().show('채워지지 않은 필드가 있습니다.')
 
   formSubmitting.value = false
 }
@@ -665,9 +666,9 @@ async function fetchForms() {
     }
   }
 
-  for (const [key, value] of formData.entries()) {
-    console.log(key, value)
-  }
+  // for (const [key, value] of formData.entries()) {
+  //   console.log(key, value)
+  // }
 
   try {
     const response = await fetchWithTokenRefresh('agent/actApply', { method: 'POST', body: formData })
@@ -679,7 +680,7 @@ async function fetchForms() {
     if (base64Images?.length > 0) printablePopup.open(base64Images, serverData.value?.chk_agent_role_info === 'Y')
     else throw decodedResponse?.message ?? 'Could not fetch image data'
   } catch (error) {
-    useSnackbarStore().showSnackbar(error.toString())
+    useSnackbarStore().show(error.toString())
   }
 }
 </script>

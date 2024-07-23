@@ -157,7 +157,7 @@ async function submit() {
       return
     }
   } catch (err) {
-    useSnackbarStore().showSnackbar(err.toString())
+    useSnackbarStore().show(err.toString())
   } finally {
     isLoading.value = false
   }

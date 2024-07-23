@@ -78,16 +78,16 @@ async function fetchData() {
     if (!response.ok) throw decodedResponse?.message ?? 'Fetch data error'
     if (decodedResponse.data && decodedResponse.data.info) mvnos.value = decodedResponse.data.info
   } catch (error) {
-    useSnackbarStore().showSnackbar(error.toString())
+    useSnackbarStore().show(error.toString())
   }
 }
 
 onMounted(async () => {
   fetchData()
-  useSnackbarStore().hideSnackbar()
+  useSnackbarStore().hide()
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
   await delay(1000)
-  useSnackbarStore().showSnackbar('가입신청  접수할 통신사를 선택해주세요', 'warning')
+  useSnackbarStore().show('가입신청  접수할 통신사를 선택해주세요', 'warning')
 })
 </script>
 

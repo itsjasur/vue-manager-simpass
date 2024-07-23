@@ -125,7 +125,7 @@ async function fetchProfileData() {
       throw new Error('Fetch profile data error')
     }
   } catch (error) {
-    useSnackbarStore().showSnackbar(error.toString())
+    useSnackbarStore().show(error.toString())
   }
 }
 
@@ -147,10 +147,10 @@ async function submit() {
 
     if (response.ok) {
       const decodedResponse = await response.json()
-      useSnackbarStore().showSnackbar(decodedResponse.message)
+      useSnackbarStore().show(decodedResponse.message)
     }
   } catch (error) {
-    useSnackbarStore().showSnackbar(error.toString())
+    useSnackbarStore().show(error.toString())
   }
 }
 

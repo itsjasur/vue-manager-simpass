@@ -43,7 +43,7 @@
       </template>
       <button v-if="agent.status === 'P'" @click="openPopup(agent.agent_cd)">계약서명</button>
 
-      <button v-if="agent.status === 'Y'" @click="fetchContractPDF(agent.agent_cd)">
+      <button v-if="agent.status === 'Y'" @click="fetchContractPDFAndPrint(agent.agent_cd)">
         <span class="material-symbols-outlined print-contract"> print </span>
         <span> 계약서 출력</span>
       </button>
@@ -99,7 +99,7 @@ async function fetchData() {
     data.value = decodedResponse.data
     // console.log(data.value)
   } catch (error) {
-    useSnackbarStore().showSnackbar(error.toString())
+    useSnackbarStore().show(error.toString())
   }
 }
 function generateCarrierList(list) {
@@ -126,13 +126,13 @@ async function fetchProfileData() {
     profileData.value = decodedResponse.data.info
     console.log(profileData)
   } catch (error) {
-    useSnackbarStore().showSnackbar(error.toString())
+    useSnackbarStore().show(error.toString())
   }
 }
 
 //print contract
 
-async function fetchContractPDF(agentCd) {
+async function fetchContractPDFAndPrint(agentCd) {
   try {
     const response = await fetchWithTokenRefresh('agent/viewContract', {
       method: 'POST',
@@ -148,7 +148,7 @@ async function fetchContractPDF(agentCd) {
     const url = URL.createObjectURL(blob)
     printablePdfPopup.open(url)
   } catch (error) {
-    useSnackbarStore().showSnackbar(error.toString())
+    useSnackbarStore().show(error.toString())
   }
 }
 

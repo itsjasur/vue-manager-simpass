@@ -106,7 +106,6 @@
           <div class="group" style="width: 70%">
             <label>상세주소*</label>
             <input v-model="forms.addressAdditions" @input="validateForms" />
-            <p v-if="submitted && errors.addressAdditions" class="input-error-message">{{ errors.addressAdditions }}</p>
           </div>
         </div>
 
@@ -191,6 +190,7 @@
           type="self"
           :placeholder="serverData.contractor"
           @updated="updatePads"
+          :errorMessage="submitted && (!signData || !sealData) ? '판매자서명을 하지 않았습니다.' : null"
           title="판매자 서명"
         />
 
@@ -263,7 +263,6 @@ const forms = reactive({
 const errors = reactive({
   email: '',
   address: '',
-  addressAdditions: '',
   bankName: '',
   accountNumber: '',
 })
@@ -272,7 +271,6 @@ function validateForms() {
   const res = [
     (errors.email = VALIDATOR.validateEmail(forms.email)),
     (errors.address = forms.address ? '' : '주소를 입력하세요.'),
-    (errors.addressAdditions = forms.addressAdditions ? '' : '상세주소를 입력하세요.'),
     (errors.bankName = forms.bankName ? '' : '은행명를 입력하세요.'),
     (errors.accountNumber = forms.accountNumber ? '' : '계좌번호를 입력하세요.'),
   ]
@@ -321,7 +319,7 @@ async function fetchData() {
     signData.value = info.partner_sign
     sealData.value = info.partner_seal
   } catch (error) {
-    useSnackbarStore().showSnackbar(error.toString())
+    useSnackbarStore().show(error.toString())
   }
 }
 
@@ -340,14 +338,19 @@ async function submit() {
   submitted.value = true
 
   if (!agreeToContracTerms.value) {
-    useSnackbarStore().showSnackbar('판매점 계약서 내용에 동의해주세요.')
+    useSnackbarStore().show('판매점 계약서 내용에 동의해주세요.')
     return
   }
 
   const imagesFilled = Object.values(imageUploads).every((item) => !item.required || item.initial || item.new)
 
   if (!validateForms() || !imagesFilled) {
-    useSnackbarStore().showSnackbar('채워지지 않은 필드가 있습니다.')
+    useSnackbarStore().show('채워지지 않은 필드가 있습니다.')
+    return
+  }
+
+  if (!signData.value || !sealData.value) {
+    useSnackbarStore().show('판매자서명을 하지 않았습니다.')
     return
   }
 
@@ -404,7 +407,7 @@ async function submit() {
     warning.open('접수완료', ['정상적으로 거래접수가 완료되었습니다.'])
     router.push('/')
   } catch (error) {
-    useSnackbarStore().showSnackbar(error.toString())
+    useSnackbarStore().show(error.toString())
   } finally {
     isSubmitting.value = false
   }

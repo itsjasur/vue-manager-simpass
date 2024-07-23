@@ -24,14 +24,11 @@ const title = computed(() => {
     return SIDEMENUNAMES[2]
   }
 
-  if (route.path === '/rental-forms') {
+  if (route.path === '/applications') {
     return SIDEMENUNAMES[3]
   }
-  if (route.path === '/applications') {
-    return SIDEMENUNAMES[4]
-  }
   if (route.path === '/download-forms') {
-    return SIDEMENUNAMES[5]
+    return SIDEMENUNAMES[4]
   }
 
   // console.log(route.name)

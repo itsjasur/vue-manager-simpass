@@ -9,7 +9,6 @@ import RegistrationFormsView from '../views/RegistrationFormsView.vue'
 import ProfileView from '../views/ProfileView.vue'
 import FormDetailsView from '../views/FormDetailsView.vue'
 import NotFoundView from '../views/NotFoundView.vue'
-import RentalRegistrationView from '../views/RentalFormsView.vue'
 import ApplicationsView from '../views/ApplicationsView.vue'
 import DownloadForms from '../views/DownloadForms.vue'
 import BusinessRequest from '../views/BusinessRequestView.vue'
@@ -48,17 +47,13 @@ const router = createRouter({
           path: '/home',
           name: 'home',
           component: HomeView,
-          meta: {
-            requiresAuth: true,
-          },
+          meta: { requiresAuth: true },
         },
         {
           path: '/profile',
           name: 'profile',
           component: ProfileView,
-          meta: {
-            requiresAuth: true,
-          },
+          meta: { requiresAuth: true },
         },
         {
           path: '/registration-forms',
@@ -72,26 +67,15 @@ const router = createRouter({
           path: '/form-details/:id',
           name: 'form-details',
           component: FormDetailsView,
-          meta: {
-            requiresAuth: true,
-          },
+          meta: { requiresAuth: true },
           props: true,
         },
-        {
-          path: '/rental-forms',
-          name: 'rental-forms',
-          component: RentalRegistrationView,
-          meta: {
-            requiresAuth: true,
-          },
-        },
+
         {
           path: '/applications',
           name: 'applications',
           component: ApplicationsView,
-          meta: {
-            requiresAuth: true,
-          },
+          meta: { requiresAuth: true },
           // props: true,
         },
 
@@ -99,27 +83,21 @@ const router = createRouter({
           path: '/download-forms',
           name: 'download-forms',
           component: DownloadForms,
-          meta: {
-            requiresAuth: true,
-          },
+          meta: { requiresAuth: true },
         },
 
         {
           path: '/business-request',
           name: 'business-request',
           component: BusinessRequest,
-          meta: {
-            requiresAuth: true,
-          },
+          meta: { requiresAuth: true },
         },
 
         {
           path: '/business-partners',
           name: 'business-partners',
           component: BusinessPartners,
-          meta: {
-            requiresAuth: true,
-          },
+          meta: { requiresAuth: true },
         },
       ],
     },

@@ -215,7 +215,7 @@ async function checkUsername() {
     if (data?.result === 'OK') isUsernameOk.value = true
     usernamePrompt.value = data?.message
   } catch (err) {
-    useSnackbarStore().showSnackbar(err.toString())
+    useSnackbarStore().show(err.toString())
   }
 }
 const checkBusinessRegNumber = async () => {
@@ -234,7 +234,7 @@ const checkBusinessRegNumber = async () => {
     if (data?.result === 'OK') isCompanyRegNumberOk.value = true
     companyRegNumberPrompt.value = data?.message
   } catch (err) {
-    useSnackbarStore().showSnackbar(err.toString())
+    useSnackbarStore().show(err.toString())
   }
 }
 
@@ -289,7 +289,7 @@ function checkPass() {
 }
 
 async function submit() {
-  if (password.value !== passwordCheck.value) useSnackbarStore().showSnackbar('비밀번호가 일치하지 않습니다')
+  if (password.value !== passwordCheck.value) useSnackbarStore().show('비밀번호가 일치하지 않습니다')
 
   isSubmitted.value = true
 
@@ -307,12 +307,12 @@ async function submit() {
 
   if (companyRegNumber.value && !isCompanyRegNumberOk.value) {
     companyRegNumberPrompt.value = '사업자번호 중복체크 해야합니다'
-    useSnackbarStore().showSnackbar('사업자번호 중복체크 해야합니다')
+    useSnackbarStore().show('사업자번호 중복체크 해야합니다')
   }
 
   if (username.value && !isUsernameOk.value) {
     usernamePrompt.value = '아이디 중복체크 해야합니다'
-    useSnackbarStore().showSnackbar('아이디 중복체크 해야합니다')
+    useSnackbarStore().show('아이디 중복체크 해야합니다')
     return
   }
 
@@ -373,7 +373,7 @@ async function submit() {
       throw data?.message
     }
   } catch (err) {
-    useSnackbarStore().showSnackbar(err.toString())
+    useSnackbarStore().show(err.toString())
   } finally {
     isLoading.value = false
   }

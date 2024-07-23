@@ -137,7 +137,7 @@ async function submit(event) {
   isSubmitted.value = true
 
   if (!agreeToTerms.value) {
-    useSnackbarStore().showSnackbar('개인정보 보호 약관에 동의해주세요.')
+    useSnackbarStore().show('개인정보 보호 약관에 동의해주세요.')
     return
   }
 
@@ -150,7 +150,7 @@ async function submit(event) {
   ].every(Boolean)
 
   if (!isAllTruthy) {
-    useSnackbarStore().showSnackbar('채워지지 않은 필드가 있습니다.')
+    useSnackbarStore().show('채워지지 않은 필드가 있습니다.')
     isLoading.value = false
     return
   }
@@ -179,7 +179,7 @@ async function submit(event) {
       waitingConfirmationPopupOpen.value = true
     }
   } catch (err) {
-    useSnackbarStore().showSnackbar(err.toString())
+    useSnackbarStore().show(err.toString())
   } finally {
     isLoading.value = false
   }

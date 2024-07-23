@@ -216,7 +216,7 @@ const clearCanvases = () => {
 }
 const savePads = () => {
   if (signPad.value.isEmpty() || namePad.value.isEmpty()) {
-    useSnackbarStore().showSnackbar('먼저 서명을 해주세요.')
+    useSnackbarStore().show('먼저 서명을 해주세요.')
   } else {
     const nameData = namePad.value.toDataURL()
     const signData = signPad.value.toDataURL()

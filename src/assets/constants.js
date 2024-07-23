@@ -2,7 +2,6 @@ export const SIDEMENUNAMES = [
   '홈',
   '나의 정보',
   '가입/번호이동 신청서',
-  '렌탈가입 신청서',
   '신청서 (접수/개통) 현황',
   '신청서양식 다운로드',
   '신청서 (접수/개통) 현황',
@@ -21,11 +20,6 @@ export const CARRIERS = [
   { cd: 'KT', label: 'KT' },
   { cd: 'SK', label: 'SKT' },
   { cd: 'LG', label: 'LG U+' },
-]
-
-export const CHECKBOXES = [
-  { name: '증빙자료첨부(선택사항)', type: 'supportDocs', value: false },
-  { name: '신청서 프린트 인쇄후 서명/사인 자필', type: 'signAfterPrint', value: false },
 ]
 
 export const EMAILOPTIONS = [

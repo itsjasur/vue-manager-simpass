@@ -9,7 +9,7 @@ export const useSnackbarStore = defineStore('snackbar', {
   }),
 
   actions: {
-    showSnackbar(message, type = '') {
+    show(message, type = '') {
       if (message) {
         this.message = message
         this.active = true
@@ -22,13 +22,13 @@ export const useSnackbarStore = defineStore('snackbar', {
 
         // setting  new timeout to hide the snackbar after 5 seconds
         this.timeout = setTimeout(() => {
-          this.hideSnackbar()
+          this.hide()
         }, 4000)
       }
     },
 
     //this hides snackbar
-    hideSnackbar() {
+    hide() {
       this.message = ''
       this.timeout = null
       this.active = false

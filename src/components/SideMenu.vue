@@ -24,8 +24,8 @@ import { useRoute, useRouter } from 'vue-router'
 const sideMenuStore = useSideMenuStore()
 
 function sideMenuChoose(item) {
-  router.push(item.path)
   if (!sideMenuStore.isDesktop) sideMenuStore.close()
+  router.push(item.path)
 }
 
 const router = useRouter()
@@ -34,9 +34,8 @@ const menuItems = ref([
   { name: SIDEMENUNAMES[0], path: '/home', icon: 'home' },
   { name: SIDEMENUNAMES[1], path: '/profile', icon: 'person' },
   { name: SIDEMENUNAMES[2], path: '/registration-forms', icon: 'description' },
-  { name: SIDEMENUNAMES[3], path: '/rental-forms', icon: 'demography' },
-  { name: SIDEMENUNAMES[4], path: '/applications', icon: 'checklist_rtl' },
-  { name: SIDEMENUNAMES[5], path: '/download-forms', icon: 'file_save' },
+  { name: SIDEMENUNAMES[3], path: '/applications', icon: 'checklist_rtl' },
+  { name: SIDEMENUNAMES[4], path: '/download-forms', icon: 'file_save' },
 ])
 function isActive(path) {
   if (path === '/select-mvno' && route.path === '/applications') return true
@@ -53,6 +52,7 @@ function isActive(path) {
   display: flex;
   flex-flow: column;
   gap: 15px;
+  overflow-y: auto;
 }
 .logo {
   padding: 10px;

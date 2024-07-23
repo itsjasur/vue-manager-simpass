@@ -96,7 +96,7 @@ async function login(event) {
       router.push('/')
     }
   } catch (err) {
-    useSnackbarStore().showSnackbar(err.toString())
+    useSnackbarStore().show(err.toString())
   }
 
   isLoading.value = false

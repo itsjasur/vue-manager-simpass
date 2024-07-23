@@ -49,6 +49,7 @@
           type="self"
           :placeholder="serverData.contractor"
           @updated="updatePads"
+          :errorMessage="submitted && (!signData || !sealData) ? '판매자서명을 하지 않았습니다.' : null"
           title="판매자 서명"
         />
 
@@ -115,7 +116,7 @@ async function fetchData() {
     signData.value = info.partner_sign
     sealData.value = info.partner_seal
   } catch (error) {
-    useSnackbarStore().showSnackbar(error.toString())
+    useSnackbarStore().show(error.toString())
   }
 }
 
@@ -127,7 +128,12 @@ async function submit() {
     submitted.value = true
 
     if (!agreeToContracTerms.value) {
-      useSnackbarStore().showSnackbar('판매점 계약서 내용에 동의해주세요.')
+      useSnackbarStore().show('판매점 계약서 내용에 동의해주세요.')
+      return
+    }
+
+    if (!signData.value || !sealData.value) {
+      useSnackbarStore().show('판매자서명을 하지 않았습니다.')
       return
     }
 
@@ -158,7 +164,7 @@ async function submit() {
     warning.open(decodedResponse.result, [decodedResponse.message ?? '정상적으로 거래접수가 완료되었습니다.'])
     router.push('/')
   } catch (error) {
-    useSnackbarStore().showSnackbar(error.toString())
+    useSnackbarStore().show(error.toString())
   } finally {
     isSubmitting.value = false
   }

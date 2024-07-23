@@ -86,7 +86,7 @@ async function fetchData() {
     data.value = decodedResponse.data
     console.log(data.value)
   } catch (error) {
-    useSnackbarStore().showSnackbar(error.toString())
+    useSnackbarStore().show(error.toString())
   }
 }
 function generateCarrierList(list) {

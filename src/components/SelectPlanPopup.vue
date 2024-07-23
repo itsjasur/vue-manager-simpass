@@ -190,7 +190,7 @@ async function fetchMvnos() {
     const decodedResponse = await response.json()
     mvnos.value = decodedResponse?.data.info ?? []
   } catch (error) {
-    useSnackbarStore().showSnackbar(error.toString())
+    useSnackbarStore().show(error.toString())
   }
 }
 
@@ -214,7 +214,7 @@ const fetchData = async () => {
       dataList.value = list
     }
   } catch (error) {
-    useSnackbarStore().showSnackbar(error.toString())
+    useSnackbarStore().show(error.toString())
   }
 }
 
@@ -232,8 +232,8 @@ onMounted(async () => {
 
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
   await delay(1000)
-  useSnackbarStore().hideSnackbar()
-  useSnackbarStore().showSnackbar('가입신청  접수할 요금제를 선택해주세요', 'warning')
+  useSnackbarStore().hide()
+  useSnackbarStore().show('가입신청  접수할 요금제를 선택해주세요', 'warning')
 })
 
 onUnmounted(() => {

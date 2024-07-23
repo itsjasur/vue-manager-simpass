@@ -47,7 +47,7 @@ async function fetchData() {
       forms.value = decodedResponse.data.info
     }
   } catch (error) {
-    useSnackbarStore().showSnackbar(error.toString())
+    useSnackbarStore().show(error.toString())
   }
 }
 
@@ -65,7 +65,7 @@ const fetchPdfBlob = async (form) => {
     const url = URL.createObjectURL(blob)
     return url
   } catch (error) {
-    useSnackbarStore().showSnackbar(error.toString())
+    useSnackbarStore().show(error.toString())
   }
 }
 
@@ -86,7 +86,7 @@ const downloadPdf = async (form) => {
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
   } catch (error) {
-    useSnackbarStore().showSnackbar(error.toString())
+    useSnackbarStore().show(error.toString())
   }
 }
 
@@ -95,7 +95,7 @@ const printPdf = async (form) => {
     const url = await fetchPdfBlob(form)
     printablePdfPopup.open(url)
   } catch (error) {
-    useSnackbarStore().showSnackbar(error.toString())
+    useSnackbarStore().show(error.toString())
   }
 }
 

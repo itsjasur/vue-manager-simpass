@@ -93,7 +93,7 @@ const clearCanvase = () => {
 
 const savePad = () => {
   if (pad.value.isEmpty()) {
-    useSnackbarStore().showSnackbar('먼저 서명을 해주세요.')
+    useSnackbarStore().show('먼저 서명을 해주세요.')
   } else {
     const padData = pad.value.toDataURL()
     emit('savePad', padData, padData)
