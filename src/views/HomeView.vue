@@ -24,14 +24,14 @@
       </div>
     </div>
 
-    <div class="home-container">
+    <div class="cards-container">
       <div class="card" @click="router.push('/registration-forms')">
         <div class="img">
           <img src="../assets/icons/sim.png" alt="" />
         </div>
         <div class="textbox">
-          <p class="primaryT">후불/선불유심</p>
-          <p class="secondoryT">가입신청서</p>
+          <span class="primaryT">후불/선불유심</span>
+          <span class="secondoryT">가입신청서</span>
         </div>
       </div>
 
@@ -40,7 +40,7 @@
           <img src="../assets/icons/docs.png" alt="" />
         </div>
         <div class="textbox">
-          <p class="primaryT">정책보기</p>
+          <span class="primaryT">정책보기</span>
         </div>
       </div>
       <div class="card" @click="router.push('/business-request')">
@@ -48,7 +48,7 @@
           <img src="../assets/icons/handshake.png" alt="" />
         </div>
         <div class="textbox">
-          <p class="primaryT">거래요청</p>
+          <span class="primaryT">거래요청</span>
         </div>
       </div>
       <div class="card" @click="router.push('/business-partners')">
@@ -56,7 +56,7 @@
           <img src="../assets/icons/store.png" alt="" />
         </div>
         <div class="textbox">
-          <p class="primaryT">거래대리점</p>
+          <span class="primaryT">거래대리점</span>
         </div>
       </div>
     </div>
@@ -129,27 +129,26 @@ onMounted(() => {
 .home-main {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  min-height: 100%;
   justify-content: center;
   align-items: center;
   padding: 20px;
   box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 .counts-container {
   width: 100%;
-  /* min-height: 160px; */
-  max-width: 860px;
   background-color: var(--main-color);
   margin-bottom: 50px;
   border-radius: 10px;
   box-sizing: border-box;
   padding: 20px;
-
   display: flex;
   flex-flow: column;
-  justify-content: space-between;
   gap: 30px;
   box-shadow: 0 0 10px #00000051;
+  max-width: 860px;
 }
 
 .counts-header {
@@ -182,11 +181,13 @@ onMounted(() => {
   flex-flow: row;
   color: #ffffffce;
   justify-content: space-evenly;
+  text-align: center;
 }
 
 .vert-divider {
   width: 1px;
   height: 100%;
+  margin: 0 5px;
   background-color: #ffffffce;
 }
 
@@ -198,12 +199,14 @@ onMounted(() => {
   cursor: pointer;
 }
 
-.home-container {
+.cards-container {
   width: 100%;
   display: flex;
   flex-flow: wrap;
   gap: 20px;
   justify-content: center;
+
+  margin-bottom: 100px;
 }
 
 .card {
@@ -211,29 +214,24 @@ onMounted(() => {
   width: 200px;
   padding: 10px;
   box-sizing: border-box;
-  align-content: center;
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  justify-content: space-evenly;
 }
 
 img {
   height: 75px;
 }
 
-.img {
-  /* background-color: yellow; */
-  display: flex;
-  justify-content: center;
-  margin: 10px 0px;
-}
-
 .textbox {
-  /* background-color: yellow; */
   display: flex;
   flex-direction: column;
   text-align: center;
+  gap: 5px;
 }
 
 .primaryT {
-  margin: 0;
   font-weight: 600;
   color: #565656;
 }
@@ -245,8 +243,12 @@ img {
 }
 
 @media (max-width: 600px) {
-  .container {
+  .home-main {
+    display: flex;
     flex-direction: column;
+    justify-content: start;
+    align-items: start;
+    padding: 20px;
   }
 
   .card {
@@ -254,20 +256,13 @@ img {
     height: auto;
     min-height: 100px;
     display: flex;
-    align-items: center;
-    align-content: center;
-    justify-items: center;
-    justify-content: center;
+    flex-flow: row;
+    gap: 10px;
   }
 
   .textbox {
-    margin-left: 10px;
     width: 100%;
     text-align: start;
-  }
-
-  .primaryT {
-    margin-bottom: 10px;
   }
 }
 </style>

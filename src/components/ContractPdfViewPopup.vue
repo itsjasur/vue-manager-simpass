@@ -55,6 +55,7 @@ const emit = defineEmits(['closePopup'])
   left: 0;
   width: 100%;
   height: 100%;
+
   justify-content: center; /* Center horizontally */
   align-items: center; /* Center vertically */
   z-index: 1100;

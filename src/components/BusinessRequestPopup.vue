@@ -12,9 +12,9 @@
           보호됩니다.
         </span>
 
-        <div>
+        <div class="checkbox-contract-row">
           <a-checkbox class="checkbox" v-model:checked="agreeToContracTerms">판매점 계약서 내용 동의 (필수)</a-checkbox>
-          <span @click="contractPopup = true" class="agree-view">계약서 확인</span>
+          <button @click="contractPopup = true" class="see-contract-button">계약서 확인</button>
         </div>
 
         <div class="part-title">판매점 정보</div>
@@ -423,13 +423,16 @@ onUnmounted(signStore.clear)
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  /* width: 100vw; */
+  /* height: 100vh; */
+  width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: #000000b2;
   padding: 20px;
+  box-sizing: border-box;
   z-index: 2000;
 }
 
@@ -440,6 +443,7 @@ onUnmounted(signStore.clear)
   max-width: 900px;
   display: flex;
   flex-flow: column;
+  align-self: flex-start;
   overflow-y: auto;
   box-sizing: border-box;
 }
@@ -448,7 +452,8 @@ onUnmounted(signStore.clear)
   position: sticky;
   top: 0;
   min-height: 50px;
-  padding: 0 25px;
+  padding-left: 20px;
+  padding-right: 10px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -469,7 +474,6 @@ onUnmounted(signStore.clear)
 .scrollable-content {
   padding: 25px;
   box-sizing: border-box;
-
   display: flex;
   flex-flow: column;
   gap: 30px;
@@ -484,18 +488,28 @@ onUnmounted(signStore.clear)
   margin-top: 10px;
 }
 
+.checkbox-contract-row {
+  display: flex;
+  flex-flow: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
 .checkbox {
   font-weight: 600;
 }
 
-.agree-view {
-  color: #0365e6;
-  cursor: pointer;
-  padding: 5px;
-  border-radius: 3px;
-  font-size: 15px;
+.see-contract-button {
   border: 1.5px solid var(--main-color);
+  background-color: transparent;
+  color: var(--main-color);
+  padding: 5px 10px;
+  margin: 0;
+  height: auto;
+  min-height: 0;
+  min-width: 0;
 }
+
 .group-row {
   display: flex;
   flex-flow: row;

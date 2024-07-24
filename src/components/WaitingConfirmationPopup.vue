@@ -167,26 +167,30 @@ async function submit() {
 <style scoped>
 .overlay {
   box-sizing: border-box;
+  position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  height: 100%;
+  width: 100%;
+  /* height: 100vh; */
+  /* width: 100vw; */
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: rgba(0, 0, 0, 0.552);
-  position: fixed;
   padding: 20px;
+  overflow: hidden;
 }
 
 .popup-content {
   background-color: white;
   border-radius: 8px;
   max-width: 1000px;
+  height: 100%;
   width: 100%;
   box-sizing: border-box;
   position: relative;
-  max-height: 90vh;
+  overflow: hidden;
 }
 
 .scrollable-content {
@@ -195,7 +199,7 @@ async function submit() {
   flex-flow: column;
   gap: 40px;
   align-items: center;
-  max-height: 90vh;
+  height: 100%;
   overflow-y: auto;
 }
 
