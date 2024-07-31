@@ -12,6 +12,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import agreementUrl from '@/assets/agreement.html?url'
 
 const emit = defineEmits(['closePopup'])
 
@@ -20,7 +21,8 @@ const htmlContent = ref('')
 // Function to fetch the HTML file content
 async function loadHtml() {
   try {
-    const response = await fetch('/src/assets/agreement.html')
+    const response = await fetch(agreementUrl)
+
     if (!response.ok) {
       throw new Error('Network response was not ok')
     }

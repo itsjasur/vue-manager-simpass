@@ -22,6 +22,13 @@
     </div>
   </template>
 
+  <Chat v-if="chatPopupStore.active" />
+
+  <div v-else class="open-chat-button" @click="chatPopupStore.active = true">
+    <span class="material-symbols-outlined"> mode_comment </span>
+    <span>Chat</span>
+  </div>
+
   <SelectPlanPopup v-if="selectPlansPopup.active" />
 </template>
 
@@ -32,8 +39,12 @@ import Header from '../components/Header.vue'
 import { useSideMenuStore } from '../stores/side-menu'
 import SelectPlanPopup from '@/components/SelectPlanPopup.vue'
 import { useSelectPlansPopup } from '@/stores/select-plans-popup'
+import { useChatPopupStore } from '@/stores/chat-popup-store'
+import Chat from '../components/Chat.vue'
 
 const selectPlansPopup = useSelectPlansPopup()
+
+const chatPopupStore = useChatPopupStore()
 
 const sideMenuStore = useSideMenuStore()
 
@@ -126,4 +137,47 @@ onUnmounted(() => {
 .m-dashboard-side-menu.closed {
   width: 0;
 }
+
+.open-chat-button {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  background-color: var(--main-color);
+  width: 120px;
+  height: 50px;
+  border-radius: 50px;
+  /* padding: 10px; */
+  /* box-sizing: border-box; */
+  box-shadow: 0 0 10px #00000045;
+  cursor: pointer;
+  color: #fff;
+  z-index: 7000;
+
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+}
+
+.material-symbols-outlined {
+  font-variation-settings:
+    'FILL' 1,
+    'wght' 400;
+}
+
+.open-chat-button:hover {
+  filter: brightness(0.6);
+}
+
+/* .chat-popup {
+  position: absolute;
+  bottom: 0;
+  right: 20px;
+  height: 600px;
+  width: 500px;
+  border-radius: 10px 10px 0 0;
+  background-color: #fff;
+  z-index: 7000;
+  box-shadow: 0 0 20px #00000045;
+} */
 </style>

@@ -97,8 +97,8 @@
     v-if="waitingConfirmationPopupOpen"
     :data="{
       name: name,
-      birthday: birthday.replace(/-/g, ''),
-      phoneNumber: phoneNumber.replace(/-/g, ''),
+      birthday: removeDashes(birthday.replace(/-/g, '')),
+      phoneNumber: removeDashes(phoneNumber.replace(/-/g, '')),
       receiptId: receiptId,
       salesCd: salesCd,
       idCertType: idCertType,
@@ -129,6 +129,11 @@ const isSubmitted = ref(false)
 
 const waitingConfirmationPopupOpen = ref(false)
 const receiptId = ref() //response returns
+
+//dashremover
+function removeDashes(value) {
+  return value.replace(/-/g, '')
+}
 
 //cleaning up store
 onMounted(useSignUpstore().clear)

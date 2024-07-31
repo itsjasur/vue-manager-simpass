@@ -65,7 +65,7 @@
 
       <div class="group-row">
         <div class="group" style="max-width: 200px">
-          <label>매장 전화</label>
+          <label>매장 전화 (선택)</label>
 
           <input
             placeholder=""
@@ -79,7 +79,7 @@
         </div>
 
         <div class="group" style="max-width: 200px">
-          <label>매장 팩스</label>
+          <label>매장 팩스 (선택)</label>
           <input
             placeholder=""
             v-model="shopPhoneFax"
@@ -346,11 +346,9 @@ async function submit() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     })
-
     const data = await response.json()
 
     // console.log(data)
-
     if (data.result === 'SUCCESS') {
       //success redirect to login
 
@@ -365,6 +363,7 @@ async function submit() {
       else warningStore.open('등록이 성공적으로 완료되었습니다', ['아이디와 비밀번호로 로그인해주세요.'])
 
       signUpStore.clear()
+
       router.push('login')
 
       return

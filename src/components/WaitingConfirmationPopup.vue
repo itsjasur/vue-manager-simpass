@@ -186,7 +186,6 @@ async function submit() {
   background-color: white;
   border-radius: 8px;
   max-width: 1000px;
-  height: 100%;
   width: 100%;
   box-sizing: border-box;
   position: relative;
