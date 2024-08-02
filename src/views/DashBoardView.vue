@@ -21,19 +21,19 @@
       <SideMenu />
     </div>
   </template>
-
-  <Chat v-if="chatPopupStore.active" />
-
-  <div v-else class="open-chat-button" @click="chatPopupStore.active = true">
-    <span class="material-symbols-outlined"> mode_comment </span>
-    <span>Chat</span>
-  </div>
+  <template v-if="userInfo?.agent_cd?.length > 0">
+    <Chat v-if="chatPopupStore.active" />
+    <div v-else class="open-chat-button" @click="chatPopupStore.active = true">
+      <span class="material-symbols-outlined"> mode_comment </span>
+      <span>개통 문의</span>
+    </div>
+  </template>
 
   <SelectPlanPopup v-if="selectPlansPopup.active" />
 </template>
 
 <script setup>
-import { onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import SideMenu from '../components/SideMenu.vue'
 import Header from '../components/Header.vue'
 import { useSideMenuStore } from '../stores/side-menu'
@@ -41,6 +41,8 @@ import SelectPlanPopup from '@/components/SelectPlanPopup.vue'
 import { useSelectPlansPopup } from '@/stores/select-plans-popup'
 import { useChatPopupStore } from '@/stores/chat-popup-store'
 import Chat from '../components/Chat.vue'
+import { useSnackbarStore } from '@/stores/snackbar'
+import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
 
 const selectPlansPopup = useSelectPlansPopup()
 
@@ -53,6 +55,7 @@ const handleResize = () => {
 }
 
 onMounted(() => {
+  fetchData()
   sideMenuStore.updateIsDesktop()
   window.addEventListener('resize', handleResize)
 })
@@ -60,6 +63,23 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
 })
+
+const userInfo = ref({})
+async function fetchData() {
+  try {
+    const response = await fetchWithTokenRefresh('agent/userInfo', { method: 'GET' })
+
+    if (!response.ok) {
+      chatPopupStore.close()
+      throw 'Fetch data error'
+    }
+    const decodedResponse = await response.json()
+    userInfo.value = decodedResponse.data.info
+  } catch (error) {
+    chatPopupStore.close()
+    useSnackbarStore().show(error.toString())
+  }
+}
 </script>
 
 <style scoped>
@@ -143,7 +163,7 @@ onUnmounted(() => {
   right: 20px;
   bottom: 20px;
   background-color: var(--main-color);
-  width: 120px;
+  width: 150px;
   height: 50px;
   border-radius: 50px;
   /* padding: 10px; */

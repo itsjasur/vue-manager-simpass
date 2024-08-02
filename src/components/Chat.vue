@@ -1,7 +1,7 @@
 <template>
   <div class="chat-container" @drop.prevent="onDrop" @dragover.prevent>
     <div class="chat-popup-header">
-      <div v-if="userInfo.agent_cd" style="width: 150px">
+      <div v-if="selectedAgentCode" style="width: 150px">
         <a-select
           v-model:value="selectedAgentCode"
           :getPopupContainer="(triggerNode) => triggerNode.parentNode"
@@ -42,7 +42,7 @@
       </template>
     </div>
 
-    <div v-if="userInfo.agent_cd" class="bottom-actions">
+    <div v-if="selectedAgentCode" class="bottom-actions">
       <div v-if="attachments.length > 0" class="attachments-row">
         <div v-for="(file, index) in attachments" :key="index" class="attached-images">
           <img :src="file.url" :alt="'image index: ' + index" />
@@ -94,12 +94,13 @@ const chats = ref([])
 const chatContainer = ref(null)
 const newMessage = ref('')
 
-const selectedAgentCode = ref('SP')
+const selectedAgentCode = ref(null)
 
 const agentList = { SP: '심패스', SJ: '에스제이' }
 
 // SOCKET CONNECTION
-const socket = io('http://127.0.0.1:5000', { transports: ['websocket', 'polling'] })
+// const socket = io('http://127.0.0.1:5000', { transports: ['websocket', 'polling'] })
+const socket = io('http://158.247.236.202:5000', { transports: ['websocket'], debug: true })
 
 // adds logic for the action to take on Enter without Shift
 const handleKeyDown = (event) => {
@@ -135,7 +136,7 @@ onMounted(() => {
   })
 
   socket.on('disconnect', () => {
-    console.log('Disconnected from server')
+    console.log('Disconnected from socket')
     connectionStatus.value = 'Disconnected'
   })
 
@@ -146,7 +147,7 @@ onMounted(() => {
 
   socket.on('error', (error) => {
     useSnackbarStore().show(error.message)
-    console.error('Connection error:', error)
+    console.error('Error:', error)
     connectionStatus.value = 'Error: ' + error.message
   })
 
@@ -154,11 +155,9 @@ onMounted(() => {
   socket.on('chats', (data) => {
     chats.value = data
     scrollToBottom()
-    // console.log('parner chats', chatList)
   })
 
   socket.on('message', (newMessage) => {
-    console.log('parner chats', newMessage)
     chats.value.push(newMessage)
     scrollToBottom()
   })
@@ -199,8 +198,6 @@ async function uploadFiles() {
         body: formData,
       })
 
-      console.log(response.status)
-
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
@@ -218,7 +215,6 @@ async function uploadFiles() {
 }
 
 const sendMessage = async () => {
-  console.log(newMessage.value)
   if (newMessage.value.trim() || attachments.value.length > 0) {
     const attachmentPaths = await uploadFiles()
 
@@ -244,6 +240,7 @@ async function fetchData() {
     }
     const decodedResponse = await response.json()
     userInfo.value = decodedResponse.data.info
+    if (userInfo.value?.agent_cd?.length > 0) selectedAgentCode.value = userInfo.value.agent_cd[0]
   } catch (error) {
     chatPopupStore.close()
     useSnackbarStore().show(error.toString())

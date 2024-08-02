@@ -2,33 +2,16 @@
   <div class="container">
     <div class="search-row">
       <div class="group" style="max-width: 180px">
-        <label>검색 선택</label>
-        <a-select v-model:value="searchType" :style="{ width: '100%' }" :options="types"> </a-select>
+        <label>상태</label>
+        <a-select
+          v-model:value="selectedStatus"
+          :style="{ width: '100%' }"
+          @change="fetchData"
+          :options="statuses.map((i) => ({ value: i.cd, label: i.value })) ?? [{ value: 'N/A', label: 'N/A' }]"
+        >
+        </a-select>
       </div>
 
-      <template v-if="searchType === 'status'">
-        <div class="group" style="max-width: 180px">
-          <label>상태</label>
-          <a-select
-            v-model:value="selectedStatus"
-            :style="{ width: '100%' }"
-            :options="statuses.map((i) => ({ value: i.cd, label: i.value })) ?? [{ value: 'N/A', label: 'N/A' }]"
-          >
-          </a-select>
-        </div>
-      </template>
-
-      <template v-else>
-        <div class="group" style="max-width: 180px">
-          <label>개통일자 (From)</label>
-          <input v-model="fromDate" v-cleave="cleavePatterns.datePattern" />
-        </div>
-
-        <div class="group" style="max-width: 180px">
-          <label>개통일자 (To)</label>
-          <input v-model="toDate" v-cleave="cleavePatterns.datePattern" />
-        </div>
-      </template>
       <button @click="fetchData" style="min-width: 100px; width: auto">조희</button>
     </div>
 
@@ -146,23 +129,11 @@ import { useHomeStatusHolder } from '@/stores/page-loading-store copy'
 
 const printPopup = usePrintablePopup()
 
-// Reactive variables
-const searchType = ref('status')
-const types = ref([
-  { value: 'status', label: '상태' },
-  { value: 'apply-date', label: '접수일자' },
-  { value: 'regis-date', label: '개통일자' },
-])
-
 const selectedStatus = ref('')
 const statuses = ref([])
 const totalCount = ref(0)
 const currentPage = ref(1)
 const rowLimit = ref(10)
-
-//from date set to 7 days ago default when initialized
-const toDate = ref(formatDate(new Date()))
-const fromDate = ref(formatDate(new Date(new Date().setDate(new Date().getDate() - 7))))
 
 //pagination change
 function onPagChange(curPage, perPage) {
@@ -232,11 +203,7 @@ const fetchData = async () => {
     const response = await fetchWithTokenRefresh('agent/actStatus', {
       method: 'POST',
       body: {
-        usim_act_status: searchType.value === 'status' ? selectedStatus.value ?? '' : '',
-        apply_fr_date: searchType.value === 'apply-date' ? fromDate.value : '',
-        apply_to_date: searchType.value === 'apply-date' ? toDate.value : '',
-        act_fr_date: searchType.value === 'regis-date' ? fromDate.value : '',
-        act_to_date: searchType.value === 'regis-date' ? toDate.value : '',
+        usim_act_status: selectedStatus.value,
         page: currentPage.value,
         rowLimit: rowLimit.value,
       },
