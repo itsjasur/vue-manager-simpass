@@ -18,7 +18,7 @@
     <div class="chats-section" ref="chatContainer">
       <div class="welcome">
         <span>환영하다: {{ userInfo.name }}!</span>
-        <span>연결 상태: {{ connectionStatus }}</span>
+        <span>연결 상태: {{ socketStore.connectionStatus }}</span>
       </div>
 
       <template v-for="(chat, index) in chats" :key="index">
@@ -84,7 +84,9 @@ import { useChatPopupStore } from '@/stores/chat-popup-store'
 import { nextTick, onMounted, ref } from 'vue'
 import { useSnackbarStore } from '@/stores/snackbar'
 import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
-import { io } from 'socket.io-client'
+import { useSocketStore } from '@/stores/chat_socket_store'
+
+const socketStore = useSocketStore()
 
 const chatPopupStore = useChatPopupStore()
 
@@ -115,64 +117,35 @@ const scrollToBottom = () => {
 }
 
 function joinRoom() {
-  socket.emit('join_room', {
+  socketStore.socket.emit('join_room', {
     agentCode: selectedAgentCode.value,
   })
   resetUnreadCount()
 }
 
 function resetUnreadCount() {
-  socket.emit('reset_room_unread_count', {
+  socketStore.socket.emit('reset_unread_count', {
     roomId: selectedAgentCode.value + '_' + userInfo.value.username,
   })
 }
 
-const socket = io('http://127.0.0.1:5000', { transports: ['websocket', 'polling'] })
-const connectionStatus = ref('Initial')
-
-onMounted(() => {
+onMounted(async () => {
   chatContainer.value = document.querySelector('.container') //chat container to scroll up or down
-  fetchData()
+  await fetchData()
 
-  socket.on('connect', () => {
-    connectionStatus.value = 'Connected'
-    console.log('Connected to server')
-
-    socket.emit('authenticate', localStorage.getItem('accessToken'))
-  })
-
-  socket.on('disconnect', () => {
-    connectionStatus.value = 'Disconnected'
-    console.log('Disconnected from server')
-  })
-
-  socket.on('connect_error', (error) => {
-    connectionStatus.value = 'Error: ' + error.message
-    console.error('Connection error:', error)
-  })
-
-  socket.on('error', (error) => {
-    useSnackbarStore().show(error.message)
-    connectionStatus.value = 'Error: ' + error.message
-    console.error('Error:', error)
-  })
-
-  socket.on('authenticated', () => {
-    connectionStatus.value = 'Authenticated'
-    console.log('User authenticated')
-    joinRoom()
-  })
+  if (socketStore.isConnected && selectedAgentCode.value) joinRoom()
 
   //partner page chats-info returns list of chats for selected agentCode
-  socket.on('chats', (data) => {
+  socketStore.socket.on('chats', (data) => {
     console.log('chats page socket store on chats called')
     console.log(data)
     chats.value = data
     scrollToBottom()
     resetUnreadCount()
+    socketStore.updateTotalCount()
   })
 
-  socket.on('message', (newMessage) => {
+  socketStore.socket.on('message', (newMessage) => {
     console.log(newMessage)
     resetUnreadCount()
     chats.value.push(newMessage)
@@ -241,7 +214,7 @@ const sendMessage = async () => {
       attachmentPaths: attachmentPaths,
       agentCode: selectedAgentCode.value,
     }
-    socket.emit('new_message', newMessageToSend)
+    socketStore.socket.emit('new_message', newMessageToSend)
     //clears input field text
     newMessage.value = ''
   }

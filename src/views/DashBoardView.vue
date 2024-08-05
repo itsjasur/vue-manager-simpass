@@ -26,6 +26,10 @@
     <div v-else class="open-chat-button" @click="chatPopupStore.active = true">
       <span class="material-symbols-outlined"> mode_comment </span>
       <span>개통 문의</span>
+
+      <!-- <div v-if="socketStore.totalUnreadCount > 0" class="unread-count-badge">
+        {{ socketStore.totalUnreadCount }}
+      </div> -->
     </div>
   </template>
 
@@ -55,7 +59,10 @@ const handleResize = () => {
 }
 
 onMounted(() => {
+  console.log('dashboard initi mounted')
+
   fetchData()
+
   sideMenuStore.updateIsDesktop()
   window.addEventListener('resize', handleResize)
 })
@@ -163,10 +170,10 @@ async function fetchData() {
   right: 20px;
   bottom: 20px;
   background-color: var(--main-color);
-  width: 150px;
+  min-width: 120px;
   height: 50px;
   border-radius: 50px;
-  /* padding: 10px; */
+  padding: 0 10px;
   /* box-sizing: border-box; */
   box-shadow: 0 0 10px #00000045;
   cursor: pointer;
@@ -189,15 +196,17 @@ async function fetchData() {
   filter: brightness(0.6);
 }
 
-/* .chat-popup {
-  position: absolute;
-  bottom: 0;
-  right: 20px;
-  height: 600px;
-  width: 500px;
-  border-radius: 10px 10px 0 0;
-  background-color: #fff;
-  z-index: 7000;
-  box-shadow: 0 0 20px #00000045;
-} */
+.unread-count-badge {
+  background-color: #ef5252;
+  height: 22px;
+  min-width: 22px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  padding: 3px;
+  justify-content: center;
+  line-height: 1;
+  color: #fff;
+  font-size: 14px;
+}
 </style>
