@@ -81,7 +81,7 @@
 
 <script setup>
 import { useChatPopupStore } from '@/stores/chat-popup-store'
-import { nextTick, onMounted, ref } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { useSnackbarStore } from '@/stores/snackbar'
 import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
 import { io } from 'socket.io-client'
@@ -118,16 +118,16 @@ function joinRoom() {
   socket.emit('join_room', {
     agentCode: selectedAgentCode.value,
   })
-  resetUnreadCount()
 }
 
-function resetUnreadCount() {
+function resetRoomUnreadCount() {
   socket.emit('reset_room_unread_count', {
     roomId: selectedAgentCode.value + '_' + userInfo.value.username,
   })
 }
 
 const socket = io('http://127.0.0.1:5000', { transports: ['websocket', 'polling'] })
+
 const connectionStatus = ref('Initial')
 
 onMounted(() => {
@@ -143,7 +143,7 @@ onMounted(() => {
 
   socket.on('disconnect', () => {
     connectionStatus.value = 'Disconnected'
-    console.log('Disconnected from server')
+    console.log('Socket disconnected from server')
   })
 
   socket.on('connect_error', (error) => {
@@ -154,7 +154,7 @@ onMounted(() => {
   socket.on('error', (error) => {
     useSnackbarStore().show(error.message)
     connectionStatus.value = 'Error: ' + error.message
-    console.error('Error:', error)
+    // console.error('Error:', error)
   })
 
   socket.on('authenticated', () => {
@@ -169,15 +169,19 @@ onMounted(() => {
     console.log(data)
     chats.value = data
     scrollToBottom()
-    resetUnreadCount()
+    resetRoomUnreadCount()
   })
 
   socket.on('message', (newMessage) => {
     console.log(newMessage)
-    resetUnreadCount()
+    resetRoomUnreadCount()
     chats.value.push(newMessage)
     scrollToBottom()
   })
+})
+
+onUnmounted(() => {
+  socket.disconnect()
 })
 
 //drop to attach files handler

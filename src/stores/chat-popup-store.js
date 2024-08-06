@@ -3,13 +3,13 @@ import { defineStore } from 'pinia'
 export const useChatPopupStore = defineStore('chatPopupStore', {
   state: () => ({
     active: false,
-    agentCode: '',
+    socket: null,
   }),
 
   actions: {
-    open(agentCode) {
+    open(socket) {
       this.active = true
-      this.agentCode = agentCode
+      this.socket = socket
     },
 
     close() {

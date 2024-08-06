@@ -27,9 +27,9 @@
       <span class="material-symbols-outlined"> mode_comment </span>
       <span>개통 문의</span>
 
-      <!-- <div v-if="socketStore.totalUnreadCount > 0" class="unread-count-badge">
-        {{ socketStore.totalUnreadCount }}
-      </div> -->
+      <div v-if="totolStore.totalUnreadCount > 0" class="unread-count-badge">
+        {{ totolStore.totalUnreadCount }}
+      </div>
     </div>
   </template>
 
@@ -37,7 +37,7 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 import SideMenu from '../components/SideMenu.vue'
 import Header from '../components/Header.vue'
 import { useSideMenuStore } from '../stores/side-menu'
@@ -47,6 +47,8 @@ import { useChatPopupStore } from '@/stores/chat-popup-store'
 import Chat from '../components/Chat.vue'
 import { useSnackbarStore } from '@/stores/snackbar'
 import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
+import { io } from 'socket.io-client'
+import { useTotalUnreadCountStore } from '@/stores/total-unread-count-store'
 
 const selectPlansPopup = useSelectPlansPopup()
 
@@ -54,22 +56,42 @@ const chatPopupStore = useChatPopupStore()
 
 const sideMenuStore = useSideMenuStore()
 
-const handleResize = () => {
-  sideMenuStore.updateIsDesktop()
-}
+const socket = io('http://127.0.0.1:5000', { transports: ['websocket', 'polling'] })
+const connectionStatus = ref('Initial')
+
+const totolStore = useTotalUnreadCountStore()
 
 onMounted(() => {
-  console.log('dashboard initi mounted')
-
   fetchData()
-
   sideMenuStore.updateIsDesktop()
   window.addEventListener('resize', handleResize)
+
+  socket.on('connect', () => {
+    connectionStatus.value = 'Connected'
+    socket.emit('authenticate', localStorage.getItem('accessToken'))
+  })
+
+  socket.on('authenticated', () => {
+    connectionStatus.value = 'Authenticated'
+    socket.emit('get_total_unread_count')
+  })
+
+  socket.on('total_unread_count', (newTotalUnreadCount) => {
+    totolStore.totalUnreadCount = newTotalUnreadCount
+  })
+  socket.on('room_modified', (modifiedRoom) => {
+    socket.emit('get_total_unread_count')
+  })
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
+  socket.disconnect()
 })
+
+const handleResize = () => {
+  sideMenuStore.updateIsDesktop()
+}
 
 const userInfo = ref({})
 async function fetchData() {
