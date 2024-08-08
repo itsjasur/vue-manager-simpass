@@ -193,6 +193,9 @@ async function submit(event) {
 
 <style scoped>
 .content-container {
+  width: 100%;
+  height: 100%;
+
   background-color: #fff;
   border-radius: 10px;
   box-shadow: 0 0 5px #00000013;

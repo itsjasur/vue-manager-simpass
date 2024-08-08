@@ -19,7 +19,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import SignPadPopup from './SignPadPopup.vue'
+import SignPadPopup from './GlobalPopupWithOverlay.vue'
 import AgreePadPopup from './AgreePadPopup.vue'
 
 const props = defineProps({

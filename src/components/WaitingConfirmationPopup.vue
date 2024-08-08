@@ -172,8 +172,6 @@ async function submit() {
   left: 0;
   height: 100%;
   width: 100%;
-  /* height: 100vh; */
-  /* width: 100vw; */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -187,6 +185,7 @@ async function submit() {
   border-radius: 8px;
   max-width: 1000px;
   width: 100%;
+  height: 100%;
   box-sizing: border-box;
   position: relative;
   overflow: hidden;

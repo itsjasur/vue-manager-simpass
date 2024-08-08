@@ -20,6 +20,8 @@
   <Warning />
   <SearchAddressPopup />
   <PrintablePopup />
+
+  <!-- <div class="popup_with_overlay"></div> -->
 </template>
 
 <script setup>
@@ -33,6 +35,11 @@ import { useSideMenuStore } from './stores/side-menu'
 import SearchAddressPopup from './components/SearchAddressPopup.vue'
 import PrintablePopup from './components/PrintablePopup.vue'
 import Loading from './components/Loading.vue'
+
+// import { messaging, getToken, onMessage } from './firebase'
+import { FIREBASEVAPIDKEY } from '../sensitive'
+import sound from '@/assets/sound.mp3'
+import logo from '@/assets/logo.png'
 
 const router = useRouter()
 const authStore = useAuthenticationStore()
@@ -56,9 +63,45 @@ const handleResize = () => {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   window.addEventListener('resize', handleResize)
   handleResize() //
+
+  // try {
+  //   var currentToken = await getToken(messaging, { vapidKey: FIREBASEVAPIDKEY })
+  //   localStorage.setItem('fcmToken', currentToken)
+  //   console.log(currentToken)
+  // } catch (e) {
+  //   console.log(e)
+  // }
+
+  // onMessage(messaging, (payload) => {
+  //   console.log('Message received. ', payload)
+
+  //   const audio = new Audio(sound)
+  //   audio.play()
+
+  //   // checks if the browser supports notifications
+  //   if ('Notification' in window) {
+  //     // requests permission if not already granted
+  //     if (Notification.permission !== 'granted') {
+  //       Notification.requestPermission()
+  //     } else {
+  //       // creates and shows the notification
+  //       const notification = new Notification(payload.notification.title, {
+  //         body: payload.notification.body,
+  //         icon: logo,
+  //       })
+
+  //       // click event to the notification
+  //       notification.onclick = function () {
+  //         window.focus()
+  //         notification.close()
+  //         //action to go to the chat
+  //       }
+  //     }
+  //   }
+  // })
 })
 
 onUnmounted(() => {
@@ -71,6 +114,7 @@ body {
   margin: 0;
   padding: 0;
   background-color: var(--main-background-color);
+  /* background-color: blueviolet; */
   z-index: 1;
 }
 </style>

@@ -71,7 +71,7 @@
 </template>
 
 <script setup>
-import { useHomeStatusHolder } from '@/stores/page-loading-store copy'
+import { useHomeStatusHolder } from '@/stores/home-status-store'
 import { useSnackbarStore } from '@/stores/snackbar'
 import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
 import { onMounted, ref } from 'vue'
@@ -84,7 +84,8 @@ const dataList = ref([])
 
 function goToApplicationsWithStatus(status) {
   if (!status) status = ''
-  useHomeStatusHolder().save(status)
+  // useHomeStatusHolder().save(status)
+  useHomeStatusHolder().save()
   router.push('/applications')
 }
 
@@ -100,7 +101,7 @@ async function fetchData() {
   }
 }
 
-const homePagePopupOpen = ref(true)
+const homePagePopupOpen = ref(false)
 const homeInfo = ref({})
 
 async function fetchHomeInfo() {
@@ -119,9 +120,9 @@ async function fetchHomeInfo() {
   }
 }
 
-onMounted(() => {
-  fetchHomeInfo()
-  fetchData()
+onMounted(async () => {
+  await fetchHomeInfo()
+  await fetchData()
 })
 </script>
 

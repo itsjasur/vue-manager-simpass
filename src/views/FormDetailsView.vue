@@ -92,7 +92,7 @@
     </div>
 
     <!-- checks and enables sign container -->
-    <a-checkbox class="checkbox" v-model:checked="signAfterPrintChecked"
+    <a-checkbox v-if="useDeviceTypeStore().isDeviceMobile()" class="checkbox" v-model:checked="signAfterPrintChecked"
       >신청서 프린트 인쇄후 서명/사인 자필</a-checkbox
     >
 
@@ -172,6 +172,7 @@ import { useSearchaddressStore } from '../stores/select-address-popup'
 import LoadingSpinner from '../components/Loader.vue'
 import { usePrintablePopup } from '../stores/printable-popup'
 import { useSelectPlansPopup } from '../stores/select-plans-popup'
+import { useDeviceTypeStore } from '@/stores/device-type-store'
 
 //address poup
 const selectAddressPopup = useSearchaddressStore()
@@ -462,8 +463,9 @@ const deleteDocImages = (index) => {
   createImageUrls()
 }
 
-//will sign after print
-const signAfterPrintChecked = ref(false)
+//will sign after print, if device is not mobile, make signAfterPrintChecked true
+const signAfterPrintChecked = ref(!useDeviceTypeStore().isDeviceMobile())
+
 //signs image data
 const nameImageData = ref(null)
 const signImageData = ref(null)
@@ -679,9 +681,9 @@ async function fetchForms() {
     }
   }
 
-  for (const [key, value] of formData.entries()) {
-    console.log(key, value)
-  }
+  // for (const [key, value] of formData.entries()) {
+  //   console.log(key, value)
+  // }
 
   try {
     const response = await fetchWithTokenRefresh('agent/actApply', {

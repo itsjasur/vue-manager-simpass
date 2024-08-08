@@ -415,6 +415,8 @@ onUnmounted(() => {
 
 <style scoped>
 .content-container {
+  width: 100%;
+  height: 100%;
   background-color: #fff;
   border-radius: 10px;
   box-shadow: 0 0 5px #00000013;
@@ -426,6 +428,7 @@ onUnmounted(() => {
   display: flex;
   flex-flow: column;
   gap: 30px;
+  z-index: 1;
 }
 
 .title {

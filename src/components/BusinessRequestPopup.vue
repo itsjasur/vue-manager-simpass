@@ -14,7 +14,7 @@
 
         <div class="checkbox-contract-row">
           <a-checkbox class="checkbox" v-model:checked="agreeToContracTerms">판매점 계약서 내용 동의 (필수)</a-checkbox>
-          <button @click="contractPopup = true" class="see-contract-button">계약서 확인</button>
+          <button @click="fetchContractPDFAndPrint()" class="see-contract-button">계약서 확인</button>
         </div>
 
         <div class="part-title">판매점 정보</div>
@@ -201,13 +201,7 @@
       </div>
     </div>
   </div>
-
-  <ContractPdfViewPoup
-    v-if="contractPopup"
-    :partnerNm="serverData.partner_nm"
-    :agentCd="props.agentCd"
-    @closePopup="contractPopup = false"
-  />
+  <PrintablePdfPopup v-if="printablePdfPopup.active" />
 </template>
 
 <script setup>
@@ -220,18 +214,18 @@ import { useRouter } from 'vue-router'
 import { useWarningStore } from '@/stores/warning'
 import LoadingSpinner from '../components/Loader.vue'
 import * as VALIDATOR from '../utils/validators'
-import ContractPdfViewPoup from '../components/ContractPdfViewPopup.vue'
 import SignImageRowContainer from '../components/SignImageRowContainer.vue'
 import { useNameSignDataStore } from '@/stores/name-sign-data-store'
+import PrintablePdfPopup from '../components/PrintablePdfPopup.vue'
+import { usePrintablePdfPopup } from '@/stores/printable-pdf-popup'
 
+const printablePdfPopup = usePrintablePdfPopup()
 const router = useRouter()
 const warning = useWarningStore()
 
 const emit = defineEmits(['closePopup'])
 
 const props = defineProps({ agentCd: { type: String, required: true } })
-
-const contractPopup = ref(false)
 
 const signStore = useNameSignDataStore()
 const signData = ref(null)
@@ -410,6 +404,26 @@ async function submit() {
     useSnackbarStore().show(error.toString())
   } finally {
     isSubmitting.value = false
+  }
+}
+
+async function fetchContractPDFAndPrint() {
+  try {
+    const response = await fetchWithTokenRefresh('agent/contractForms', {
+      method: 'POST',
+      body: { agent_cd: props.agentCd },
+    })
+
+    if (!response.ok) throw 'Fetch contract PDF data error'
+
+    const pdfData = await response.blob()
+    const blob = new Blob([pdfData], { type: 'application/pdf' })
+
+    // a URL for the Blob
+    const url = URL.createObjectURL(blob)
+    printablePdfPopup.open(url)
+  } catch (error) {
+    useSnackbarStore().show(error.toString())
   }
 }
 

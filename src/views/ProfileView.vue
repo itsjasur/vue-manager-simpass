@@ -61,9 +61,15 @@
       </div>
     </div>
 
-    <SignImageRowContainer type="self" :placeholder="data.contractor" @updated="updatePads" title="판매자 서명" />
-
-    <button @click="submit">사인 저장</button>
+    <template v-if="useDeviceTypeStore().isDeviceMobile()">
+      <SignImageRowContainer
+        type="self"
+        :overlayText="data.contractor"
+        title="판매자 서명"
+        @updateSignSeal="updatePads"
+      />
+      <button @click="submit">서명/사인 저장</button>
+    </template>
   </div>
 </template>
 
@@ -75,6 +81,7 @@ import { fetchWithTokenRefresh } from '../utils/tokenUtils'
 import SignImageRowContainer from '../components/SignImageRowContainer.vue'
 
 import { useNameSignDataStore } from '../stores/name-sign-data-store'
+import { useDeviceTypeStore } from '@/stores/device-type-store'
 
 const signStore = useNameSignDataStore()
 
@@ -92,11 +99,9 @@ const status = ref('')
 const signData = ref(null)
 const sealData = ref(null)
 
-const updatePads = ({ name, sign, type }) => {
-  console.log('type')
-  console.log(type)
-  signData.value = name
-  sealData.value = sign
+const updatePads = (sign, seal) => {
+  signData.value = sign
+  sealData.value = seal
 }
 
 async function fetchProfileData() {
@@ -193,7 +198,7 @@ button {
   max-width: 200px;
   margin-top: 20px;
   height: 45px;
-  margin-bottom: 400px;
+  margin-bottom: 100px;
 }
 
 @media (max-width: 600px) {

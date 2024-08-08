@@ -125,7 +125,7 @@ import { useSnackbarStore } from '../stores/snackbar'
 import { fetchWithTokenRefresh } from '../utils/tokenUtils'
 import { usePrintablePopup } from '../stores/printable-popup'
 import { usePageLoadingStore } from '@/stores/page-loading-store'
-import { useHomeStatusHolder } from '@/stores/page-loading-store copy'
+import { useHomeStatusHolder } from '@/stores/home-status-store'
 
 const printPopup = usePrintablePopup()
 

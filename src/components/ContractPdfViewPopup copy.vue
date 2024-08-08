@@ -9,13 +9,13 @@
       <div class="scrollable-content">
         <template v-if="props.agentCd == 'SJ'">
           <img v-for="(image, index) in jImages" :key="index" class="background-image" :src="image" alt="" />
-          <div class="sj-text-overlay">{{ props.partnerNm }}</div>
+          <!-- <div class="sj-text-overlay">{{ props.partnerNm }}</div> -->
         </template>
 
         <!-- Simpass contract -->
         <template v-else>
           <img v-for="(image, index) in sImages" :key="index" class="background-image" :src="image" alt="" />
-          <div class="sp-text-overlay">{{ props.partnerNm }}</div>
+          <!-- <div class="ik-text-overlay">{{ props.partnerNm }}</div> -->
         </template>
       </div>
     </div>
@@ -33,10 +33,6 @@ import j6 from '../assets/contracts/j/j6.jpg'
 
 import s1 from '../assets/contracts/s/s1.png'
 import s2 from '../assets/contracts/s/s2.png'
-import s3 from '../assets/contracts/s/s3.png'
-import s4 from '../assets/contracts/s/s4.png'
-import s5 from '../assets/contracts/s/s5.png'
-import s6 from '../assets/contracts/s/s6.png'
 
 const jImages = ref([j1, j2, j3, j4, j5, j6])
 const sImages = ref([s1, s2, s3, s4, s5, s6])
@@ -92,7 +88,7 @@ const emit = defineEmits(['closePopup'])
   display: flex;
   flex-direction: column;
   gap: 30px;
-  padding: 0 20px;
+  /* padding: 0 20px; */
   height: 100%;
 
   position: relative;
@@ -112,11 +108,14 @@ const emit = defineEmits(['closePopup'])
   color: #474747;
 }
 
-.sp-text-overlay {
-  top: 260px;
-  left: 440px;
+.ik-text-overlay {
+  /* top: 260px; */
+  /* left: 440px; */
+
+  top: 30%;
+  left: 50%;
   position: absolute;
-  font-size: 18px;
+  font-size: 1em;
   font-weight: 700;
   color: #646464;
 }

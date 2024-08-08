@@ -95,9 +95,9 @@ const chatContainer = ref(null)
 const chats = ref([])
 const newMessage = ref('')
 
-const selectedAgentCode = ref('SP')
+const selectedAgentCode = ref('IK')
 
-const agentList = { SP: '심패스', SJ: '에스제이' }
+const agentList = { IK: '인스코리아', SJ: '에스제이' }
 
 // adds logic for the action to take on Enter without Shift
 const handleKeyDown = (event) => {
@@ -126,7 +126,7 @@ function resetRoomUnreadCount() {
   })
 }
 
-const socket = io('http://127.0.0.1:5000', { transports: ['websocket', 'polling'] })
+const socket = io(import.meta.env.VITE_CHAT_SERVER_URL, { transports: ['websocket', 'polling'] })
 
 const connectionStatus = ref('Initial')
 
@@ -138,7 +138,10 @@ onMounted(() => {
     connectionStatus.value = 'Connected'
     console.log('Connected to server')
 
-    socket.emit('authenticate', localStorage.getItem('accessToken'))
+    socket.emit('authenticate', {
+      userToken: localStorage.getItem('accessToken'),
+      fcmToken: localStorage.getItem('fcmToken'),
+    })
   })
 
   socket.on('disconnect', () => {

@@ -61,12 +61,12 @@
     </div>
   </div>
 
-  <ContractPdfViewPoup
+  <!-- <ContractPdfViewPoup
     v-if="contractPopup"
     :partnerNm="serverData.partner_nm"
     :agentCd="props.agentCd"
     @closePopup="contractPopup = false"
-  />
+  /> -->
 </template>
 
 <script setup>
@@ -79,7 +79,7 @@ import { useWarningStore } from '@/stores/warning'
 import LoadingSpinner from './Loader.vue'
 import SignImageRowContainer from './SignImageRowContainer.vue'
 import { useNameSignDataStore } from '@/stores/name-sign-data-store'
-import ContractPdfViewPoup from '../components/ContractPdfViewPopup.vue'
+// import ContractPdfViewPoup from '../components/ContractPdfViewPopup.vue'
 
 const router = useRouter()
 const warning = useWarningStore()
@@ -89,7 +89,8 @@ const emit = defineEmits(['closePopup'])
 const props = defineProps({ agentCd: { type: String, required: true } })
 
 const agreeToContracTerms = ref(false)
-const contractPopup = ref(false)
+
+// const contractPopup = ref(false)
 
 const signStore = useNameSignDataStore()
 const signData = ref(null)

@@ -47,8 +47,8 @@ import { useChatPopupStore } from '@/stores/chat-popup-store'
 import Chat from '../components/Chat.vue'
 import { useSnackbarStore } from '@/stores/snackbar'
 import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
-import { io } from 'socket.io-client'
 import { useTotalUnreadCountStore } from '@/stores/total-unread-count-store'
+import { io } from 'socket.io-client'
 
 const selectPlansPopup = useSelectPlansPopup()
 
@@ -56,7 +56,8 @@ const chatPopupStore = useChatPopupStore()
 
 const sideMenuStore = useSideMenuStore()
 
-const socket = io('http://127.0.0.1:5000', { transports: ['websocket', 'polling'] })
+const socket = io(import.meta.env.VITE_CHAT_SERVER_URL, { transports: ['websocket', 'polling'] })
+
 const connectionStatus = ref('Initial')
 
 const totolStore = useTotalUnreadCountStore()
@@ -68,7 +69,11 @@ onMounted(() => {
 
   socket.on('connect', () => {
     connectionStatus.value = 'Connected'
-    socket.emit('authenticate', localStorage.getItem('accessToken'))
+
+    socket.emit('authenticate', {
+      userToken: localStorage.getItem('accessToken'),
+      fcmToken: localStorage.getItem('fcmToken'),
+    })
   })
 
   socket.on('authenticated', () => {
@@ -200,8 +205,7 @@ async function fetchData() {
   box-shadow: 0 0 10px #00000045;
   cursor: pointer;
   color: #fff;
-  z-index: 7000;
-
+  z-index: 1100;
   display: flex;
   gap: 10px;
   align-items: center;
