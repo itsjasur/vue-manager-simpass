@@ -13,25 +13,26 @@
         <RouterView />
       </div>
     </div>
-  </div>
 
-  <template v-if="!sideMenuStore.isDesktop">
-    <div v-if="sideMenuStore.isOpen" @click="sideMenuStore.close()" class="m-dashboard-side-menu-overlay"></div>
-    <div :class="['m-dashboard-side-menu', { closed: !sideMenuStore.isOpen }]">
-      <SideMenu />
-    </div>
-  </template>
-  <template v-if="userInfo?.agent_cd?.length > 0">
-    <Chat v-if="chatPopupStore.active" />
-    <div v-else class="open-chat-button" @click="chatPopupStore.active = true">
-      <span class="material-symbols-outlined"> mode_comment </span>
-      <span>개통 문의</span>
+    <template v-if="userInfo?.agent_cd?.length > 0">
+      <Chat v-if="chatPopupStore.active" />
+      <div v-else class="open-chat-button" @click="chatPopupStore.active = true">
+        <span class="material-symbols-outlined"> mode_comment </span>
+        <span>개통 문의</span>
 
-      <div v-if="totolStore.totalUnreadCount > 0" class="unread-count-badge">
-        {{ totolStore.totalUnreadCount }}
+        <div v-if="totolStore.totalUnreadCount > 0" class="unread-count-badge">
+          {{ totolStore.totalUnreadCount }}
+        </div>
       </div>
-    </div>
-  </template>
+    </template>
+
+    <template v-if="!sideMenuStore.isDesktop">
+      <div v-if="sideMenuStore.isOpen" @click="sideMenuStore.close()" class="m-dashboard-side-menu-overlay"></div>
+      <div :class="['m-dashboard-side-menu', { closed: !sideMenuStore.isOpen }]">
+        <SideMenu />
+      </div>
+    </template>
+  </div>
 
   <SelectPlanPopup v-if="selectPlansPopup.active" />
 </template>
@@ -120,9 +121,11 @@ async function fetchData() {
 .dashboard-container {
   display: flex;
   flex-flow: row;
-  height: 100vh;
-  width: 100vw;
+  position: fixed;
+  height: 100%;
+  width: 100%;
   background-color: #ffc0cb76;
+  overflow-y: hidden;
 }
 
 .dashboard-side-menu {
@@ -138,11 +141,11 @@ async function fetchData() {
 
 .dashboard-view-content {
   flex: 1;
-  height: 100%;
-  width: 100%;
   display: flex;
   flex-direction: column;
   background-color: var(--main-background-color);
+  height: 100%;
+  width: 100%;
   z-index: 1003;
 }
 
@@ -157,7 +160,8 @@ async function fetchData() {
   display: flex;
   flex-flow: column;
   height: 100%;
-  overflow-y: scroll;
+  position: relative;
+  overflow-y: auto;
 }
 
 .icon {
@@ -170,8 +174,8 @@ async function fetchData() {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   background-color: #00000047;
   z-index: 1100;
 }
@@ -181,7 +185,7 @@ async function fetchData() {
   position: absolute;
   top: 0;
   left: 0;
-  height: 100vh;
+  height: 100%;
   width: 300px;
   transition: width 0.3s ease;
   overflow: hidden;

@@ -3,7 +3,7 @@
     <div class="snackbar-content">
       {{ snackbarStore.message }}
     </div>
-    <div class="close-icon" @click="snackbarStore.hideSnackbar">&times;</div>
+    <div class="close-icon" @click="snackbarStore.hide">&times;</div>
   </div>
 </template>
 
@@ -24,10 +24,13 @@ const snackbarStore = useSnackbarStore()
   padding: 10px 15px;
   border-radius: 4px;
   display: flex;
-  max-width: 80%; /* mobile default */
-  min-width: 40%;
-  justify-content: space-between;
   align-items: center;
+
+  width: 80%;
+  max-width: 400px;
+  min-width: 200px;
+
+  justify-content: space-between;
   z-index: 5000;
   box-shadow: 0 0 20px #00000042;
   /* font-weight: 600; */
@@ -42,14 +45,6 @@ const snackbarStore = useSnackbarStore()
   flex-grow: 1;
   text-align: center;
   white-space: pre-line;
-}
-
-/* Desktop styles */
-@media (min-width: 600px) {
-  .snackbar {
-    max-width: 400px;
-    min-width: 200px;
-  }
 }
 
 .close-icon {

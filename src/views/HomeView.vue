@@ -130,13 +130,14 @@ onMounted(async () => {
 .home-main {
   display: flex;
   flex-direction: column;
-  min-height: 100%;
   justify-content: center;
   align-items: center;
   padding: 20px;
   box-sizing: border-box;
+
+  min-height: 100%;
   overflow-y: auto;
-  overflow-x: hidden;
+  /* overflow-x: hidden; */
 }
 .counts-container {
   width: 100%;
@@ -183,6 +184,7 @@ onMounted(async () => {
   color: #ffffffce;
   justify-content: space-evenly;
   text-align: center;
+  font-size: 15px;
 }
 
 .vert-divider {
@@ -207,7 +209,7 @@ onMounted(async () => {
   gap: 20px;
   justify-content: center;
 
-  margin-bottom: 100px;
+  margin-bottom: 200px;
 }
 
 .card {
@@ -259,6 +261,10 @@ img {
     display: flex;
     flex-flow: row;
     gap: 10px;
+  }
+
+  .counts-data-list {
+    font-size: 11px;
   }
 
   .textbox {

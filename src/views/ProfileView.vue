@@ -61,12 +61,13 @@
       </div>
     </div>
 
-    <template v-if="useDeviceTypeStore().isDeviceMobile()">
+    <template v-if="useDeviceTypeStore().isDeviceMobile() && partnerInfoFetched">
       <SignImageRowContainer
-        type="self"
         :overlayText="data.contractor"
         title="판매자 서명"
         @updateSignSeal="updatePads"
+        :signImageData="signData"
+        :sealImageData="sealData"
       />
       <button @click="submit">서명/사인 저장</button>
     </template>
@@ -75,18 +76,14 @@
 
 //
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, onBeforeMount } from 'vue'
 import { useSnackbarStore } from '../stores/snackbar'
 import { fetchWithTokenRefresh } from '../utils/tokenUtils'
 import SignImageRowContainer from '../components/SignImageRowContainer.vue'
 
-import { useNameSignDataStore } from '../stores/name-sign-data-store'
 import { useDeviceTypeStore } from '@/stores/device-type-store'
 
-const signStore = useNameSignDataStore()
-
 const data = ref({})
-
 const pname = ref('')
 const pcode = ref('')
 const contact = ref('')
@@ -104,12 +101,11 @@ const updatePads = (sign, seal) => {
   sealData.value = seal
 }
 
+const partnerInfoFetched = ref(false)
+
 async function fetchProfileData() {
   try {
-    const response = await fetchWithTokenRefresh('agent/partnerInfo', {
-      method: 'GET',
-      // body: JSON.stringify(requestModel)
-    })
+    const response = await fetchWithTokenRefresh('agent/partnerInfo', { method: 'GET' })
     if (response.ok) {
       const decodedResponse = await response.json()
       if (decodedResponse.data && decodedResponse.data.info) {
@@ -124,13 +120,17 @@ async function fetchProfileData() {
         storeDetailAddress.value = info.dtl_address
         contractDate.value = new Date(info.apply_date).toLocaleString()
         status.value = info.status_nm
-        signStore.save(info.partner_sign, info.partner_seal)
+
+        signData.value = info.partner_sign
+        sealData.value = info.partner_seal
       }
     } else {
       throw new Error('Fetch profile data error')
     }
   } catch (error) {
     useSnackbarStore().show(error.toString())
+  } finally {
+    partnerInfoFetched.value = true
   }
 }
 
@@ -138,11 +138,12 @@ async function fetchProfileData() {
 const formData = new FormData()
 
 async function submit() {
+  // //checks if all values are filled
+  if (!signData.value || !sealData.value) return useSnackbarStore().show('서명/사인 하지 않았습니다')
+
   //adding sign images data
   formData.set('partner_sign', signData.value)
   formData.set('partner_seal', sealData.value)
-
-  // //checks if all values are filled
 
   try {
     const response = await fetchWithTokenRefresh('agent/setActSign', {
@@ -158,10 +159,7 @@ async function submit() {
     useSnackbarStore().show(error.toString())
   }
 }
-
 onMounted(fetchProfileData)
-
-onUnmounted(signStore.clear)
 </script>
 
 <style scoped>

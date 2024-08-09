@@ -13,8 +13,13 @@
         <a-slider v-model:value="signPenSickness" :min="1" :max="8" :step="1" />
       </div>
 
-      <div class="canvas_container" :style="{ maxWidth: props.popupFor === 'sign' ? '700px' : '500px' }">
-        <span class="overlay-text" :style="nameStyle">{{ overlayText }}</span>
+      <div class="canvas_container">
+        <img
+          ref="backgroundImage"
+          src="../assets/umobile_agree_seal.png"
+          alt="umobi agree image"
+          @load="initializeSignaturePad"
+        />
         <canvas ref="signatureCanvas" class="signature_pad"></canvas>
       </div>
     </div>
@@ -31,10 +36,7 @@ const signPenSickness = ref(3)
 const signatureCanvas = ref(null)
 let padData = null
 
-const props = defineProps({
-  overlayText: { type: String, default: '' },
-  popupFor: { type: String, required: true },
-})
+const props = defineProps({ overlayText: { type: String, default: '' } })
 
 const emit = defineEmits(['closePopup', 'savePad'])
 
@@ -45,70 +47,7 @@ watch(signPenSickness, (newValue) => {
   }
 })
 
-const nameStyle = ref()
-
-const length = props?.overlayText?.length ?? 0
-
-const setNameStyle = () => {
-  const screenWidth = window.innerWidth
-  if (screenWidth <= 768) {
-    nameStyle.value = {
-      fontSize: '5vw',
-      letterSpacing: '2px',
-    }
-
-    if (length <= 4) {
-      nameStyle.value = {
-        fontSize: '22vw',
-        letterSpacing: '12px',
-      }
-    }
-
-    if (length > 4 && length < 20) {
-      nameStyle.value = {
-        fontSize: '11vw',
-        letterSpacing: '5px',
-      }
-    }
-    if (length >= 20 && length < 40) {
-      nameStyle.value = {
-        fontSize: '8.5vw',
-        letterSpacing: '3px',
-      }
-    }
-  }
-
-  if (screenWidth > 768) {
-    nameStyle.value = {
-      fontSize: '40px',
-      letterSpacing: '10px',
-    }
-
-    if (length <= 4) {
-      nameStyle.value = {
-        fontSize: '180px',
-        letterSpacing: '10px',
-      }
-    }
-
-    if (length > 4 && length < 20) {
-      nameStyle.value = {
-        fontSize: '80px',
-        letterSpacing: '5px',
-      }
-    }
-    if (length >= 20 && length < 40) {
-      nameStyle.value = {
-        fontSize: '60px',
-        letterSpacing: '5px',
-      }
-    }
-  }
-}
-
 const initializeSignaturePad = () => {
-  setNameStyle()
-
   const canvas = signatureCanvas.value
   const ratio = Math.max(window.devicePixelRatio || 1, 1)
   canvas.width = canvas.offsetWidth * ratio
@@ -134,6 +73,7 @@ onMounted(() => {
     fullscreenElement.value.requestFullscreen()
   }
   window.addEventListener('resize', initializeSignaturePad)
+
   initializeSignaturePad()
 })
 
@@ -147,7 +87,7 @@ const clear = () => {
 
 const save = async () => {
   if (padData.isEmpty()) {
-    useSnackbarStore().show('먼저 서명을 해주세요.')
+    useSnackbarStore().show(' "동의합니다" 비어있습니다.')
   } else {
     const padDataUrl = await padData.toDataURL()
     emit('savePad', padDataUrl)
@@ -161,7 +101,6 @@ const save = async () => {
   width: 100%;
   height: 100%;
   background-color: #fff;
-
   position: relative;
 }
 
@@ -213,14 +152,10 @@ const save = async () => {
 
 .canvas_container {
   display: flex;
-  height: 200px;
   width: 90%;
   justify-content: center;
   position: relative;
-
   align-items: center;
-
-  padding: 10px;
   box-sizing: border-box;
 }
 
@@ -232,12 +167,13 @@ canvas {
   border-radius: 6px;
 }
 
-.overlay-text {
+.canvas_container img {
+  width: 100%;
+  display: block;
   pointer-events: none !important;
-  white-space: normal; /* Allow text to wrap */
-  box-sizing: border-box;
-  overflow: hidden;
-  color: #00000010; /* Set the desired text color */
-  font-weight: 900;
 }
+
+/* :not(:root):fullscreen::backdrop {
+  background-color: transparent;
+} */
 </style>

@@ -114,7 +114,7 @@ body {
   margin: 0;
   padding: 0;
   background-color: var(--main-background-color);
-  /* background-color: blueviolet; */
+  height: 100%;
   z-index: 1;
 }
 </style>

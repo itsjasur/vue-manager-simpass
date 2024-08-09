@@ -1,13 +1,20 @@
 <template>
   <div class="content-container">
-    <span class="title-note"
+    <!-- <span class="title-note"
       >본 신청서는 심패스에서 직접 운영하는 판매점 전자계약서이며 고객님에 소중한 개인정보는 암호화되어 안전하게
       보호됩니다.
-    </span>
+    </span> -->
+
+    <div class="title-note">판매점 회원 가입</div>
 
     <div class="agree-checkbox">
-      <a-checkbox class="checkbox" v-model:checked="agreeToTerms">개인정보 수집이용 동의 (필수)</a-checkbox>
-      <span @click="agreementPopupIsOpen = true" class="agree-view">약관내용</span>
+      <a-checkbox class="checkbox" v-model:checked="useTermsCheck">이용약관 (필수)</a-checkbox>
+      <span @click="showPopupAgreement('useterms')" class="agree-view">전문보기</span>
+    </div>
+
+    <div class="agree-checkbox">
+      <a-checkbox class="checkbox" v-model:checked="privacyCheck">개인정보보호정책 (필수)</a-checkbox>
+      <span @click="showPopupAgreement('privacy')" class="agree-view">전문보기</span>
     </div>
 
     <div class="partition">
@@ -49,13 +56,21 @@
 
       <div class="group">
         <label>본인명의 휴대폰번호</label>
-        <input v-model="phoneNumber" placeholder="010-1234-5678" v-cleave="cleavePatterns.phoneNumberPattern" />
+        <input
+          placeholder="010-1234-5678"
+          v-cleave="cleavePatterns.phoneNumberPattern"
+          @cleave:input="(event) => (phoneNumber = event.detail.raw)"
+        />
         <p v-if="isSubmitted && !phoneNumber" class="input-error-message">휴대폰번호를 정확하게 입력하세요.</p>
       </div>
 
       <div class="group">
         <label>생년월일</label>
-        <input v-model="birthday" placeholder="1981-01-31" v-cleave="cleavePatterns.birthdayPatternFull" />
+        <input
+          placeholder="1981-01-31"
+          v-cleave="cleavePatterns.birthdayPatternFull"
+          @cleave:input="(event) => (birthday = event.detail.raw)"
+        />
         <p v-if="isSubmitted && !birthday" class="input-error-message">올바른 날짜를 입력하십시오.</p>
       </div>
     </div>
@@ -90,20 +105,28 @@
     </button>
   </div>
 
-  <AgreementPopup v-if="agreementPopupIsOpen" @closePopup="agreementPopupIsOpen = false" />
+  <GlobalPopupWithOverlay ref="userTermsRef">
+    <AgreementPopup @closePopup="closePopupAgreement" title="이용약관" type="useterms" />
+  </GlobalPopupWithOverlay>
+  <GlobalPopupWithOverlay ref="privacyRef">
+    <AgreementPopup @closePopup="closePopupAgreement" title="개인정보보호정책" type="privacy" />
+  </GlobalPopupWithOverlay>
 
-  <WaitingConfirmationPopup
-    @closePopup="waitingConfirmationPopupOpen = false"
-    v-if="waitingConfirmationPopupOpen"
-    :data="{
-      name: name,
-      birthday: removeDashes(birthday.replace(/-/g, '')),
-      phoneNumber: removeDashes(phoneNumber.replace(/-/g, '')),
-      receiptId: receiptId,
-      salesCd: salesCd,
-      idCertType: idCertType,
-    }"
-  />
+  <GlobalPopupWithOverlay ref="popupRef">
+    <WaitingConfirmationPopup
+      @closePopup="closePopup"
+      :data="{
+        name: name,
+        // birthday: removeDashes(birthday.replace(/-/g, '')),
+        birthday: birthday,
+        // phoneNumber: removeDashes(phoneNumber.replace(/-/g, '')),
+        phoneNumber: phoneNumber,
+        receiptId: receiptId,
+        salesCd: salesCd,
+        idCertType: idCertType,
+      }"
+    />
+  </GlobalPopupWithOverlay>
 </template>
 
 <script setup>
@@ -114,11 +137,35 @@ import LoadingSpinner from '../components/Loader.vue'
 import { useSnackbarStore } from '../stores/snackbar'
 import WaitingConfirmationPopup from './WaitingConfirmationPopup.vue'
 import { useSignUpstore } from '@/stores/signup-store'
+import GlobalPopupWithOverlay from './GlobalPopupWithOverlay.vue'
 
-const agreeToTerms = ref(false)
+const userTermsRef = ref(null)
+const privacyRef = ref(null)
+
+const showPopupAgreement = (whichOne) => {
+  if (whichOne === 'useterms') userTermsRef.value.showPopup()
+  if (whichOne === 'privacy') privacyRef.value.showPopup()
+}
+
+const closePopupAgreement = () => {
+  userTermsRef.value.closePopup()
+  privacyRef.value.closePopup()
+}
+
+const popupRef = ref(null)
+const showPopup = () => {
+  popupRef.value.showPopup()
+}
+
+const closePopup = () => {
+  popupRef.value.closePopup()
+}
+
+const useTermsCheck = ref(false)
+const privacyCheck = ref(false)
+
 const salesCd = ref('') //sales_cd
 const codeUnavailable = ref(true)
-const agreementPopupIsOpen = ref(false)
 const name = ref('')
 const phoneNumber = ref('')
 const birthday = ref('')
@@ -127,13 +174,7 @@ const idCertType = ref('KAKAO')
 const isLoading = ref(false)
 const isSubmitted = ref(false)
 
-const waitingConfirmationPopupOpen = ref(false)
 const receiptId = ref() //response returns
-
-//dashremover
-function removeDashes(value) {
-  return value.replace(/-/g, '')
-}
 
 //cleaning up store
 onMounted(useSignUpstore().clear)
@@ -141,13 +182,19 @@ onMounted(useSignUpstore().clear)
 async function submit(event) {
   isSubmitted.value = true
 
-  if (!agreeToTerms.value) {
-    useSnackbarStore().show('개인정보 보호 약관에 동의해주세요.')
+  console.log(birthday.value, phoneNumber.value)
+
+  if (!useTermsCheck.value) {
+    useSnackbarStore().show('이용약관에 동의해주세요.')
+    return
+  }
+
+  if (!privacyCheck.value) {
+    useSnackbarStore().show('개인정보보호정책에 동의해주세요.')
     return
   }
 
   const isAllTruthy = [
-    agreeToTerms.value,
     name.value,
     phoneNumber.value,
     birthday.value,
@@ -168,8 +215,10 @@ async function submit(event) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         name: name.value,
-        birthday: birthday.value.replace(/-/g, ''),
-        cert_phone_number: phoneNumber.value.replace(/-/g, ''),
+        // birthday: birthday.value.replace(/-/g, ''),
+        birthday: birthday.value,
+        // cert_phone_number: phoneNumber.value.replace(/-/g, ''),
+        cert_phone_number: phoneNumber.value,
         id_cert_type: idCertType.value,
         sales_cd: salesCd.value ?? '',
       }),
@@ -181,7 +230,7 @@ async function submit(event) {
     if (data.result === 'ERROR') throw data.message
     if (data.result === 'SUCCESS') {
       receiptId.value = data.receipt_id
-      waitingConfirmationPopupOpen.value = true
+      showPopup()
     }
   } catch (err) {
     useSnackbarStore().show(err.toString())
@@ -205,20 +254,21 @@ async function submit(event) {
   box-sizing: border-box;
   display: flex;
   flex-flow: column;
-  gap: 30px;
-  text-align: center;
+  gap: 20px;
+  /* text-align: center; */
 }
 
 .title-note {
-  font-size: 15px;
-  color: #6e7881;
-  line-height: 1.5;
-  /* font-weight: 500; */
+  font-size: 17px;
+  font-weight: 500;
+  color: #202020;
+  align-self: center;
+  /* line-height: 1.5; */
 }
 
 .checkbox {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 500;
 }
 
 .agree-view {
@@ -231,7 +281,7 @@ async function submit(event) {
   display: flex;
   flex-flow: column;
   align-items: flex-start;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 500;
   width: 100%;
   gap: 10px;

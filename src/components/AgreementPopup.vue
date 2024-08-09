@@ -1,8 +1,8 @@
 <template>
-  <div class="overlay">
+  <div class="agreement-main">
     <div class="popup-content">
       <div class="fixed-header">
-        <span class="header-title">개인정보 수집·이용약관</span>
+        <span class="header-title">{{ props.title }}</span>
         <span @click="$emit('closePopup')" class="material-symbols-outlined close-button"> cancel </span>
       </div>
       <div class="html-content" v-html="htmlContent"></div>
@@ -12,16 +12,22 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import agreementUrl from '@/assets/agreement.html?url'
+import privacyHtml from '@/assets/privacy.html?url'
+import usetermsHtml from '@/assets/useterms.html?url'
 
 const emit = defineEmits(['closePopup'])
+
+const props = defineProps({
+  title: { type: String, default: '' },
+  type: { type: String, default: 'privacy' },
+})
 
 const htmlContent = ref('')
 
 // Function to fetch the HTML file content
 async function loadHtml() {
   try {
-    const response = await fetch(agreementUrl)
+    const response = await fetch(props.type === 'privacy' ? privacyHtml : usetermsHtml)
 
     if (!response.ok) {
       throw new Error('Network response was not ok')
@@ -47,31 +53,19 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.overlay {
-  box-sizing: border-box;
-  position: fixed;
-  top: 0;
-  left: 0;
-  /* width: 100vw; */
-  /* height: 100vh; */
+.agreement-main {
+  display: flex;
+  flex-flow: column;
+  align-items: center;
   width: 100%;
   height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: rgba(0, 0, 0, 0.552);
-  /* z-index: 1100; */
-  /* padding: 20px; */
-  overflow-y: auto;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 .popup-content {
   background-color: white;
   border-radius: 8px;
-  height: 100%;
-  width: 900px;
-
-  max-height: 900px;
   max-width: 800px;
   box-sizing: border-box;
   display: flex;
@@ -79,27 +73,20 @@ onMounted(() => {
   overflow-y: auto;
 }
 
-.fixed-header {
-  position: sticky;
-  top: 0;
-  min-height: 50px;
-  padding: 0 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  /* background-color: #fdc3c3; */
-  box-sizing: border-box;
-}
-
-.header-title {
-  font-size: 18px;
-  font-weight: 600;
+@media (max-width: 600px) {
+  .agreement-main {
+    padding: 0;
+  }
+  .popup-content {
+    width: 100%;
+    height: 100%;
+    border-radius: 0px;
+  }
 }
 
 .html-content {
-  padding: 30px;
-  padding-bottom: 100px;
+  padding: 0 30px;
+  /* padding-bottom: 100px; */
   box-sizing: border-box;
   overflow-y: auto;
 }

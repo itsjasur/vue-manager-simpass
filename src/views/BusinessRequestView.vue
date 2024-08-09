@@ -49,11 +49,9 @@
     </div>
   </div>
 
-  <BusinessRequestPopup
-    v-if="businessRequestPopup"
-    :agentCd="selectedAgentCd"
-    @closePopup="businessRequestPopup = false"
-  />
+  <GlobalPopupWithOverlay ref="popupRef">
+    <BusinessRequestPopup v-if="businessRequestPopup" :agentCd="selectedAgentCd" @closePopup="closePopup" />
+  </GlobalPopupWithOverlay>
 </template>
 
 <script setup>
@@ -61,17 +59,24 @@ import { useSnackbarStore } from '@/stores/snackbar'
 import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import BusinessRequestPopup from '../components/BusinessRequestPopup.vue'
+import BusinessRequestPopup from '@/components/BusinessRequestPopup.vue'
+import GlobalPopupWithOverlay from '@/components/GlobalPopupWithOverlay.vue'
 
 const router = useRouter()
 
+const popupRef = ref(null)
 //business request popup
 const businessRequestPopup = ref(false)
 const selectedAgentCd = ref()
 
+const closePopup = () => {
+  popupRef.value.closePopup()
+}
+
 function openPopup(agentCd) {
   businessRequestPopup.value = true
   selectedAgentCd.value = agentCd
+  popupRef.value.showPopup()
 }
 
 const data = ref()
@@ -98,8 +103,6 @@ function generateCarrierList(list) {
       else return
     })
   }
-
-  //   console.log('list ', carriers)
   return carriers
 }
 
@@ -116,6 +119,7 @@ onMounted(fetchData)
   gap: 30px;
   justify-content: center;
   align-items: flex-start;
+
   overflow-y: auto;
 }
 

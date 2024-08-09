@@ -1,204 +1,198 @@
 <template>
-  <div class="overlay">
-    <div class="popup-content">
-      <div class="fixed-header">
-        <h3 class="title">판매점 계약 동의 및 계약내용 확인</h3>
-        <span @click="$emit('closePopup')" class="material-symbols-outlined close-button"> cancel </span>
+  <div class="popup-content">
+    <div class="fixed-header">
+      <p class="title">판매점 계약 동의 및 계약내용 확인</p>
+      <span @click="$emit('closePopup')" class="material-symbols-outlined close-button"> cancel </span>
+    </div>
+
+    <div class="scrollable-content">
+      <span class="title-note"
+        >본 신청서는 심패스에서 직접 운영하는 판매점 전자계약서이며 고객님에 소중한 개인정보는 암호화되어 안전하게
+        보호됩니다.
+      </span>
+
+      <div class="checkbox-contract-row">
+        <a-checkbox class="checkbox" v-model:checked="agreeToContracTerms">판매점 계약서 내용 동의 (필수)</a-checkbox>
+        <button @click="fetchContractPDFAndPrint" class="see-contract-button">계약서 확인</button>
       </div>
 
-      <div class="scrollable-content">
-        <span class="title-note"
-          >본 신청서는 심패스에서 직접 운영하는 판매점 전자계약서이며 고객님에 소중한 개인정보는 암호화되어 안전하게
-          보호됩니다.
-        </span>
+      <div class="part-title">판매점 정보</div>
 
-        <div class="checkbox-contract-row">
-          <a-checkbox class="checkbox" v-model:checked="agreeToContracTerms">판매점 계약서 내용 동의 (필수)</a-checkbox>
-          <button @click="fetchContractPDFAndPrint()" class="see-contract-button">계약서 확인</button>
+      <div class="group">
+        <label>상호명*</label>
+        <input :value="serverData.partner_nm" readonly />
+        <p v-if="submitted && !serverData.partner_nm" class="input-error-message">상호명를 입력하세요.</p>
+      </div>
+
+      <div class="group-row">
+        <div class="group">
+          <label>사업자번호*</label>
+          <input
+            :value="serverData.business_num"
+            placeholder="000-00-00000"
+            name="businessNumber"
+            v-cleave="{ ...cleavePatterns.businessNumberPattern }"
+            readonly
+          />
+          <p v-if="submitted && !serverData.business_num" class="input-error-message">사업자번호를 입력하세요.</p>
         </div>
-
-        <div class="part-title">판매점 정보</div>
 
         <div class="group">
-          <label>상호명*</label>
-          <input :value="serverData.partner_nm" readonly />
-          <p v-if="submitted && !serverData.partner_nm" class="input-error-message">상호명를 입력하세요.</p>
+          <label>대표자명*</label>
+          <input :value="serverData.contractor" readonly />
+          <p v-if="submitted && !serverData.contractor" class="input-error-message">대표자명를 입력하세요.</p>
         </div>
-
-        <div class="group-row">
-          <div class="group">
-            <label>사업자번호*</label>
-            <input
-              :value="serverData.business_num"
-              placeholder="000-00-00000"
-              name="businessNumber"
-              v-cleave="{ ...cleavePatterns.businessNumberPattern }"
-              readonly
-            />
-            <p v-if="submitted && !serverData.business_num" class="input-error-message">사업자번호를 입력하세요.</p>
-          </div>
-
-          <div class="group">
-            <label>대표자명*</label>
-            <input :value="serverData.contractor" readonly />
-            <p v-if="submitted && !serverData.contractor" class="input-error-message">대표자명를 입력하세요.</p>
-          </div>
-        </div>
-
-        <div class="group-row">
-          <div class="group">
-            <label>연락 번호*</label>
-            <input
-              :value="serverData.phone_number"
-              placeholder="010-1234-5678"
-              name="mobileNumber"
-              v-cleave="{ ...cleavePatterns.phoneNumberPattern }"
-              readonly
-            />
-            <p v-if="submitted && !serverData.phone_number" class="input-error-message">연락 번호를 입력하세요.</p>
-          </div>
-
-          <div class="group">
-            <label>이메일주소*</label>
-
-            <div class="group-inner-row">
-              <input v-model="forms.email" @input="validateForms" />
-              <!-- <a-select
-                v-model:value="forms.emailAddition"
-                :style="{ minWidth: '140px' }"
-                @change="validateEmail"
-                :options="EMAILOPTIONS"
-              >
-              </a-select> -->
-            </div>
-            <p v-if="submitted && errors.email" class="input-error-message">{{ errors.email }}</p>
-          </div>
-        </div>
-        <div class="group-row">
-          <div class="group">
-            <label>매장 전화</label>
-            <input
-              v-model="forms.telNumber"
-              placeholder="02-1234-5678"
-              name="telNumber"
-              v-cleave="{ ...cleavePatterns.phoneNumberPattern, onValueChanged }"
-            />
-          </div>
-
-          <div class="group">
-            <label>매장 팩스</label>
-            <input
-              v-model="forms.faxNumber"
-              placeholder="02-1234-5678"
-              name="faxNumber"
-              v-cleave="{ ...cleavePatterns.phoneNumberPattern, onValueChanged }"
-            />
-          </div>
-        </div>
-
-        <div class="group-row">
-          <div class="group">
-            <label>주소*</label>
-            <input v-model="forms.address" @input="validateForms" @click="searchAddressPopup.open()" readonly />
-            <p v-if="submitted && errors.address" class="input-error-message">{{ errors.address }}</p>
-          </div>
-
-          <div class="group" style="width: 70%">
-            <label>상세주소*</label>
-            <input v-model="forms.addressAdditions" @input="validateForms" />
-          </div>
-        </div>
-
-        <!-- payment data -->
-        <div class="part-title">수수료 입금계좌 정보</div>
-
-        <div class="group-row">
-          <div class="group">
-            <label>예급주 명*</label>
-            <input :value="serverData.contractor" readonly />
-            <p v-if="submitted && !serverData.contractor" class="input-error-message">예급주 명를 입력하세요.</p>
-          </div>
-
-          <div class="group" style="width: 60%">
-            <label>생년월일*</label>
-            <input
-              :value="serverData.birthday"
-              placeholder="1991-01-31"
-              name="accountBirthday"
-              v-cleave="{ ...cleavePatterns.birthdayPatternFull }"
-              readonly
-            />
-            <p v-if="submitted && !serverData.birthday" class="input-error-message">생년월일를 입력하세요.</p>
-          </div>
-        </div>
-
-        <div class="group-row">
-          <div class="group">
-            <label>은행명 (첨부할 자료와 동일)*</label>
-            <input v-model="forms.bankName" @input="validateForms" />
-            <p v-if="submitted && errors.bankName" class="input-error-message">{{ errors.bankName }}</p>
-          </div>
-
-          <div class="group">
-            <label>계좌번호 (첨부할 자료와 동일)*</label>
-            <input v-model="forms.accountNumber" @input="validateForms" />
-            <p v-if="submitted && errors.accountNumber" class="input-error-message">{{ errors.accountNumber }}</p>
-          </div>
-        </div>
-
-        <!-- files data -->
-        <div class="part-title">판매점 서류 등록</div>
-
-        <div v-for="(item, index) in imageUploads" :key="index" class="image-uploads">
-          <div class="upload-row">
-            <input
-              :id="`file-input-${index}`"
-              @change="handleFileUpload($event, index)"
-              type="file"
-              style="display: none"
-              accept="image/*"
-            />
-            <span class="upload-title"> {{ item.title }} </span>
-
-            <div class="right-side">
-              <div v-if="item.initial" class="submitted">
-                <span>문서가 제출되었습니다</span>
-                <span class="material-symbols-outlined"> new_releases </span>
-              </div>
-
-              <div v-if="!item.initial && !item.new" class="not-submitted">
-                <span class="material-symbols-outlined"> add </span>
-                <label :for="`file-input-${index}`">이미지 업로드</label>
-              </div>
-
-              <div v-if="!item.initial && item.new" class="file-name">
-                <span>{{ item.new.name }}</span>
-              </div>
-
-              <div v-if="!item.initial && item.new" class="not-submitted">
-                <span class="material-symbols-outlined"> add </span>
-                <label :for="`file-input-${index}`">재업로드</label>
-              </div>
-            </div>
-          </div>
-          <p v-if="submitted && !item.initial && !item.new && item.required" class="input-error-message">
-            이미지를 업로드해주세요.
-          </p>
-        </div>
-
-        <SignImageRowContainer
-          type="self"
-          :placeholder="serverData.contractor"
-          @updated="updatePads"
-          :errorMessage="submitted && (!signData || !sealData) ? '판매자서명을 하지 않았습니다.' : null"
-          title="판매자 서명"
-        />
-
-        <button @click="submit" :disabled="isSubmitting">
-          <LoadingSpinner v-if="isSubmitting" height="20px" color="#ffffff" />
-          <span v-else> 온라인 판매점 계약신청 </span>
-        </button>
       </div>
+
+      <div class="group-row">
+        <div class="group">
+          <label>연락 번호*</label>
+          <input
+            :value="serverData.phone_number"
+            placeholder="010-1234-5678"
+            name="mobileNumber"
+            v-cleave="{ ...cleavePatterns.phoneNumberPattern }"
+            readonly
+          />
+          <p v-if="submitted && !serverData.phone_number" class="input-error-message">연락 번호를 입력하세요.</p>
+        </div>
+
+        <div class="group">
+          <label>이메일주소*</label>
+
+          <div class="group-inner-row">
+            <input v-model="forms.email" @input="validateForms" />
+          </div>
+          <p v-if="submitted && errors.email" class="input-error-message">{{ errors.email }}</p>
+        </div>
+      </div>
+      <div class="group-row">
+        <div class="group">
+          <label>매장 전화</label>
+          <input
+            v-model="forms.telNumber"
+            placeholder="02-1234-5678"
+            name="telNumber"
+            v-cleave="{ ...cleavePatterns.phoneNumberPattern, onValueChanged }"
+          />
+        </div>
+
+        <div class="group">
+          <label>매장 팩스</label>
+          <input
+            v-model="forms.faxNumber"
+            placeholder="02-1234-5678"
+            name="faxNumber"
+            v-cleave="{ ...cleavePatterns.phoneNumberPattern, onValueChanged }"
+          />
+        </div>
+      </div>
+
+      <div class="group-row">
+        <div class="group">
+          <label>주소*</label>
+          <input v-model="forms.address" @input="validateForms" @click="searchAddressPopup.open()" readonly />
+          <p v-if="submitted && errors.address" class="input-error-message">{{ errors.address }}</p>
+        </div>
+
+        <div class="group" style="width: 70%">
+          <label>상세주소*</label>
+          <input v-model="forms.addressAdditions" @input="validateForms" />
+        </div>
+      </div>
+
+      <!-- payment data -->
+      <div class="part-title">수수료 입금계좌 정보</div>
+
+      <div class="group-row">
+        <div class="group">
+          <label>예급주 명*</label>
+          <input :value="serverData.contractor" readonly />
+          <p v-if="submitted && !serverData.contractor" class="input-error-message">예급주 명를 입력하세요.</p>
+        </div>
+
+        <div class="group" style="width: 60%">
+          <label>생년월일*</label>
+          <input
+            :value="serverData.birthday"
+            placeholder="1991-01-31"
+            name="accountBirthday"
+            v-cleave="{ ...cleavePatterns.birthdayPatternFull }"
+            readonly
+          />
+          <p v-if="submitted && !serverData.birthday" class="input-error-message">생년월일를 입력하세요.</p>
+        </div>
+      </div>
+
+      <div class="group-row">
+        <div class="group">
+          <label>은행명 (첨부할 자료와 동일)*</label>
+          <input v-model="forms.bankName" @input="validateForms" />
+          <p v-if="submitted && errors.bankName" class="input-error-message">{{ errors.bankName }}</p>
+        </div>
+
+        <div class="group">
+          <label>계좌번호 (첨부할 자료와 동일)*</label>
+          <input v-model="forms.accountNumber" @input="validateForms" />
+          <p v-if="submitted && errors.accountNumber" class="input-error-message">{{ errors.accountNumber }}</p>
+        </div>
+      </div>
+
+      <!-- files data -->
+      <div class="part-title">판매점 서류 등록</div>
+
+      <div v-for="(item, index) in imageUploads" :key="index" class="image-uploads">
+        <div class="upload-row">
+          <input
+            :id="`file-input-${index}`"
+            @change="handleFileUpload($event, index)"
+            type="file"
+            style="display: none"
+            accept="image/*"
+          />
+          <span class="upload-title"> {{ item.title }} </span>
+
+          <div class="right-side">
+            <div v-if="item.initial" class="submitted">
+              <span>문서가 제출되었습니다</span>
+              <span class="material-symbols-outlined"> new_releases </span>
+            </div>
+
+            <div v-if="!item.initial && !item.new" class="not-submitted">
+              <span class="material-symbols-outlined"> add </span>
+              <label :for="`file-input-${index}`">이미지 업로드</label>
+            </div>
+
+            <div v-if="!item.initial && item.new" class="file-name">
+              <span>{{ item.new.name }}</span>
+            </div>
+
+            <div v-if="!item.initial && item.new" class="not-submitted">
+              <span class="material-symbols-outlined"> add </span>
+              <label :for="`file-input-${index}`">재업로드</label>
+            </div>
+          </div>
+        </div>
+        <p v-if="submitted && !item.initial && !item.new && item.required" class="input-error-message">
+          이미지를 업로드해주세요.
+        </p>
+      </div>
+
+      <template v-if="useDeviceTypeStore().isDeviceMobile() && partnerInfoFetched">
+        <SignImageRowContainer
+          :overlayText="serverData.contractor"
+          title="판매자 서명"
+          @updateSignSeal="updatePads"
+          :errorMessage="submitted && (!signData || !sealData) ? '판매자서명을 하지 않았습니다.' : null"
+          :signImageData="signData"
+          :sealImageData="sealData"
+        />
+      </template>
+
+      <button @click="submit" :disabled="isSubmitting">
+        <LoadingSpinner v-if="isSubmitting" height="20px" color="#ffffff" />
+        <span v-else> 온라인 판매점 계약신청 </span>
+      </button>
     </div>
   </div>
   <PrintablePdfPopup v-if="printablePdfPopup.active" />
@@ -215,9 +209,9 @@ import { useWarningStore } from '@/stores/warning'
 import LoadingSpinner from '../components/Loader.vue'
 import * as VALIDATOR from '../utils/validators'
 import SignImageRowContainer from '../components/SignImageRowContainer.vue'
-import { useNameSignDataStore } from '@/stores/name-sign-data-store'
 import PrintablePdfPopup from '../components/PrintablePdfPopup.vue'
 import { usePrintablePdfPopup } from '@/stores/printable-pdf-popup'
+import { useDeviceTypeStore } from '@/stores/device-type-store'
 
 const printablePdfPopup = usePrintablePdfPopup()
 const router = useRouter()
@@ -227,13 +221,12 @@ const emit = defineEmits(['closePopup'])
 
 const props = defineProps({ agentCd: { type: String, required: true } })
 
-const signStore = useNameSignDataStore()
 const signData = ref(null)
 const sealData = ref(null)
 
-const updatePads = ({ name, sign, type }) => {
-  signData.value = name
-  sealData.value = sign
+const updatePads = (sign, seal) => {
+  signData.value = sign
+  sealData.value = seal
 }
 
 //cleave value change callback
@@ -287,6 +280,7 @@ watchEffect(() => {
   forms.addressAdditions = searchAddressPopup.buildingName
 })
 
+const partnerInfoFetched = ref(false)
 async function fetchData() {
   try {
     const response = await fetchWithTokenRefresh('agent/partnerInfo', { method: 'GET' })
@@ -309,11 +303,12 @@ async function fetchData() {
     imageUploads.directorId.initial = info.id_card
     imageUploads.bankBook.initial = info.bank_book
 
-    signStore.save(info.partner_sign, info.partner_seal)
     signData.value = info.partner_sign
     sealData.value = info.partner_seal
   } catch (error) {
     useSnackbarStore().show(error.toString())
+  } finally {
+    partnerInfoFetched.value = true
   }
 }
 
@@ -343,9 +338,11 @@ async function submit() {
     return
   }
 
-  if (!signData.value || !sealData.value) {
-    useSnackbarStore().show('판매자서명을 하지 않았습니다.')
-    return
+  if (useDeviceTypeStore().isDeviceMobile()) {
+    if (!signData.value || !sealData.value) {
+      useSnackbarStore().show('판매자서명을 하지 않았습니다.')
+      return
+    }
   }
 
   if (imageUploads.businessLicence.new && imageUploads.businessLicence.new instanceof File)
@@ -428,61 +425,18 @@ async function fetchContractPDFAndPrint() {
 }
 
 onMounted(fetchData)
-onUnmounted(signStore.clear)
 </script>
 
 <style scoped>
-.overlay {
-  box-sizing: border-box;
-  position: fixed;
-  top: 0;
-  left: 0;
-  /* width: 100vw; */
-  /* height: 100vh; */
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #000000b2;
-  padding: 20px;
-  box-sizing: border-box;
-  z-index: 2000;
-}
-
 .popup-content {
   background-color: var(--main-background-color);
   border-radius: 8px;
-  height: 100%;
   max-width: 900px;
   display: flex;
   flex-flow: column;
-  align-self: flex-start;
-  overflow-y: auto;
   box-sizing: border-box;
-}
 
-.fixed-header {
-  position: sticky;
-  top: 0;
-  min-height: 50px;
-  padding-left: 20px;
-  padding-right: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow: 0 2px 4px #0000001a;
-  box-sizing: border-box;
-}
-
-.header-title {
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.close-button {
-  font-size: 30px;
-  color: #737373;
+  margin: 20px;
 }
 
 .scrollable-content {
@@ -510,7 +464,7 @@ onUnmounted(signStore.clear)
 }
 
 .checkbox {
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .see-contract-button {
@@ -542,7 +496,7 @@ onUnmounted(signStore.clear)
 }
 
 .part-title {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
   margin-bottom: -10px;
 }
@@ -578,8 +532,8 @@ button {
 }
 
 .upload-title {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 500;
 }
 
 .submitted .material-symbols-outlined {

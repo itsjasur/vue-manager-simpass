@@ -2,82 +2,52 @@
   <div class="sign_seal_container">
     <p class="sign_title">{{ props.title }}</p>
     <div class="group">
-      <div class="group_title">서명</div>
       <div class="image_container sign">
-        <span v-if="!signData" class="edit_icon material-symbols-outlined" @click="showPopup('sign')">
-          stylus_note
-        </span>
+        <span v-if="!agreePadData" class="edit_icon material-symbols-outlined" @click="showPopup()"> stylus_note </span>
         <span v-else class="delete_icon material-symbols-outlined" @click="deletePad('sign')"> delete </span>
-        <img v-if="signData" class="data_image" :src="signData" alt="서명 오류" @error="signData = null" />
+        <img v-if="agreePadData" class="data_image" :src="agreePadData" alt="서명 오류" @error="agreePadData = null" />
       </div>
     </div>
-    <div class="group">
-      <div class="group_title">사인</div>
-      <div class="image_container seal">
-        <span v-if="!sealData" class="edit_icon material-symbols-outlined" @click="showPopup('seal')">
-          stylus_note
-        </span>
-        <span v-else class="delete_icon material-symbols-outlined" @click="deletePad('seal')"> delete </span>
 
-        <img v-if="sealData" class="data_image" :src="sealData" alt="서명 오류" @error="sealData = null" />
-      </div>
-    </div>
     <div class="input-error-message" v-if="errorMessage">{{ errorMessage }}</div>
   </div>
 
   <GlobalPopupWithOverlay ref="popupRef">
-    <SignPadPopupContent
-      @closePopup="closePopup"
-      @savePad="savePadData"
-      :popupFor="popupFor"
-      :overlayText="popupFor === 'sign' ? props.overlayText : ''"
-    />
+    <AgreePadPopupContent @closePopup="closePopup" @savePad="savePadData" />
   </GlobalPopupWithOverlay>
 </template>
 
 <script setup>
 import { nextTick, onMounted, ref } from 'vue'
 import GlobalPopupWithOverlay from './GlobalPopupWithOverlay.vue'
-import SignPadPopupContent from './SignPadPopupContent.vue'
+import AgreePadPopupContent from './AgreePadPopupContent.vue'
 
 const props = defineProps({
   errorMessage: { type: String, default: null },
   title: { type: String, default: 'Sign title' },
-  overlayText: { type: String, default: '' },
-  signImageData: { type: String, default: null },
-  sealImageData: { type: String, default: null },
 })
+const emits = defineEmits(['updateAgreePadData'])
 
 const popupRef = ref(null)
 
-const signData = ref(props.signImageData)
-const sealData = ref(props.sealImageData)
+const agreePadData = ref()
 
-var popupFor = null
-const showPopup = (pfor) => {
-  popupFor = pfor
-  console.log('show popup clicked')
+const showPopup = () => {
   popupRef.value.showPopup()
 }
 
 const closePopup = () => {
-  console.log('close popup clicked')
   popupRef.value.closePopup()
 }
 
-const emits = defineEmits(['updateSignSeal'])
-
 function savePadData(data) {
-  if (popupFor === 'sign') signData.value = data
-  else sealData.value = data
-  emits('updateSignSeal', signData.value, sealData.value)
+  agreePadData.value = data
+  emits('updateAgreePadData', agreePadData)
 }
 
 function deletePad(pfor) {
-  console.log(pfor)
-  if (pfor === 'sign') signData.value = null
-  else sealData.value = null
-  emits('updateSignSeal', signData.value, sealData.value)
+  agreePadData.value = null
+  emits('updateAgreePadData', agreePadData)
 }
 </script>
 
@@ -106,7 +76,7 @@ function deletePad(pfor) {
   border-radius: 5px;
   border: 1px dashed var(--main-color);
   box-sizing: border-box;
-  height: 100px;
+  height: 60px;
   background-color: #ffffff;
   position: relative;
   display: flex;
@@ -120,9 +90,6 @@ function deletePad(pfor) {
 
 .image_container.sign {
   width: 300px;
-}
-.image_container.seal {
-  width: 200px;
 }
 
 .delete_icon {

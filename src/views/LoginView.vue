@@ -27,7 +27,7 @@
       <hr />
 
       <router-link to="/signup">
-        <button class="signup-button">판매점 계약 접수</button>
+        <button class="signup-button">판매점 회원 가입</button>
       </router-link>
     </div>
 

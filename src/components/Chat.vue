@@ -229,7 +229,7 @@ async function uploadFiles() {
       const result = await response.json()
       uploadedFilesPaths.push(result.path)
 
-      attachments.value = []
+      // attachments.value = []
     } catch (error) {
       console.error('Error uploading file:', error)
     }
@@ -248,9 +248,12 @@ const sendMessage = async () => {
       attachmentPaths: attachmentPaths,
       agentCode: selectedAgentCode.value,
     }
+
     socket.emit('new_message', newMessageToSend)
+
     //clears input field text
     newMessage.value = ''
+    attachments.value = []
   }
 }
 
@@ -276,26 +279,27 @@ async function fetchData() {
 <style scoped>
 .chat-container {
   position: absolute;
-  bottom: 0;
   right: 20px;
-  /* height: 600px; */
-  height: auto;
+  bottom: 0;
+  z-index: 1400;
   width: 500px;
-  border-radius: 10px 10px 0 0;
-  background-color: #fff;
-  z-index: 7000;
   box-shadow: 0 0 20px #00000045;
-  overflow-y: hidden;
+  background-color: #fff;
+  border-radius: 10px 10px 0 0;
+
+  display: flex;
+  flex-flow: column;
 }
 
 .chat-popup-header {
-  height: 50px;
+  height: 55px;
   padding: 0 20px;
   align-items: center;
   display: flex;
   justify-content: space-between;
   background-color: #ffffff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 10px 10px 0 0;
 }
 
 .chats-section {
@@ -307,6 +311,22 @@ async function fetchData() {
   height: 500px;
   overflow-y: auto;
 }
+
+@media (max-width: 900px) {
+  .chat-container {
+    height: 100%;
+    width: 100%;
+    left: 0px;
+    right: 0px;
+  }
+  .chats-section {
+    height: 100%;
+  }
+  .chat-popup-header {
+    height: 65px;
+  }
+}
+
 .welcome {
   display: flex;
   flex-flow: column;

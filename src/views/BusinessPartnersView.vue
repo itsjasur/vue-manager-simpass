@@ -41,7 +41,8 @@
           </template>
         </div>
       </template>
-      <button v-if="agent.status === 'P'" @click="openPopup(agent.agent_cd)">계약서명</button>
+      <!-- <button v-if="agent.status === 'P'" @click="openPopup(agent.agent_cd)">계약서명</button> -->
+      <button @click="openPopup(agent.agent_cd)">계약서명</button>
 
       <button v-if="agent.status === 'Y'" @click="fetchContractPDFAndPrint(agent.agent_cd)">
         <span class="material-symbols-outlined print-contract"> print </span>
@@ -56,11 +57,9 @@
     </div>
   </div>
 
-  <BusinessPartnersPopup
-    v-if="businessPartnersPopup"
-    :agentCd="selectedAgentCd"
-    @closePopup="businessPartnersPopup = false"
-  />
+  <GlobalPopupWithOverlay ref="popupRef">
+    <BusinessPartnersPopup v-if="businessPartnersPopup" :agentCd="selectedAgentCd" @closePopup="closePopup" />
+  </GlobalPopupWithOverlay>
 
   <PrintablePdfPopup v-if="printablePdfPopup.active" />
 </template>
@@ -73,11 +72,13 @@ import { useRouter } from 'vue-router'
 import BusinessPartnersPopup from '../components/BusinessPartnersPopup.vue'
 import { usePrintablePdfPopup } from '@/stores/printable-pdf-popup'
 import PrintablePdfPopup from '../components/PrintablePdfPopup.vue'
+import GlobalPopupWithOverlay from '@/components/GlobalPopupWithOverlay.vue'
 
 const router = useRouter()
 
 const printablePdfPopup = usePrintablePdfPopup()
 
+const popupRef = ref(null)
 //business request popup
 const businessPartnersPopup = ref(false)
 const selectedAgentCd = ref()
@@ -85,6 +86,10 @@ const selectedAgentCd = ref()
 function openPopup(agentCd) {
   businessPartnersPopup.value = true
   selectedAgentCd.value = agentCd
+  popupRef.value.showPopup()
+}
+const closePopup = () => {
+  popupRef.value.closePopup()
 }
 
 const data = ref([])
