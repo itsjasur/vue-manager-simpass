@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-import { nextTick, onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import GlobalPopupWithOverlay from './GlobalPopupWithOverlay.vue'
 import AgreePadPopupContent from './AgreePadPopupContent.vue'
 
@@ -41,13 +41,14 @@ const closePopup = () => {
 }
 
 function savePadData(data) {
+  console.log(data)
   agreePadData.value = data
-  emits('updateAgreePadData', agreePadData)
+  emits('updateAgreePadData', agreePadData.value)
 }
 
 function deletePad(pfor) {
   agreePadData.value = null
-  emits('updateAgreePadData', agreePadData)
+  emits('updateAgreePadData', agreePadData.value)
 }
 </script>
 

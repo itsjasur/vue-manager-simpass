@@ -9,19 +9,33 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 
 const isVisible = ref(false)
 
 const showPopup = () => {
   isVisible.value = true
-  document.body.style.overflow = 'hidden' // Prevent body scrolling when popup is open
+  document.body.style.overflow = 'hidden'
 }
 
 const closePopup = () => {
   isVisible.value = false
-  document.body.style.overflow = '' // Restore body scrolling when popup is closed
+  document.body.style.overflow = ''
 }
+
+const handleKeydown = (event) => {
+  if (event.key === 'Escape' && isVisible.value) {
+    closePopup()
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeydown)
+})
 
 defineExpose({ showPopup, closePopup })
 </script>

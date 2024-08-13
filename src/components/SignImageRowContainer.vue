@@ -37,8 +37,9 @@
 
 <script setup>
 import { nextTick, onMounted, ref } from 'vue'
-import GlobalPopupWithOverlay from './GlobalPopupWithOverlay.vue'
 import SignPadPopupContent from './SignPadPopupContent.vue'
+import GlobalPopupWithOverlay from './GlobalPopupWithOverlay.vue'
+import { useDeviceTypeStore } from '@/stores/device-type-store'
 
 const props = defineProps({
   errorMessage: { type: String, default: null },
@@ -55,14 +56,16 @@ const sealData = ref(props.sealImageData)
 
 var popupFor = null
 const showPopup = (pfor) => {
-  popupFor = pfor
-  console.log('show popup clicked')
-  popupRef.value.showPopup()
+  if (useDeviceTypeStore().isDeviceMobile()) {
+    popupFor = pfor
+    popupRef.value.showPopup()
+  }
 }
 
 const closePopup = () => {
-  console.log('close popup clicked')
-  popupRef.value.closePopup()
+  if (useDeviceTypeStore().isDeviceMobile()) {
+    popupRef.value.closePopup()
+  }
 }
 
 const emits = defineEmits(['updateSignSeal'])
@@ -82,6 +85,15 @@ function deletePad(pfor) {
 </script>
 
 <style scoped>
+.sign_seal_container {
+  display: flex;
+  flex-flow: wrap;
+  gap: 10px;
+
+  width: 100%;
+  box-sizing: border-box;
+}
+
 .sign_title {
   width: 100%;
   padding: 0;
@@ -89,12 +101,6 @@ function deletePad(pfor) {
   margin-bottom: 5px;
   line-height: 1;
   font-weight: 600;
-}
-
-.sign_seal_container {
-  display: flex;
-  flex-flow: wrap;
-  gap: 10px;
 }
 
 .group_title {
@@ -112,6 +118,8 @@ function deletePad(pfor) {
   display: flex;
   justify-content: center;
   align-items: center;
+
+  width: auto;
 }
 
 .image_container.no_data {

@@ -67,6 +67,8 @@ onMounted(async () => {
   window.addEventListener('resize', handleResize)
   handleResize() //
 
+  console.log(window.location.host)
+
   // try {
   //   var currentToken = await getToken(messaging, { vapidKey: FIREBASEVAPIDKEY })
   //   localStorage.setItem('fcmToken', currentToken)
@@ -115,6 +117,10 @@ body {
   padding: 0;
   background-color: var(--main-background-color);
   height: 100%;
+  width: 100%;
   z-index: 1;
+
+  /* overflow-y: hidden; */
+  /* overflow-x: hidden; */
 }
 </style>

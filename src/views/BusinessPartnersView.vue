@@ -41,8 +41,8 @@
           </template>
         </div>
       </template>
-      <!-- <button v-if="agent.status === 'P'" @click="openPopup(agent.agent_cd)">계약서명</button> -->
-      <button @click="openPopup(agent.agent_cd)">계약서명</button>
+      <button v-if="agent.status === 'P'" @click="openPopup(agent.agent_cd)">계약서명</button>
+      <!-- <button @click="openPopup(agent.agent_cd)">계약서명</button> -->
 
       <button v-if="agent.status === 'Y'" @click="fetchContractPDFAndPrint(agent.agent_cd)">
         <span class="material-symbols-outlined print-contract"> print </span>

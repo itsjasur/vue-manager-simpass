@@ -1,9 +1,8 @@
 <template>
   <div class="menu">
-    <div class="logo">
-      <router-link @click="sideMenuChoose" to="/profile"
-        ><img src="../assets/logo.png" alt="Logo" style="width: 200px" />
-      </router-link>
+    <div @click="sideMenuChoose(menuItems[0])" class="logo_container">
+      <img v-if="hostname === 'sjnetwork'" :src="sjlogo" alt="Logo" style="width: 200px" class="sjnetwork" />
+      <img v-else :src="baroformlogo" alt="Logo" style="width: 200px" class="baroform" />
     </div>
 
     <template v-for="(item, index) in menuItems" :key="index">
@@ -18,8 +17,16 @@
 <script setup>
 import { SIDEMENUNAMES } from '../assets/constants'
 import { useSideMenuStore } from '../stores/side-menu'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+
+import sjlogo from '@/assets/sjlogo.png'
+import baroformlogo from '@/assets/baroformlogo.png'
+
+const hostname = ref('sjnetwork')
+onMounted(() => {
+  hostname.value = window.location.hostname.includes('sjnetwork') ? 'sjnetwork' : 'baroform'
+})
 
 const sideMenuStore = useSideMenuStore()
 
@@ -54,18 +61,34 @@ function isActive(path) {
   gap: 15px;
   overflow-y: auto;
 }
-.logo {
-  padding: 10px;
-  margin: 15px 10px;
-  user-select: none;
-}
-img {
-  color: antiquewhite;
+
+.logo_container {
+  height: auto;
+  width: 100%;
+  padding-left: 20px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  box-sizing: border-box;
 }
 
-.logo:hover {
+.logo_container:hover {
   background-color: #4e4e4e;
   border-radius: 5px;
+}
+
+.sjnetwork {
+  padding: 10px 5px;
+  height: 45px;
+  width: 100%;
+  object-fit: contain;
+  object-position: left;
+}
+.baroform {
+  padding: 10px 5px;
+  height: 40px;
+  width: 100%;
+  object-fit: contain;
+  object-position: left;
 }
 
 a {

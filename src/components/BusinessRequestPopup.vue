@@ -189,6 +189,18 @@
         />
       </template>
 
+      <template v-else>
+        <template v-if="signData && sealData">
+          <SignImageRowContainer
+            title="판매자 서명"
+            @updateSignSeal="updatePads"
+            :signImageData="signData"
+            :sealImageData="sealData"
+          />
+        </template>
+        <button v-else @click="showSendSmsPopupContent" class="sign_seal_button">서명/사인 하기</button>
+      </template>
+
       <button @click="submit" :disabled="isSubmitting">
         <LoadingSpinner v-if="isSubmitting" height="20px" color="#ffffff" />
         <span v-else> 온라인 판매점 계약신청 </span>
@@ -196,10 +208,18 @@
     </div>
   </div>
   <PrintablePdfPopup v-if="printablePdfPopup.active" />
+
+  <GlobalPopupWithOverlay ref="smsPopupRef">
+    <SendSmsPopupContent
+      @closePopup="closeSendSmsPopupContent"
+      :phoneNumber="serverData.phone_number"
+      :partnerCd="serverData.partner_cd"
+    />
+  </GlobalPopupWithOverlay>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, reactive, watchEffect } from 'vue'
+import { ref, onMounted, reactive, watchEffect } from 'vue'
 import * as cleavePatterns from '../utils/cleavePatterns'
 import { useSearchaddressStore } from '@/stores/select-address-popup'
 import { useSnackbarStore } from '@/stores/snackbar'
@@ -212,6 +232,19 @@ import SignImageRowContainer from '../components/SignImageRowContainer.vue'
 import PrintablePdfPopup from '../components/PrintablePdfPopup.vue'
 import { usePrintablePdfPopup } from '@/stores/printable-pdf-popup'
 import { useDeviceTypeStore } from '@/stores/device-type-store'
+import GlobalPopupWithOverlay from './GlobalPopupWithOverlay.vue'
+import SendSmsPopupContent from './SendSmsPopupContent.vue'
+
+//sign and seal popup
+const smsPopupRef = ref(null)
+const showSendSmsPopupContent = () => {
+  smsPopupRef.value.showPopup()
+}
+const closeSendSmsPopupContent = (sign, seal) => {
+  if (sign) signData.value = sign
+  if (seal) sealData.value = seal
+  smsPopupRef.value.closePopup()
+}
 
 const printablePdfPopup = usePrintablePdfPopup()
 const router = useRouter()
@@ -338,11 +371,9 @@ async function submit() {
     return
   }
 
-  if (useDeviceTypeStore().isDeviceMobile()) {
-    if (!signData.value || !sealData.value) {
-      useSnackbarStore().show('판매자서명을 하지 않았습니다.')
-      return
-    }
+  if (!signData.value || !sealData.value) {
+    useSnackbarStore().show('판매자서명을 하지 않았습니다.')
+    return
   }
 
   if (imageUploads.businessLicence.new && imageUploads.businessLicence.new instanceof File)
@@ -415,10 +446,22 @@ async function fetchContractPDFAndPrint() {
 
     const pdfData = await response.blob()
     const blob = new Blob([pdfData], { type: 'application/pdf' })
-
     // a URL for the Blob
     const url = URL.createObjectURL(blob)
-    printablePdfPopup.open(url)
+    if (!useDeviceTypeStore().isDeviceMobile()) {
+      printablePdfPopup.open(url)
+    } else {
+      //  temporary anchor element to trigger the download
+      const a = document.createElement('a')
+      a.href = url
+      // a.download = form.title + '.pdf' // desired file name
+      document.body.appendChild(a)
+      a.click()
+      window.open(url, '_blank')
+      // Clean up
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    }
   } catch (error) {
     useSnackbarStore().show(error.toString())
   }
@@ -435,7 +478,6 @@ onMounted(fetchData)
   display: flex;
   flex-flow: column;
   box-sizing: border-box;
-
   margin: 20px;
 }
 
@@ -507,6 +549,11 @@ button {
   min-width: 200px;
   width: auto;
   align-self: flex-end;
+}
+
+.sign_seal_button {
+  align-self: self-start;
+  background-color: #cda000;
 }
 
 .upload-row {

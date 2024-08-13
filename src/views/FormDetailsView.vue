@@ -161,7 +161,8 @@
         title="동의합니다"
         @updateAgreePadData="
           (padData) => {
-            agreePadData = padData
+            console.log(padData)
+            // agreePadData = padData
           }
         "
         :errorMessage="!agreePadData && formSubmitted ? '가입약관에 동의하지 않았습니다.' : null"

@@ -163,11 +163,11 @@ async function fetchData() {
   position: relative;
   overflow-y: auto;
 }
-
+/* 
 .icon {
   cursor: pointer;
   font-size: 30px;
-}
+} */
 
 .m-dashboard-side-menu-overlay {
   display: block;
