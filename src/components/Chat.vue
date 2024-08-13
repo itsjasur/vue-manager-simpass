@@ -217,7 +217,7 @@ async function uploadFiles() {
     formData.set('filename', 'filename')
 
     try {
-      const response = await fetch('http://127.0.0.1:5000/upload', {
+      const response = await fetch(import.meta.env.VITE_CHAT_SERVER_URL + 'upload', {
         method: 'POST',
         body: formData,
       })

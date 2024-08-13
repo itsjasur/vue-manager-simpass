@@ -73,6 +73,7 @@ import BusinessPartnersPopup from '../components/BusinessPartnersPopup.vue'
 import { usePrintablePdfPopup } from '@/stores/printable-pdf-popup'
 import PrintablePdfPopup from '../components/PrintablePdfPopup.vue'
 import GlobalPopupWithOverlay from '@/components/GlobalPopupWithOverlay.vue'
+import { useDeviceTypeStore } from '@/stores/device-type-store'
 
 const router = useRouter()
 
@@ -151,7 +152,21 @@ async function fetchContractPDFAndPrint(agentCd) {
 
     // a URL for the Blob
     const url = URL.createObjectURL(blob)
-    printablePdfPopup.open(url)
+
+    if (!useDeviceTypeStore().isDeviceMobile()) {
+      printablePdfPopup.open(url)
+    } else {
+      //  temporary anchor element to trigger the download
+      const a = document.createElement('a')
+      a.href = url
+      // a.download = form.title + '.pdf' // desired file name
+      document.body.appendChild(a)
+      a.click()
+      window.open(url, '_blank')
+      // Clean up
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    }
   } catch (error) {
     useSnackbarStore().show(error.toString())
   }

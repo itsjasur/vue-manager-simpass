@@ -16,7 +16,7 @@
             src=" @/assets/logos/kakao.png"
             alt="kakao"
           />
-          <img v-else class="circle-cont" src="@/assets/logos/kakao.png" alt="KAKAO" />
+          <img v-else class="circle-cont" src="@/assets/logos/pass.png" alt="pass" />
 
           <span>STEP 01</span>
           <span>앱에서 인증요청 메시지확인</span>
