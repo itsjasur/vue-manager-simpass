@@ -12,7 +12,7 @@ import cleaveDirective from './directives/cleaveDirective'
 const app = createApp(App)
 
 const pinia = createPinia()
-app.directive('cleave', cleaveDirective)
+// app.directive('cleave', cleaveDirective)
 app.use(pinia)
 app.use(router)
 app.use(Antd)
