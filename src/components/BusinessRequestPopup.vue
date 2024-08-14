@@ -27,13 +27,14 @@
       <div class="group-row">
         <div class="group">
           <label>사업자번호*</label>
-          <input
-            :value="serverData.business_num"
+
+          <CleaveInput
+            v-model="serverData.business_num"
             placeholder="000-00-00000"
-            name="businessNumber"
-            v-cleave="{ ...cleavePatterns.businessNumberPattern }"
+            :options="cleavePatterns.businessNumberPattern"
             readonly
           />
+
           <p v-if="submitted && !serverData.business_num" class="input-error-message">사업자번호를 입력하세요.</p>
         </div>
 
@@ -47,11 +48,11 @@
       <div class="group-row">
         <div class="group">
           <label>연락 번호*</label>
-          <input
-            :value="serverData.phone_number"
+
+          <CleaveInput
+            v-model="serverData.phone_number"
             placeholder="010-1234-5678"
-            name="mobileNumber"
-            v-cleave="{ ...cleavePatterns.phoneNumberPattern }"
+            :options="cleavePatterns.phoneNumberPattern"
             readonly
           />
           <p v-if="submitted && !serverData.phone_number" class="input-error-message">연락 번호를 입력하세요.</p>
@@ -69,21 +70,21 @@
       <div class="group-row">
         <div class="group">
           <label>매장 전화</label>
-          <input
-            v-model="forms.telNumber"
+
+          <CleaveInput
             placeholder="02-1234-5678"
-            name="telNumber"
-            v-cleave="{ ...cleavePatterns.phoneNumberPattern, onValueChanged }"
+            :options="cleavePatterns.phoneNumberPattern"
+            @rawValue="forms.telNumber = $event"
           />
         </div>
 
         <div class="group">
           <label>매장 팩스</label>
-          <input
-            v-model="forms.faxNumber"
+
+          <CleaveInput
             placeholder="02-1234-5678"
-            name="faxNumber"
-            v-cleave="{ ...cleavePatterns.phoneNumberPattern, onValueChanged }"
+            :options="cleavePatterns.phoneNumberPattern"
+            @rawValue="forms.faxNumber = $event"
           />
         </div>
       </div>
@@ -113,13 +114,14 @@
 
         <div class="group" style="width: 60%">
           <label>생년월일*</label>
-          <input
-            :value="serverData.birthday"
+
+          <CleaveInput
+            v-model="serverData.birthday"
             placeholder="1991-01-31"
-            name="accountBirthday"
-            v-cleave="{ ...cleavePatterns.birthdayPatternFull }"
+            :options="cleavePatterns.birthdayPatternFull"
             readonly
           />
+
           <p v-if="submitted && !serverData.birthday" class="input-error-message">생년월일를 입력하세요.</p>
         </div>
       </div>
@@ -262,11 +264,11 @@ const updatePads = (sign, seal) => {
   sealData.value = seal
 }
 
-//cleave value change callback
-function onValueChanged(event) {
-  if (event.target.name === 'telNumber') forms.telNumber = event.target.rawValue
-  if (event.target.name === 'faxNumber') forms.faxNumber = event.target.rawValue
-}
+// //cleave value change callback
+// function onValueChanged(event) {
+//   if (event.target.name === 'telNumber') forms.telNumber = event.target.rawValue
+//   if (event.target.name === 'faxNumber') forms.faxNumber = event.target.rawValue
+// }
 
 const agreeToContracTerms = ref(false)
 

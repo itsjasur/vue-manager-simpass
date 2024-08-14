@@ -60,17 +60,16 @@
         <input v-model="status" placeholder="" readonly />
       </div>
 
-      <div class="groups">
+      <!-- <div class="groups">
         <label>Cleave </label>
         <CleaveInput v-model="cleaveInp" :options="cloptions" @rawValue="console.log($event)" />
-      </div>
+      </div> -->
 
       <!-- <div class="groups">
         <label>Cleave </label>
         <CleaveInput :modelValue="cleaveInp" @update:modelValue="cleaveInp = $event" />
       </div> -->
-
-      <button @click="updateCl">Cleave input print</button>
+      <!-- <button @click="updateCl">Cleave input print</button> -->
     </div>
 
     <template v-if="useDeviceTypeStore().isDeviceMobile() && partnerInfoFetched">
@@ -94,26 +93,14 @@ import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
 import SignImageRowContainer from '@/components/SignImageRowContainer.vue'
 import { useDeviceTypeStore } from '@/stores/device-type-store'
 
-import CleaveInput from '../components/CleaveInput.vue'
-const cleaveInp = ref(12312)
+// const cleaveInp = ref(12312)
 
-const cloptions = {
-  date: true,
-  delimiter: '-',
-  datePattern: ['Y', 'm', 'd'],
-  strictDate: true,
-  // onValueChanged: clValChanged,
-}
-
-function clValChanged(e) {
-  console.log(e)
-  console.log('Formatted:', e.target.value)
-  console.log('Raw:', e.target.rawValue)
-}
-function updateCl() {
-  console.log('value updated here')
-  cleaveInp.value = 12312321
-}
+// const cloptions = {
+//   date: true,
+//   delimiter: '-',
+//   datePattern: ['Y', 'm', 'd'],
+//   strictDate: true,
+// }
 
 const data = ref({})
 const pname = ref('')

@@ -56,21 +56,25 @@
 
       <div class="group">
         <label>본인명의 휴대폰번호</label>
-        <input
+
+        <CleaveInput
           placeholder="010-1234-5678"
-          v-cleave="cleavePatterns.phoneNumberPattern"
-          @cleave:input="(event) => (phoneNumber = event.detail.raw)"
+          :options="cleavePatterns.phoneNumberPattern"
+          @rawValue="phoneNumber = $event"
         />
+
         <p v-if="isSubmitted && !phoneNumber" class="input-error-message">휴대폰번호를 정확하게 입력하세요.</p>
       </div>
 
       <div class="group">
         <label>생년월일</label>
-        <input
+
+        <CleaveInput
           placeholder="1981-01-31"
-          v-cleave="cleavePatterns.birthdayPatternFull"
-          @cleave:input="(event) => (birthday = event.detail.raw)"
+          :options="cleavePatterns.birthdayPatternFull"
+          @rawValue="birthday = $event"
         />
+
         <p v-if="isSubmitted && !birthday" class="input-error-message">올바른 날짜를 입력하십시오.</p>
       </div>
     </div>
@@ -181,8 +185,6 @@ onMounted(useSignUpstore().clear)
 
 async function submit(event) {
   isSubmitted.value = true
-
-  console.log(birthday.value, phoneNumber.value)
 
   if (!useTermsCheck.value) {
     useSnackbarStore().show('이용약관에 동의해주세요.')

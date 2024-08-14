@@ -28,7 +28,6 @@
           </div>
 
           <template v-for="(formName, index) in typeFormNames" :key="index">
-            <!-- <div>{{ FIXED_FORMS[formName] }}</div> -->
             <div class="group" :style="{ maxWidth: FIXED_FORMS[formName].maxwidth }">
               <label>{{ FIXED_FORMS[formName].label }}</label>
 
@@ -56,11 +55,11 @@
 
               <!-- cleave -->
               <template v-if="FIXED_FORMS[formName].type === 'cleave'">
-                <input
+                <CleaveInput
+                  :options="FIXED_FORMS[formName].pattern"
                   :value="FIXED_FORMS[formName].value"
-                  @cleave:input="handleCleaveInput($event, formName)"
-                  v-cleave="FIXED_FORMS[formName].pattern"
                   v-bind="inputBindings(formName)"
+                  @update:modelValue="handleCleaveInput($event, formName)"
                 />
               </template>
 
@@ -396,6 +395,7 @@ const inputBindings = (formName) => {
     }
   }
 
+  //setting payment
   if (['account_name', 'account_birthday', 'account_birthday_full'].includes(formName)) {
     bindings.readonly = selfRegisterChecked.value
   }
@@ -429,19 +429,14 @@ watchEffect(() => {
 })
 
 //this handles cleave input updates. it has raw values!
-const handleCleaveInput = (event, formName) => {
-  let rawValue = event.detail.raw
-  let formattedValue = event.detail.formatted
-
-  // console.log(formName, rawValue)
-
+const handleCleaveInput = (formattedValue, formName) => {
   FIXED_FORMS[formName].value = formattedValue
 
   if (['birthday', 'deputy_birthday', 'account_birthday'].includes(formName)) {
     const today = new Date()
     const currYear = today.getFullYear() % 100
 
-    if (rawValue.length === 6) {
+    if (formattedValue.length === 8) {
       const [yy, mm, dd] = formattedValue.split('-')
       if (yy > currYear) formattedValue = '19' + formattedValue
       else formattedValue = '20' + formattedValue

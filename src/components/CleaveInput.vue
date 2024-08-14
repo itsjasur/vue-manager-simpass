@@ -1,10 +1,11 @@
 <template>
-  <input :value="modelValue" @input="onInput" ref="input" />
+  <input :value="modelValue" ref="input" v-bind="$attrs" />
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, watch, watchEffect, nextTick } from 'vue'
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import Cleave from 'cleave.js'
+import 'cleave.js/dist/addons/cleave-phone.kr'
 
 const props = defineProps({
   modelValue: {
@@ -16,6 +17,8 @@ const props = defineProps({
     default: () => ({}),
   },
 })
+
+defineOptions({ inheritAttrs: false })
 
 const emit = defineEmits(['update:modelValue', 'rawValue'])
 
@@ -33,6 +36,7 @@ onMounted(() => {
     }
 
     cleave = new Cleave(input.value, cleaveOptions)
+
     // cleave = new Cleave(input.value, props.options)
 
     if (props.modelValue) {
@@ -46,4 +50,30 @@ onBeforeUnmount(() => {
     cleave.destroy()
   }
 })
+
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    if (cleave && newValue !== undefined) {
+      cleave.setRawValue(newValue)
+    }
+  }
+)
+
+watch(
+  () => props.options,
+  (newOptions) => {
+    if (cleave) {
+      cleave.destroy()
+      cleave = new Cleave(input.value, {
+        ...newOptions,
+        onValueChanged: (event) => {
+          emit('update:modelValue', event.target.value)
+          emit('rawValue', event.target.rawValue)
+        },
+      })
+    }
+  },
+  { deep: true }
+)
 </script>

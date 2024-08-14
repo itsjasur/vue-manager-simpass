@@ -4,15 +4,14 @@ import router from './router'
 
 import { createPinia } from 'pinia'
 import Antd from 'ant-design-vue'
-import './assets/global.css'
-import cleaveDirective from './directives/cleaveDirective'
-
 // import 'ant-design-vue/dist/reset.css'
+import './assets/global.css'
+import CleaveInput from './components/CleaveInput.vue'
 
 const app = createApp(App)
 
 const pinia = createPinia()
-// app.directive('cleave', cleaveDirective)
+app.component('CleaveInput', CleaveInput)
 app.use(pinia)
 app.use(router)
 app.use(Antd)

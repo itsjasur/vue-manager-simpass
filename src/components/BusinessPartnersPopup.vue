@@ -27,13 +27,14 @@
       <div class="group-row">
         <div class="group">
           <label>사업자번호*</label>
-          <input
-            :value="serverData.business_num"
+
+          <CleaveInput
+            v-model="serverData.business_num"
             placeholder="000-00-00000"
-            name="businessNumber"
-            v-cleave="{ ...cleavePatterns.businessNumberPattern }"
+            :options="cleavePatterns.businessNumberPattern"
             readonly
           />
+
           <p v-if="submitted && !serverData.business_num" class="input-error-message">사업자번호를 입력하세요.</p>
         </div>
 
@@ -47,13 +48,14 @@
       <div class="group-row">
         <div class="group">
           <label>연락 번호*</label>
-          <input
-            :value="serverData.phone_number"
+
+          <CleaveInput
+            v-model="serverData.phone_number"
             placeholder="010-1234-5678"
-            name="mobileNumber"
-            v-cleave="{ ...cleavePatterns.phoneNumberPattern }"
+            :options="cleavePatterns.phoneNumberPattern"
             readonly
           />
+
           <p v-if="submitted && !serverData.phone_number" class="input-error-message">연락 번호를 입력하세요.</p>
         </div>
 

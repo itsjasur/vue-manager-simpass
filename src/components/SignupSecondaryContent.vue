@@ -14,7 +14,7 @@
         <label>사업자번호*</label>
 
         <div class="group-inner-row">
-          <input ref="companyNumberRef" placeholder="" value="" />
+          <CleaveInput v-model="companyRegNumber" :options="cleavePatterns.businessNumberPattern" />
           <button @click="checkBusinessRegNumber">중복체크</button>
         </div>
 
@@ -27,16 +27,8 @@
       <div class="group-row">
         <div class="group" style="max-width: 200px">
           <label>연락 번호*</label>
-          <input
-            placeholder=""
-            v-model="signUpStore.data.phoneNumber"
-            readonly
-            v-cleave="{
-              phone: true,
-              phoneRegionCode: 'KR',
-              delimiter: '-',
-            }"
-          />
+
+          <CleaveInput v-model="signUpStore.data.phoneNumber" :options="cleavePatterns.phoneNumberPattern" readonly />
         </div>
 
         <div class="group">
@@ -67,28 +59,13 @@
         <div class="group" style="max-width: 200px">
           <label>매장 전화 (선택)</label>
 
-          <input
-            placeholder=""
-            v-model="shopPhoneNumber"
-            v-cleave="{
-              phone: true,
-              phoneRegionCode: 'KR',
-              delimiter: '-',
-            }"
-          />
+          <CleaveInput v-model="shopPhoneNumber" :options="cleavePatterns.phoneNumberPattern" />
         </div>
 
         <div class="group" style="max-width: 200px">
           <label>매장 팩스 (선택)</label>
-          <input
-            placeholder=""
-            v-model="shopPhoneFax"
-            v-cleave="{
-              phone: true,
-              phoneRegionCode: 'KR',
-              delimiter: '-',
-            }"
-          />
+
+          <CleaveInput v-model="shopPhoneFax" :options="cleavePatterns.phoneNumberPattern" />
         </div>
       </div>
 
@@ -172,16 +149,15 @@
 <script setup>
 import { ref, onMounted, watch, onUnmounted } from 'vue'
 import { useSnackbarStore } from '@/stores/snackbar'
-import { message } from 'ant-design-vue'
 import SearchAddressPopup from '../components/SearchAddressPopup.vue'
 import { useSearchaddressStore } from '@/stores/select-address-popup'
 import { useSignUpstore } from '../stores/signup-store'
-import Cleave from 'cleave.js'
 import * as helpers from '@/utils/helpers'
 import { useRouter } from 'vue-router'
 import LoadingSpinner from '../components/Loader.vue'
 import { useWarningStore } from '../stores/warning'
 import { EMAILOPTIONS } from '../assets/constants'
+import * as cleavePatterns from '../utils/cleavePatterns'
 
 const warningStore = useWarningStore()
 
@@ -226,7 +202,7 @@ const checkBusinessRegNumber = async () => {
     const response = await fetch(import.meta.env.VITE_API_BASE_URL + 'auth/chkBizNum', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ business_num: companyRegNumber.value }),
+      body: JSON.stringify({ business_num: companyRegNumber.value.replace(/-/g, '') }),
     })
 
     const data = await response.json()
@@ -326,7 +302,7 @@ async function submit() {
       username: username.value, //아이디
       password: password.value, //패스워드
       partner_nm: companyName.value, //판매점명
-      business_num: companyRegNumber.value, //사업자번호
+      business_num: companyRegNumber.value.replace(/-/g, ''), //사업자번호
       address: address.value, //주소
       dtl_address: addressDetails.value, //상세주소
       email: email.value + emailAddition.value,
@@ -389,27 +365,9 @@ function validateEmail() {
   emailError.value = !emailPattern.test(email.value + emailAddition.value)
 }
 
-const companyNumberRef = ref(null)
-let cleaveInstanceCompanyNumber = null
-
-onMounted(() => {
-  cleaveInstanceCompanyNumber = new Cleave(companyNumberRef.value, {
-    delimiter: '-',
-    blocks: [3, 2, 5],
-    numericOnly: true,
-    onValueChanged: (event) => {
-      companyRegNumber.value = event.target.rawValue
-      isCompanyRegNumberOk.value = false
-      companyRegNumberPrompt.value = null
-    },
-  })
-})
-
-onUnmounted(() => {
-  if (cleaveInstanceCompanyNumber) {
-    cleaveInstanceCompanyNumber.destroy()
-    cleaveInstanceCompanyNumber = null
-  }
+watch(companyRegNumber, (oldV, newV) => {
+  isCompanyRegNumberOk.value = false
+  companyRegNumberPrompt.value = null
 })
 </script>
 
