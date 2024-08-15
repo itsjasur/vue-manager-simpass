@@ -87,20 +87,11 @@
 
 //
 <script setup>
-import { ref, onMounted, onUnmounted, onBeforeMount } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useSnackbarStore } from '@/stores/snackbar'
 import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
 import SignImageRowContainer from '@/components/SignImageRowContainer.vue'
 import { useDeviceTypeStore } from '@/stores/device-type-store'
-
-// const cleaveInp = ref(12312)
-
-// const cloptions = {
-//   date: true,
-//   delimiter: '-',
-//   datePattern: ['Y', 'm', 'd'],
-//   strictDate: true,
-// }
 
 const data = ref({})
 const pname = ref('')
@@ -112,8 +103,8 @@ const storeDetailAddress = ref('')
 const contractDate = ref('')
 const status = ref('')
 
-const signData = ref(null)
-const sealData = ref(null)
+const signData = ref()
+const sealData = ref()
 
 const updatePads = (sign, seal) => {
   signData.value = sign

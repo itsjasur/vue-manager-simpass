@@ -256,19 +256,13 @@ const emit = defineEmits(['closePopup'])
 
 const props = defineProps({ agentCd: { type: String, required: true } })
 
-const signData = ref(null)
-const sealData = ref(null)
+const signData = ref()
+const sealData = ref()
 
 const updatePads = (sign, seal) => {
   signData.value = sign
   sealData.value = seal
 }
-
-// //cleave value change callback
-// function onValueChanged(event) {
-//   if (event.target.name === 'telNumber') forms.telNumber = event.target.rawValue
-//   if (event.target.name === 'faxNumber') forms.faxNumber = event.target.rawValue
-// }
 
 const agreeToContracTerms = ref(false)
 

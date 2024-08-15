@@ -143,8 +143,8 @@ const emit = defineEmits(['closePopup'])
 
 const props = defineProps({ agentCd: { type: String, required: true } })
 
-const signData = ref(null)
-const sealData = ref(null)
+const signData = ref()
+const sealData = ref()
 
 const updatePads = (sign, seal) => {
   signData.value = sign
