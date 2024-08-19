@@ -40,7 +40,7 @@ const emits = defineEmits(['closePopup'])
 
 async function sendSMS() {
   try {
-    const response = await fetch(import.meta.env.VITE_CHAT_SERVER_URL + '/send-single-sms', {
+    const response = await fetch(import.meta.env.VITE_CHAT_SERVER_URL + 'send-single-sms', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

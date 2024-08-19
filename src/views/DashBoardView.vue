@@ -50,18 +50,17 @@ import { useSnackbarStore } from '@/stores/snackbar'
 import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
 import { useWebSocketStore } from '@/stores/webscoket-store'
 
+const webSocketStore = useWebSocketStore()
+
 const selectPlansPopup = useSelectPlansPopup()
 const chatPopupStore = useChatPopupStore()
 const sideMenuStore = useSideMenuStore()
-
-const webSocketStore = useWebSocketStore()
 
 onMounted(async () => {
   await fetchData()
   sideMenuStore.updateIsDesktop()
   window.addEventListener('resize', handleResize)
-
-  webSocketStore.connect() // connects to WebSocket
+  if (!webSocketStore.socket) webSocketStore.connect()
 })
 
 onUnmounted(() => {
