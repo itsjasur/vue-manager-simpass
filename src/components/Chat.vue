@@ -7,7 +7,7 @@
           :getPopupContainer="(triggerNode) => triggerNode.parentNode"
           :style="{ width: '100%' }"
           @change="webSocketStore.joinRoom(selectedAgentCode)"
-          :options="userInfo.agent_cd.map((i) => ({ value: i, label: agentList[i] })) ?? []"
+          :options="agentList.map((i) => ({ value: i.agent_cd, label: i.agent_nm })) ?? []"
         >
         </a-select>
         <!-- :options="statuses.map((i) => ({ value: i.cd, label: i.value })) ?? [{ value: 'N/A', label: 'N/A' }]" -->
@@ -94,8 +94,6 @@ const selectedAgentCode = ref(null)
 
 const newMessage = ref('')
 
-const agentList = { IK: '인스코리아', SJ: '에스제이' }
-
 // adds logic for the action to take on Enter without Shift
 const handleKeyDown = (event) => {
   if (event.key === 'Enter' && !event.shiftKey) {
@@ -169,7 +167,7 @@ async function uploadFiles() {
     formData.set('filename', 'filename')
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/' + 'upload', {
+      const response = await fetch(import.meta.env.VITE_CHAT_SERVER_URL + 'upload', {
         method: 'POST',
         body: formData,
       })
@@ -192,7 +190,8 @@ async function uploadFiles() {
 
 async function sendNewMessage() {
   const attachmentPaths = await uploadFiles()
-  if (newMessage.value.trim() || attachments.value.length > 0) {
+
+  if (newMessage.value.trim() || attachmentPaths.length > 0) {
     webSocketStore.sendMessage(newMessage.value, attachmentPaths)
 
     newMessage.value = ''
@@ -200,6 +199,27 @@ async function sendNewMessage() {
   }
 }
 
+const agentList = ref([])
+async function fetchAgentList() {
+  try {
+    const response = await fetchWithTokenRefresh('agent/agentlist', { method: 'GET' })
+
+    if (!response.ok) {
+      chatPopupStore.close()
+      throw 'Fetch data error'
+    }
+    const decodedResponse = await response.json()
+    agentList.value = decodedResponse?.data?.agentlist
+
+    if (agentList.value?.length > 0) {
+      selectedAgentCode.value = agentList.value?.[0]?.agent_cd
+      if (selectedAgentCode.value) webSocketStore.joinRoom(selectedAgentCode.value)
+    }
+  } catch (error) {
+    chatPopupStore.close()
+    useSnackbarStore().show(error.toString())
+  }
+}
 async function fetchData() {
   try {
     const response = await fetchWithTokenRefresh('agent/userInfo', { method: 'GET' })
@@ -210,11 +230,7 @@ async function fetchData() {
     }
     const decodedResponse = await response.json()
     userInfo.value = decodedResponse.data.info
-    if (userInfo.value?.agent_cd?.length > 0) {
-      selectedAgentCode.value = userInfo.value.agent_cd[0]
-      if (selectedAgentCode.value) webSocketStore.joinRoom(selectedAgentCode.value)
-    }
-    // console.log(userInfo.value)
+    await fetchAgentList()
   } catch (error) {
     chatPopupStore.close()
     useSnackbarStore().show(error.toString())

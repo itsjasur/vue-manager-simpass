@@ -14,7 +14,10 @@ export const useWebSocketStore = defineStore('webSocket', {
   actions: {
     connect() {
       const accessToken = localStorage.getItem('accessToken')
-      this.socket = new WebSocket(`ws://localhost:8000/ws/${accessToken}`)
+      // this.socket = new WebSocket(`ws://localhost:8000/ws/${accessToken}`)
+      // this.socket = new WebSocket(`wss://chat.baroform.com/ws/${accessToken}`)
+      // this.socket = new WebSocket(`https://chat.baroform.com/ws/${accessToken}`)
+      this.socket = new WebSocket(import.meta.env.VITE_CHAT_SERVER_URL + `ws/${accessToken}`)
 
       this.socket.onopen = () => {
         console.log('Socket connected')
@@ -43,8 +46,7 @@ export const useWebSocketStore = defineStore('webSocket', {
           //   console.log(data.chats)
         }
         if (data?.type === 'new_chat') {
-          this.chats.push(data?.new_chat)
-          //   console.log(data.new_chat)
+          if (this.roomId === data?.new_chat.room_id) this.chats.push(data?.new_chat)
         }
       }
     },
