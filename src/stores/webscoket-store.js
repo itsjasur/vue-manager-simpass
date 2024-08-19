@@ -3,11 +3,12 @@ import { defineStore } from 'pinia'
 export const useWebSocketStore = defineStore('webSocket', {
   state: () => ({
     socket: null,
-    socketConnected: false,
+    isConnected: false,
     totalUnreadCount: 0,
     connectionStatus: 'Initial',
     chats: [],
     roomId: null,
+    reconnectInterval: null,
   }),
 
   actions: {
@@ -16,9 +17,16 @@ export const useWebSocketStore = defineStore('webSocket', {
       this.socket = new WebSocket(`ws://localhost:8000/ws/${accessToken}`)
 
       this.socket.onopen = () => {
-        console.log('Connected to server')
+        console.log('Socket connected')
         this.connectionStatus = 'Connected'
-        this.socketConnected = true
+        this.isConnected = true
+        this.clearReconnectInterval()
+      }
+
+      this.socket.onclose = () => {
+        console.log('Socket disconnected')
+        this.isConnected = false
+        this.attemptReconnect()
       }
 
       this.socket.onmessage = (event) => {
@@ -38,11 +46,6 @@ export const useWebSocketStore = defineStore('webSocket', {
           this.chats.push(data?.new_chat)
           //   console.log(data.new_chat)
         }
-      }
-
-      this.socket.onclose = (event) => {
-        this.connectionStatus = event?.reason ?? 'Disconnected'
-        // console.log(event)
       }
     },
     joinRoom(selectedAgentCode) {
@@ -68,12 +71,30 @@ export const useWebSocketStore = defineStore('webSocket', {
       )
     },
 
+    attemptReconnect() {
+      if (!this.reconnectInterval) {
+        this.reconnectInterval = setInterval(() => {
+          console.log('Attempting to reconnect...')
+          this.connect()
+        }, 5000)
+      }
+    },
+
+    clearReconnectInterval() {
+      if (this.reconnectInterval) {
+        clearInterval(this.reconnectInterval)
+        this.reconnectInterval = null
+      }
+    },
+
     disconnect() {
+      this.clearReconnectInterval()
       if (this.socket && this.socket.readyState === WebSocket.OPEN) {
         this.socket.send(JSON.stringify({ action: 'disconnect' }))
         this.socket.close()
       }
       this.socket = null
+      this.isConnected = false
     },
   },
 })
