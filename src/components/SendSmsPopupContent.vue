@@ -65,7 +65,7 @@ async function sendSMS() {
 
 async function checkSignSeal() {
   try {
-    const response = await fetch(import.meta.env.VITE_CHAT_SERVER_URL + '/check-sign', {
+    const response = await fetch(import.meta.env.VITE_CHAT_SERVER_URL + 'check-sign', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ key: uniqueKey.value }),

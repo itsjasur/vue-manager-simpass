@@ -6,7 +6,7 @@ export const useChatPopupStore = defineStore('chatPopupStore', {
   }),
 
   actions: {
-    open(socket) {
+    open() {
       this.active = true
     },
 

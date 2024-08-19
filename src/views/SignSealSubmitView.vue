@@ -40,7 +40,7 @@ async function saveSignData() {
 
   try {
     usePageLoadingStore().start()
-    const response = await fetch(import.meta.env.VITE_CHAT_SERVER_URL + '/save-sign', {
+    const response = await fetch(import.meta.env.VITE_CHAT_SERVER_URL + 'save-sign', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

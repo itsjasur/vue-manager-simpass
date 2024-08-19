@@ -14,17 +14,16 @@
       </div>
     </div>
 
-    <template v-if="userInfo?.agent_cd?.length > 0">
-      <Chat v-if="chatPopupStore.active" />
-      <div v-else class="open-chat-button" @click="chatPopupStore.active = true">
-        <span class="material-symbols-outlined"> mode_comment </span>
-        <span>개통 문의</span>
+    <Chat v-if="chatPopupStore.active" />
 
-        <div v-if="webSocketStore.totalUnreadCount > 0" class="unread-count-badge">
-          {{ webSocketStore.totalUnreadCount }}
-        </div>
+    <div v-else class="open-chat-button" @click="chatPopupStore.open()">
+      <span class="material-symbols-outlined"> mode_comment </span>
+      <span>개통 문의</span>
+
+      <div v-if="webSocketStore.totalUnreadCount > 0" class="unread-count-badge">
+        {{ webSocketStore.totalUnreadCount }}
       </div>
-    </template>
+    </div>
 
     <template v-if="!sideMenuStore.isDesktop">
       <div v-if="sideMenuStore.isOpen" @click="sideMenuStore.close()" class="m-dashboard-side-menu-overlay"></div>
@@ -57,7 +56,6 @@ const chatPopupStore = useChatPopupStore()
 const sideMenuStore = useSideMenuStore()
 
 onMounted(async () => {
-  await fetchData()
   sideMenuStore.updateIsDesktop()
   window.addEventListener('resize', handleResize)
   if (!webSocketStore.socket) webSocketStore.connect()
@@ -70,23 +68,6 @@ onUnmounted(() => {
 
 const handleResize = () => {
   sideMenuStore.updateIsDesktop()
-}
-
-const userInfo = ref({})
-async function fetchData() {
-  try {
-    const response = await fetchWithTokenRefresh('agent/userInfo', { method: 'GET' })
-
-    if (!response.ok) {
-      chatPopupStore.close()
-      throw 'Fetch data error'
-    }
-    const decodedResponse = await response.json()
-    userInfo.value = decodedResponse.data.info
-  } catch (error) {
-    chatPopupStore.close()
-    useSnackbarStore().show(error.toString())
-  }
 }
 </script>
 

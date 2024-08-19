@@ -38,7 +38,6 @@ import Loading from './components/Loading.vue'
 import { messaging, getToken, onMessage } from './firebase'
 import { FIREBASEVAPIDKEY } from '../sensitive'
 import sound from '@/assets/sound.mp3'
-import { useWebSocketStore } from './stores/webscoket-store'
 
 const router = useRouter()
 const authStore = useAuthenticationStore()

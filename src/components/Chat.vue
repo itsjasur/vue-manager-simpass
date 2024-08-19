@@ -243,7 +243,6 @@ async function fetchData() {
   position: absolute;
   right: 20px;
   bottom: 0;
-  z-index: 1400;
   width: 500px;
   box-shadow: 0 0 20px #00000045;
   background-color: #fff;
@@ -251,6 +250,7 @@ async function fetchData() {
 
   display: flex;
   flex-flow: column;
+  z-index: 1400;
 }
 
 .chat-popup-header {
