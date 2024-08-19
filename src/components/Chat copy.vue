@@ -1,12 +1,12 @@
 <template>
   <div v-if="userInfo" class="chat-container" @drop.prevent="onDrop" @dragover.prevent>
     <div class="chat-popup-header">
-      <div style="width: 150px">
+      <div v-if="selectedAgentCode" style="width: 150px">
         <a-select
           v-model:value="selectedAgentCode"
           :getPopupContainer="(triggerNode) => triggerNode.parentNode"
           :style="{ width: '100%' }"
-          @change="webSocketStore.joinRoom(selectedAgentCode)"
+          @change="joinRoom"
           :options="userInfo.agent_cd.map((i) => ({ value: i, label: agentList[i] })) ?? []"
         >
         </a-select>
@@ -18,10 +18,10 @@
     <div class="chats-section" ref="chatContainer">
       <div class="welcome">
         <span>환영하다: {{ userInfo.name }}!</span>
-        <span>연결 상태: {{ webSocketStore.connectionStatus }}</span>
+        <span>연결 상태: {{ connectionStatus }}</span>
       </div>
 
-      <template v-for="(chat, index) in webSocketStore.chats" :key="index">
+      <template v-for="(chat, index) in chats" :key="index">
         <template v-if="chat.attachment_paths.length > 0">
           <template v-for="(attachmentPath, pathIndex) in chat.attachment_paths" :key="pathIndex">
             <img
@@ -66,7 +66,7 @@
           <span class="material-symbols-outlined"> add_photo_alternate </span>
         </label>
 
-        <span @click="sendNewMessage" class="send-message-icon material-symbols-outlined"> send </span>
+        <span @click="sendMessage" class="send-message-icon material-symbols-outlined"> send </span>
         <a-textarea
           size="large"
           @keydown="handleKeyDown"
@@ -81,18 +81,21 @@
 
 <script setup>
 import { useChatPopupStore } from '@/stores/chat-popup-store'
-import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { useSnackbarStore } from '@/stores/snackbar'
 import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
-import { useWebSocketStore } from '@/stores/webscoket-store'
+import { io } from 'socket.io-client'
 
 const chatPopupStore = useChatPopupStore()
+
 const userInfo = ref()
+
 const chatContainer = ref(null)
 
-const selectedAgentCode = ref(null)
-
+const chats = ref([])
 const newMessage = ref('')
+
+const selectedAgentCode = ref('IK')
 
 const agentList = { IK: '인스코리아', SJ: '에스제이' }
 
@@ -100,43 +103,88 @@ const agentList = { IK: '인스코리아', SJ: '에스제이' }
 const handleKeyDown = (event) => {
   if (event.key === 'Enter' && !event.shiftKey) {
     event.preventDefault()
-    sendNewMessage()
+    sendMessage()
   }
 }
-
 const scrollToBottom = () => {
   nextTick(() => {
     if (chatContainer.value) {
       chatContainer.value.scrollTop = chatContainer.value.scrollHeight
-      webSocketStore.resetRoomUnreadCount()
     }
   })
 }
 
-const webSocketStore = useWebSocketStore()
+function joinRoom() {
+  socket.emit('join_room', {
+    agentCode: selectedAgentCode.value,
+  })
+}
 
-// function resetRoomUnreadCount() {
-//   socket.emit('reset_room_unread_count', {
-//     roomId: selectedAgentCode.value + '_' + userInfo.value.username,
-//   })
-// }
+function resetRoomUnreadCount() {
+  socket.emit('reset_room_unread_count', {
+    roomId: selectedAgentCode.value + '_' + userInfo.value.username,
+  })
+}
 
-watch(
-  () => webSocketStore.chats,
-  (newv, oldv) => {
-    console.log('chats changed')
-    scrollToBottom()
-  },
-  { deep: true }
-)
+const socket = io(import.meta.env.VITE_CHAT_SERVER_URL, { transports: ['websocket', 'polling'] })
 
-onMounted(async () => {
+const connectionStatus = ref('Initial')
+
+onMounted(() => {
   chatContainer.value = document.querySelector('.container') //chat container to scroll up or down
   fetchData()
+
+  socket.on('connect', () => {
+    connectionStatus.value = 'Connected'
+    console.log('Connected to server')
+
+    socket.emit('authenticate', {
+      userToken: localStorage.getItem('accessToken'),
+      fcmToken: localStorage.getItem('fcmToken'),
+    })
+  })
+
+  socket.on('disconnect', () => {
+    connectionStatus.value = 'Disconnected'
+    console.log('Socket disconnected from server')
+  })
+
+  socket.on('connect_error', (error) => {
+    connectionStatus.value = 'Error: ' + error.message
+    console.error('Connection error:', error)
+  })
+
+  socket.on('error', (error) => {
+    useSnackbarStore().show(error.message)
+    connectionStatus.value = 'Error: ' + error.message
+    // console.error('Error:', error)
+  })
+
+  socket.on('authenticated', () => {
+    connectionStatus.value = 'Authenticated'
+    console.log('User authenticated')
+    joinRoom()
+  })
+
+  //partner page chats-info returns list of chats for selected agentCode
+  socket.on('chats', (data) => {
+    console.log('chats page socket store on chats called')
+    console.log(data)
+    chats.value = data
+    scrollToBottom()
+    resetRoomUnreadCount()
+  })
+
+  socket.on('message', (newMessage) => {
+    console.log(newMessage)
+    resetRoomUnreadCount()
+    chats.value.push(newMessage)
+    scrollToBottom()
+  })
 })
 
 onUnmounted(() => {
-  webSocketStore.chats = []
+  socket.disconnect()
 })
 
 //drop to attach files handler
@@ -169,7 +217,7 @@ async function uploadFiles() {
     formData.set('filename', 'filename')
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/' + 'upload', {
+      const response = await fetch(import.meta.env.VITE_CHAT_SERVER_URL + 'upload', {
         method: 'POST',
         body: formData,
       })
@@ -190,11 +238,20 @@ async function uploadFiles() {
   return uploadedFilesPaths
 }
 
-async function sendNewMessage() {
-  const attachmentPaths = await uploadFiles()
+const sendMessage = async () => {
   if (newMessage.value.trim() || attachments.value.length > 0) {
-    webSocketStore.sendMessage(newMessage.value, attachmentPaths)
+    const attachmentPaths = await uploadFiles()
 
+    const newMessageToSend = {
+      userToken: localStorage.getItem('accessToken'),
+      text: newMessage.value,
+      attachmentPaths: attachmentPaths,
+      agentCode: selectedAgentCode.value,
+    }
+
+    socket.emit('new_message', newMessageToSend)
+
+    //clears input field text
     newMessage.value = ''
     attachments.value = []
   }
@@ -210,11 +267,8 @@ async function fetchData() {
     }
     const decodedResponse = await response.json()
     userInfo.value = decodedResponse.data.info
-    if (userInfo.value?.agent_cd?.length > 0) {
-      selectedAgentCode.value = userInfo.value.agent_cd[0]
-      if (selectedAgentCode.value) webSocketStore.joinRoom(selectedAgentCode.value)
-    }
-    // console.log(userInfo.value)
+    if (userInfo.value?.agent_cd?.length > 0) selectedAgentCode.value = userInfo.value.agent_cd[0]
+    console.log(userInfo.value)
   } catch (error) {
     chatPopupStore.close()
     useSnackbarStore().show(error.toString())

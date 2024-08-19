@@ -20,8 +20,8 @@
         <span class="material-symbols-outlined"> mode_comment </span>
         <span>개통 문의</span>
 
-        <div v-if="webSocketStore.totalUnreadCount > 0" class="unread-count-badge">
-          {{ webSocketStore.totalUnreadCount }}
+        <div v-if="totolStore.totalUnreadCount > 0" class="unread-count-badge">
+          {{ totolStore.totalUnreadCount }}
         </div>
       </div>
     </template>
@@ -48,25 +48,51 @@ import { useChatPopupStore } from '@/stores/chat-popup-store'
 import Chat from '../components/Chat.vue'
 import { useSnackbarStore } from '@/stores/snackbar'
 import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
-import { useWebSocketStore } from '@/stores/webscoket-store'
+import { useTotalUnreadCountStore } from '@/stores/total-unread-count-store'
+import { io } from 'socket.io-client'
 
 const selectPlansPopup = useSelectPlansPopup()
+
 const chatPopupStore = useChatPopupStore()
+
 const sideMenuStore = useSideMenuStore()
 
-const webSocketStore = useWebSocketStore()
+const socket = io(import.meta.env.VITE_CHAT_SERVER_URL, { transports: ['websocket', 'polling'] })
 
-onMounted(async () => {
-  await fetchData()
+const connectionStatus = ref('Initial')
+
+const totolStore = useTotalUnreadCountStore()
+
+onMounted(() => {
+  fetchData()
   sideMenuStore.updateIsDesktop()
   window.addEventListener('resize', handleResize)
 
-  webSocketStore.connect() // connects to WebSocket
+  socket.on('connect', () => {
+    connectionStatus.value = 'Connected'
+
+    socket.emit('authenticate', {
+      userToken: localStorage.getItem('accessToken'),
+      fcmToken: localStorage.getItem('fcmToken'),
+    })
+  })
+
+  socket.on('authenticated', () => {
+    connectionStatus.value = 'Authenticated'
+    socket.emit('get_total_unread_count')
+  })
+
+  socket.on('total_unread_count', (newTotalUnreadCount) => {
+    totolStore.totalUnreadCount = newTotalUnreadCount
+  })
+  socket.on('room_modified', (modifiedRoom) => {
+    socket.emit('get_total_unread_count')
+  })
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
-  webSocketStore.disconnect() // disconnects from WebSocket
+  socket.disconnect()
 })
 
 const handleResize = () => {
