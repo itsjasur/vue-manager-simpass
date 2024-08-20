@@ -146,12 +146,11 @@ onMounted(async () => {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 20px;
   box-sizing: border-box;
-
-  min-height: 100%;
-  overflow-y: auto;
-  /* overflow-x: hidden; */
+  padding: 20px;
+  margin-top: 20px;
+  /* min-height: 100%; */
+  /* overflow-y: auto; */
 }
 .counts-container {
   width: 100%;
@@ -222,8 +221,7 @@ onMounted(async () => {
   flex-flow: wrap;
   gap: 20px;
   justify-content: center;
-
-  margin-bottom: 200px;
+  margin-bottom: 100px;
 }
 
 .card {

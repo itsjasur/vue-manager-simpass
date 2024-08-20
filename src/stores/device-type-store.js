@@ -2,17 +2,39 @@
 
 // export const useDeviceTypeStore = defineStore('deviceType', {
 //   state: () => ({
-//     isMobile: '',
+//     isMobile: true,
 //   }),
 
 //   actions: {
 //     isDeviceMobile() {
 //       const userAgent = navigator.userAgent.toLowerCase()
-//       const mobileTabletRegex = /android|webos|iphone|ipad/i
-//       this.isMobile = mobileTabletRegex.test(userAgent)
-//       return mobileTabletRegex.test(userAgent)
-//     },
+//       console.log(userAgent)
 
+//       // Combined regex for both mobile and tablet devices
+//       const mobileTabletRegex =
+//         /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|kindle|silk|mobile|tab|cros|firefox.*mobile|tizen/i
+
+//       // Check if it's a mobile device or tablet
+//       if (mobileTabletRegex.test(userAgent)) {
+//         this.isMobile = true
+//         return true
+//       }
+
+//       // Check for iPad running iOS 13+ (which can report as a Mac)
+//       if (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) {
+//         this.isMobile = true
+//         return true
+//       }
+
+//       // Additional check for Android tablets that might not be caught by the regex
+//       if (userAgent.indexOf('android') > -1 && userAgent.indexOf('mobile') === -1) {
+//         this.isMobile = true
+//         return true
+//       }
+
+//       this.isMobile = false
+//       return false
+//     },
 //   },
 // })
 
@@ -26,30 +48,15 @@ export const useDeviceTypeStore = defineStore('deviceType', {
   actions: {
     isDeviceMobile() {
       const userAgent = navigator.userAgent.toLowerCase()
-      const mobileRegex = /android|webos|iphone|ipod|blackberry|iemobile|opera mini/i
-      const tabletRegex =
-        /(ipad|tablet|(android(?!.*mobile))|(windows(?!.*phone)(.*touch))|kindle|playbook|silk|(puffin(?!.*(IP|AP|WP))))/i
+      console.log('User Agent:', userAgent)
 
-      // Check if it's a mobile device
-      if (mobileRegex.test(userAgent)) {
-        this.isMobile = true
-        return true
-      }
+      // Check for Windows or macOS
+      const isWindows = userAgent.indexOf('win') > -1
+      const isMacOS = userAgent.indexOf('mac') > -1
 
-      // Check if it's a tablet
-      if (tabletRegex.test(userAgent)) {
-        this.isMobile = true
-        return true
-      }
-
-      // Check for iPad running iOS 13+ (which can report as a Mac)
-      if (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) {
-        this.isMobile = true
-        return true
-      }
-
-      this.isMobile = false
-      return false
+      // If it's neither Windows nor macOS, consider it mobile
+      this.isMobile = !(isWindows || isMacOS)
+      return this.isMobile
     },
   },
 })

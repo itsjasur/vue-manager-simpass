@@ -27,15 +27,15 @@ export const useWebSocketStore = defineStore('webSocket', {
         this.isConnected = true
         this.clearReconnectInterval()
 
-        // try {
-        //   var currentFcmToken = await getToken(messaging, { vapidKey: FIREBASEVAPIDKEY })
-        //   console.log(currentFcmToken)
-        //   if (currentFcmToken) {
-        //     this.socket.send(JSON.stringify({ action: 'update_fcm_token', fcmToken: currentFcmToken }))
-        //   }
-        // } catch (e) {
-        //   console.log(e)
-        // }
+        try {
+          var currentFcmToken = await getToken(messaging, { vapidKey: FIREBASEVAPIDKEY })
+          console.log(currentFcmToken)
+          if (currentFcmToken) {
+            this.socket.send(JSON.stringify({ action: 'update_fcm_token', fcmToken: currentFcmToken }))
+          }
+        } catch (e) {
+          console.log(e)
+        }
       }
 
       this.socket.onclose = () => {

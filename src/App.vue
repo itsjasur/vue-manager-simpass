@@ -35,9 +35,9 @@ import { useSideMenuStore } from './stores/side-menu'
 import SearchAddressPopup from './components/SearchAddressPopup.vue'
 import PrintablePopup from './components/PrintablePopup.vue'
 import Loading from './components/Loading.vue'
-import { messaging, getToken, onMessage } from './firebase'
-import { FIREBASEVAPIDKEY } from '../sensitive'
 import sound from '@/assets/sound.mp3'
+
+import { messaging, onMessage } from './firebase'
 
 const router = useRouter()
 const authStore = useAuthenticationStore()
@@ -65,13 +65,13 @@ onMounted(async () => {
   window.addEventListener('resize', handleResize)
   handleResize()
 
-  // try {
-  //   var currentToken = await getToken(messaging, { vapidKey: FIREBASEVAPIDKEY })
-  //   localStorage.setItem('fcmToken', currentToken)
-  //   console.log(currentToken)
-  // } catch (e) {
-  //   console.log(e)
-  // }
+  try {
+    var currentToken = await getToken(messaging, { vapidKey: FIREBASEVAPIDKEY })
+    localStorage.setItem('fcmToken', currentToken)
+    console.log(currentToken)
+  } catch (e) {
+    console.log(e)
+  }
 
   onMessage(messaging, (payload) => {
     console.log('Message received. ', payload)

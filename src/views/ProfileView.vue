@@ -1,6 +1,7 @@
 <template>
-  <div class="container">
+  <div class="profile_container">
     <div class="title">가입신청/고객정보</div>
+    <!-- <div class="title">{{ userAgent }}</div> -->
     <div class="row">
       <div class="groups">
         <label>판매점 아이디 </label>
@@ -82,6 +83,10 @@
       />
       <button @click="submit">서명/사인 저장</button>
     </template>
+
+    <div></div>
+    <div></div>
+    <div></div>
   </div>
 </template>
 
@@ -170,10 +175,15 @@ async function submit() {
   }
 }
 onMounted(fetchProfileData)
+
+// const userAgent = ref('')
+// onMounted(() => {
+//   userAgent.value = navigator.userAgent.toLowerCase()
+// })
 </script>
 
 <style scoped>
-.container {
+.profile_container {
   max-width: 1000px;
   margin-top: 20px;
   box-sizing: border-box;
@@ -181,6 +191,7 @@ onMounted(fetchProfileData)
   flex-flow: column;
   gap: 30px;
   padding: 0 20px;
+  overflow-y: auto;
 }
 
 .groups {
