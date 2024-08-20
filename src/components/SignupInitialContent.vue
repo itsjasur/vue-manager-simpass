@@ -121,9 +121,7 @@
       @closePopup="closePopup"
       :data="{
         name: name,
-        // birthday: removeDashes(birthday.replace(/-/g, '')),
         birthday: birthday,
-        // phoneNumber: removeDashes(phoneNumber.replace(/-/g, '')),
         phoneNumber: phoneNumber,
         receiptId: receiptId,
         salesCd: salesCd,

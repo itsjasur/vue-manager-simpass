@@ -336,7 +336,7 @@ export const FORMS = reactive({
     // value: '91-01-31',
     type: 'cleave',
     pattern: cleavePatterns.birthdayPattern,
-    maxwidth: '100px',
+    maxwidth: '150px',
     error: '생년월일 입력하세요.',
     placeholder: '91-01-31',
     label: '예금주 생년월일',
@@ -349,7 +349,7 @@ export const FORMS = reactive({
     // value: '91-01-31',
     type: 'cleave',
     pattern: cleavePatterns.birthdayPatternFull,
-    maxwidth: '200px',
+    maxwidth: '150px',
     error: '생년월일 입력하세요.',
     placeholder: '1991-01-31',
     label: '예금주 생년월일',
@@ -661,7 +661,7 @@ export const FORMS = reactive({
     //
     type: 'cleave',
     pattern: cleavePatterns.birthdayPattern,
-    maxwidth: '100px',
+    maxwidth: '150px',
     hasDefault: true,
     required: true,
     errorMessage: null,
@@ -675,7 +675,7 @@ export const FORMS = reactive({
     //
     type: 'cleave',
     pattern: cleavePatterns.birthdayPatternFull,
-    maxwidth: '200px',
+    maxwidth: '150px',
     hasDefault: true,
     required: true,
     errorMessage: null,
@@ -738,7 +738,7 @@ export const FORMS = reactive({
   deputy_birthday: {
     type: 'cleave',
     pattern: cleavePatterns.birthdayPattern,
-    maxwidth: '100px',
+    maxwidth: '150px',
     hasDefault: true,
     required: true,
     errorMessage: null,
@@ -750,7 +750,7 @@ export const FORMS = reactive({
   deputy_birthday_full: {
     type: 'cleave',
     pattern: cleavePatterns.birthdayPatternFull,
-    maxwidth: '200px',
+    maxwidth: '150px',
     hasDefault: true,
     required: true,
     errorMessage: null,

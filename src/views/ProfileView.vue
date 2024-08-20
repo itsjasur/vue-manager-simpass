@@ -16,8 +16,8 @@
 
     <div class="row">
       <div class="groups">
-        <label for="contact">대표자명</label>
-        <input id="contact" :value="data.contractor" placeholder="" readonly />
+        <label>대표자명</label>
+        <input :value="data.contractor" placeholder="" readonly />
       </div>
 
       <div class="groups">
@@ -28,8 +28,8 @@
 
     <div class="row">
       <div class="groups">
-        <label for="contact">연락처</label>
-        <input id="contact" v-model="contact" placeholder="" readonly />
+        <label>연락처</label>
+        <input v-model="contact" placeholder="" readonly />
       </div>
 
       <div class="groups">
@@ -84,6 +84,47 @@
       <button @click="submit">서명/사인 저장</button>
     </template>
 
+    <div class="password-change-container">
+      <div class="title">비밀번호 변경</div>
+      <div class="groups" style="max-width: 400px">
+        <label>현재 비밀번호 </label>
+        <input type="password" v-model="oldPassword" placeholder="비밀번호" />
+        <p v-if="isSubmitted && !oldPassword" class="input-error-message">현재 비밀번호를 입력해주세요.</p>
+      </div>
+      <div class="groups" style="max-width: 400px">
+        <label>새 비밀번호 </label>
+        <input type="password" v-model="newPassword" placeholder="비밀번호" />
+        <p v-if="isSubmitted && !newPassword" class="input-error-message">새 비밀번호를 입력해주세요.</p>
+      </div>
+      <div class="groups" style="max-width: 400px">
+        <label>현재 비밀번호 확인 </label>
+        <input type="password" v-model="newPasswordCheck" placeholder="비밀번호" />
+        <p v-if="isSubmitted && !newPasswordCheck" class="input-error-message">새 비밀번호를 다시 입력해주세요.</p>
+        <p
+          v-if="isSubmitted && newPassword && newPasswordCheck && newPassword !== newPasswordCheck"
+          class="input-error-message"
+        >
+          비밀번호가 일치하지 않습니다.
+        </p>
+      </div>
+
+      <button @click="changePassword" :disabled="isLoading">
+        <LoadingSpinner v-if="isLoading" height="20px" color="#ffffff" />
+        <span v-else> 비밀번호 업데이트 </span>
+      </button>
+
+      <div class="password-change-rules">
+        <div class="rule-title">강력한 비밀번호를 얻으려면 이 가이드를 따르세요.</div>
+
+        <ul>
+          <li>특수 문자 1개</li>
+          <li>최소 8글자</li>
+          <li>숫자 1개(2개 권장)</li>
+          <li>자주 바꾸세요</li>
+        </ul>
+      </div>
+    </div>
+
     <div></div>
     <div></div>
     <div></div>
@@ -97,6 +138,7 @@ import { useSnackbarStore } from '@/stores/snackbar'
 import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
 import SignImageRowContainer from '@/components/SignImageRowContainer.vue'
 import { useDeviceTypeStore } from '@/stores/device-type-store'
+import LoadingSpinner from '../components/Loader.vue'
 
 const data = ref({})
 const pname = ref('')
@@ -176,6 +218,49 @@ async function submit() {
 }
 onMounted(fetchProfileData)
 
+const oldPassword = ref(null)
+const newPassword = ref(null)
+const newPasswordCheck = ref(null)
+const isSubmitted = ref(false)
+const isLoading = ref(false)
+
+async function changePassword() {
+  // console.log(data.value)
+
+  isSubmitted.value = true
+  if (!oldPassword.value || !newPassword.value) {
+    useSnackbarStore().show('이전 비밀번호와 새 비밀번호를 입력하세요.')
+    return
+  }
+  if (newPassword.value !== newPasswordCheck.value) {
+    useSnackbarStore().show('비밀번호가 일치하지 않습니다.')
+    return
+  }
+
+  try {
+    isLoading.value = true
+
+    const response = await fetchWithTokenRefresh('admin/myPassword', {
+      method: 'POST',
+      body: {
+        id: data.value.id,
+        username: data.value.username,
+        password: oldPassword.value,
+        new_password: newPassword.value,
+      },
+    })
+
+    const decodedResponse = await response.json()
+    console.log(decodedResponse)
+
+    useSnackbarStore().show(decodedResponse?.message ?? 'Password change error')
+  } catch (error) {
+    useSnackbarStore().show(error.toString())
+  } finally {
+    isLoading.value = false
+  }
+}
+
 // const userAgent = ref('')
 // onMounted(() => {
 //   userAgent.value = navigator.userAgent.toLowerCase()
@@ -217,7 +302,13 @@ button {
   max-width: 200px;
   margin-top: 20px;
   height: 45px;
-  margin-bottom: 100px;
+}
+
+.password-change-container {
+  display: flex;
+  flex-flow: column;
+  gap: 20px;
+  margin-bottom: 150px;
 }
 
 @media (max-width: 600px) {

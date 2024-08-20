@@ -53,7 +53,7 @@ export const formatDate = (today) => {
 // 최소 8자이상, 영문대문자 1개이상포함, 숫자 1개이상포함, 특수문자(! @ # $ & ~ * % ^ ?) 1개이상포함
 export const isValidPassword = (password) => {
   const minLength = 8
-  const uppercasePattern = /[A-Z]/
+  const uppercasePattern = /[a-zA-Z]/
   const numberPattern = /[0-9]/
   const specialCharPattern = /[!@#$&~*%^?]/
 

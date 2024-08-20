@@ -98,18 +98,21 @@ onMounted(async () => {
   display: flex;
   flex-flow: column;
   gap: 40px;
+  padding-bottom: 100px;
 }
 
 .types {
   display: flex; /* Display the carrier buttons in a row */
   gap: 20px;
   flex-flow: wrap;
+  align-items: center;
 }
 
 .carriers {
   display: flex; /* Display the carrier buttons in a row */
   gap: 20px;
   flex-flow: wrap;
+  align-items: center;
 }
 
 .mvnos {
@@ -121,6 +124,7 @@ onMounted(async () => {
 .button {
   min-height: 55px;
   min-width: 140px;
+  align-items: center;
 }
 
 .card {

@@ -148,17 +148,17 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, onUnmounted } from 'vue'
+import { ref, watch } from 'vue'
 import { useSnackbarStore } from '@/stores/snackbar'
 import SearchAddressPopup from '../components/SearchAddressPopup.vue'
 import { useSearchaddressStore } from '@/stores/select-address-popup'
 import { useSignUpstore } from '../stores/signup-store'
-import * as helpers from '@/utils/helpers'
 import { useRouter } from 'vue-router'
 import LoadingSpinner from '../components/Loader.vue'
 import { useWarningStore } from '../stores/warning'
 import { EMAILOPTIONS } from '../assets/constants'
 import * as cleavePatterns from '../utils/cleavePatterns'
+import { validatePass, validateRentryPass } from '@/utils/validators'
 
 const warningStore = useWarningStore()
 
@@ -237,9 +237,10 @@ const addressDetails = ref()
 const password = ref()
 const passwordValid = ref(false)
 const passwordPrompt = ref()
+
 const passwordCheck = ref()
-const passwordCheckValid = ref()
 const passwordCheckPrompt = ref()
+const passwordCheckValid = ref()
 
 const isSubmitted = ref(false)
 
@@ -249,17 +250,15 @@ function checkPass() {
   passwordCheckPrompt.value = null
   passwordCheckValid.value = false
 
-  if (!helpers.isValidPassword(password.value)) {
-    passwordPrompt.value =
-      '최소 8자이상, 영문대문자 1개이상포함, 숫자 1개이상포함, 특수문자(! @ # $ & ~ * % ^ ?) 1개이상포함'
-  } else {
+  passwordPrompt.value = validatePass(password.value)
+  passwordCheckPrompt.value = validateRentryPass(password.value, passwordCheck.value)
+
+  if (!passwordPrompt.value) {
     passwordValid.value = true
     passwordPrompt.value = 'OK'
   }
 
-  if (password.value !== passwordCheck.value) {
-    passwordCheckPrompt.value = '비밀번호가 일치하지 않습니다'
-  } else {
+  if (!passwordCheckPrompt.value) {
     passwordCheckValid.value = true
     passwordCheckPrompt.value = 'OK'
   }
