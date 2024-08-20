@@ -35,7 +35,17 @@
         </div>
       </div>
 
-      <div class="card">
+      <div
+        @click="
+          warningStore.open(`현재 정책보기 서비스는 개발진행중 입니다.`, [
+            '빠른시일내 서비스 제공해 드리겠습니다. ^^',
+            '당분간 정책관련 문의는 아래 연락처로 연락부탁드립니다.',
+            '담당자 : 안도현',
+            '연락처 : 010-8062-1111',
+          ])
+        "
+        class="card"
+      >
         <div class="img">
           <img src="../assets/icons/docs.png" alt="" />
         </div>
@@ -77,6 +87,10 @@ import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
 import { onMounted, ref } from 'vue'
 import HomePagePopup from '../components/HomePagePopup.vue'
 import { useRouter } from 'vue-router'
+
+import { useWarningStore } from '@/stores/warning'
+
+const warningStore = useWarningStore()
 
 const router = useRouter()
 

@@ -92,6 +92,7 @@
           <input
             type="username"
             v-model="username"
+            maxlength="20"
             @input="
               (event) => {
                 validateIdInput(event)
