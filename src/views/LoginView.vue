@@ -31,21 +31,33 @@
       </router-link>
     </div>
 
-    <p class="foot-note">
-      상호 : 심패스(Simpass) | 대표 : 김익태 | 대표전화 : 02-2108-3121 | FAX : 02-2108-3120 사업자등록번호 :
-      343-18-00713 | 통신판매신고번호 : 제 2021-서울구로-1451 호 서울시 구로구 디지털로33길 28, 우림이비지센터 1차
-      1210호
-    </p>
+    <div v-if="hostname === 'sjnetwork'" class="foot-note">
+      <span>상호 : (주)에스제이네트웍스 | 대표 : 백제현</span>
+      <span>대표전화 : 1660-3566 | 부산센터 : 1660-3577</span>
+      <span>사업자등록번호 : 358-86-02691</span>
+      <span>대구광역시 동구 송라로16길 85 C&P빌딩 2층</span>
+    </div>
+    <div v-else class="foot-note">
+      <span>상호 : 심패스(Simpass) | 대표 : 김익태</span>
+      <span>대표전화 : 02-2108-3121 | FAX : 02-2108-3120</span>
+      <span>사업자등록번호 : 343-18-00713 | 통신판매신고번호 : 제 2021-서울구로-1451 호</span>
+      <span>서울시 구로구 디지털로33길 28, 우림이비지센터 1차 1210호</span>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useAuthenticationStore } from '../stores/authentication'
 import { useSnackbarStore } from '../stores/snackbar'
 import LoadingSpinner from '../components/Loader.vue'
 import { useRouteMemoryStore } from '@/stores/router-memory-store'
 import { useRouter } from 'vue-router'
+
+const hostname = ref('sjnetwork')
+onMounted(() => {
+  hostname.value = window.location.hostname.includes('sjnetwork') ? 'sjnetwork' : 'baroform'
+})
 
 const username = ref('')
 const password = ref('')
@@ -165,6 +177,16 @@ async function login(event) {
   font-size: 14px;
   text-align: center;
   width: 500px;
+
+  display: flex;
+  flex-flow: column;
+
+  /* word-break: keep-all; */
+  /* overflow-wrap: break-word; */
+
+  white-space: pre-wrap;
+  word-break: keep-all;
+  word-wrap: break-word;
 }
 
 .submit-button {
