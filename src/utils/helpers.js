@@ -49,27 +49,29 @@ export const formatDate = (today) => {
   const day = String(today.getDate()).padStart(2, '0')
   return `${year}-${month}-${day}`
 }
+export function base64ToBlobUrl(base64Data) {
+  let contentType = 'image/png' // Default content type set to PNG
+  let raw = base64Data
 
-// 최소 8자이상, 영문대문자 1개이상포함, 숫자 1개이상포함, 특수문자(! @ # $ & ~ * % ^ ?) 1개이상포함
-export const isValidPassword = (password) => {
-  const minLength = 8
-  const uppercasePattern = /[a-zA-Z]/
-  const numberPattern = /[0-9]/
-  const specialCharPattern = /[!@#$&~*%^?]/
+  // Check if the base64 string includes the data URL prefix
+  if (base64Data.startsWith('data:')) {
+    const parts = base64Data.split(';base64,')
+    contentType = parts[0].split(':')[1]
+    raw = parts[1]
+  }
 
-  if (password.length < minLength) {
-    return false
+  const byteCharacters = atob(raw)
+  const byteNumbers = new Array(byteCharacters.length)
+
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i)
   }
-  if (!uppercasePattern.test(password)) {
-    return false
-  }
-  if (!numberPattern.test(password)) {
-    return false
-  }
-  if (!specialCharPattern.test(password)) {
-    return false
-  }
-  return true
+
+  const byteArray = new Uint8Array(byteNumbers)
+  const blob = new Blob([byteArray], { type: contentType })
+  const url = URL.createObjectURL(blob)
+
+  return url
 }
 
 // const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))

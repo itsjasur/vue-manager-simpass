@@ -177,7 +177,6 @@ async function fetchData() {
 
 const submitted = ref(false)
 const isSubmitting = ref(false)
-const formData = new FormData()
 
 async function submit() {
   try {

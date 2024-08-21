@@ -19,7 +19,6 @@
   <Snackbar />
   <Warning />
   <SearchAddressPopup />
-  <PrintablePopup />
 
   <!-- <div class="popup_with_overlay"></div> -->
 </template>
@@ -33,7 +32,6 @@ import { useAuthenticationStore } from './stores/authentication'
 import { useRouteMemoryStore } from './stores/router-memory-store'
 import { useSideMenuStore } from './stores/side-menu'
 import SearchAddressPopup from './components/SearchAddressPopup.vue'
-import PrintablePopup from './components/PrintablePopup.vue'
 import Loading from './components/Loading.vue'
 import sound from '@/assets/sound.mp3'
 

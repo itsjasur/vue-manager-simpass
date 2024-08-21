@@ -7,11 +7,14 @@ import Antd from 'ant-design-vue'
 // import 'ant-design-vue/dist/reset.css'
 import './assets/global.css'
 import CleaveInput from './components/CleaveInput.vue'
+import GlobalPopupWithOverlay from './components/GlobalPopupWithOverlay.vue'
 
 const app = createApp(App)
 
 const pinia = createPinia()
 app.component('CleaveInput', CleaveInput)
+app.component('GlobalPopupWithOverlay', GlobalPopupWithOverlay)
+
 app.use(pinia)
 app.use(router)
 app.use(Antd)

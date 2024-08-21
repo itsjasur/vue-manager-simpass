@@ -199,8 +199,8 @@ async function submit() {
   if (!signData.value || !sealData.value) return useSnackbarStore().show('서명/사인 하지 않았습니다')
 
   //adding sign images data
-  formData.set('partner_sign', signData.value)
-  formData.set('partner_seal', sealData.value)
+  formData.set('partner_sign', signData.value ?? '')
+  formData.set('partner_seal', sealData.value ?? '')
 
   try {
     const response = await fetchWithTokenRefresh('agent/setActSign', {

@@ -115,19 +115,31 @@
       </div>
     </div>
   </div>
+
+  <GlobalPopupWithOverlay ref="imageViewerRef">
+    <ImageViewPopup @closePopup="closeImageViewPopup" :imageUrls="imageBlobUrls" :canPrint="true" />
+  </GlobalPopupWithOverlay>
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import * as cleavePatterns from '../utils/cleavePatterns'
-import { formatDate } from '../utils/helpers'
 import { useSnackbarStore } from '../stores/snackbar'
 import { fetchWithTokenRefresh } from '../utils/tokenUtils'
-import { usePrintablePopup } from '../stores/printable-popup'
 import { usePageLoadingStore } from '@/stores/page-loading-store'
 import { useHomeStatusHolder } from '@/stores/home-status-store'
+import ImageViewPopup from '../components/ImageViewPopup.vue'
+import { base64ToBlobUrl } from '@/utils/helpers'
 
-const printPopup = usePrintablePopup()
+const imageViewerRef = ref()
+const imageBlobUrls = ref([])
+function openImageViewPopup(base64Images) {
+  imageBlobUrls.value = base64Images?.map((i) => base64ToBlobUrl(i)) || []
+  imageViewerRef.value.showPopup()
+}
+
+function closeImageViewPopup() {
+  imageViewerRef.value.closePopup()
+}
 
 const selectedStatus = ref('')
 const statuses = ref([])
@@ -236,7 +248,7 @@ const fetchAndOpenFile = async (actNo) => {
     if (response.ok) {
       const decodedResponse = await response.json()
       if (decodedResponse.data && decodedResponse.data.apply_forms_list) {
-        printPopup.open(decodedResponse.data.apply_forms_list)
+        openImageViewPopup(decodedResponse?.data?.apply_forms_list ?? [])
       } else {
         throw 'No form with this ID'
       }

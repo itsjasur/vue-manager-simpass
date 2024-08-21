@@ -373,13 +373,17 @@ async function submit() {
   }
 
   if (imageUploads.businessLicence.new && imageUploads.businessLicence.new instanceof File)
-    formData.set('bs_reg_no_attach', imageUploads.businessLicence.new, imageUploads.businessLicence.new.name)
+    formData.set(
+      'bs_reg_no_attach',
+      imageUploads.businessLicence.new,
+      imageUploads?.businessLicence?.new?.name ?? 'filename'
+    )
 
   if (imageUploads.directorId.new && imageUploads.directorId.new instanceof File)
-    formData.set('id_card_attach', imageUploads.directorId.new, imageUploads.directorId.new.name)
+    formData.set('id_card_attach', imageUploads.directorId.new, imageUploads?.directorId?.new?.name ?? 'filename')
 
   if (imageUploads.bankBook.new && imageUploads.bankBook.new instanceof File)
-    formData.set('bank_book_attach', imageUploads.bankBook.new, imageUploads.bankBook.new.name)
+    formData.set('bank_book_attach', imageUploads.bankBook.new, imageUploads?.bankBook?.new?.name ?? '')
 
   formData.set('agent_cd', props.agentCd)
 
