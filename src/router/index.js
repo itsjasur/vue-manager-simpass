@@ -77,7 +77,6 @@ const router = createRouter({
           name: 'form-details',
           component: FormDetailsView,
           meta: { requiresAuth: true },
-          props: true,
         },
 
         {

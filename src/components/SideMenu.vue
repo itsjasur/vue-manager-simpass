@@ -23,7 +23,7 @@ import { useRoute, useRouter } from 'vue-router'
 import sjlogo from '@/assets/sjlogo.png'
 import baroformlogo from '@/assets/baroformlogo.png'
 
-const hostname = ref('sjnetwork')
+const hostname = ref('baroform')
 onMounted(() => {
   hostname.value = window.location.hostname.includes('sjnetwork') ? 'sjnetwork' : 'baroform'
 })

@@ -14,6 +14,8 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import privacyHtml from '@/assets/privacy.html?url'
 import usetermsHtml from '@/assets/useterms.html?url'
+import sjPrivacyHtml from '@/assets/sj_privacy.html?url'
+import sjUsetermsHtml from '@/assets/sj_useterms.html?url'
 
 const emit = defineEmits(['closePopup'])
 
@@ -27,7 +29,12 @@ const htmlContent = ref('')
 // Function to fetch the HTML file content
 async function loadHtml() {
   try {
-    const response = await fetch(props.type === 'privacy' ? privacyHtml : usetermsHtml)
+    let response
+    if (hostname.value === 'sjnetwork') {
+      response = await fetch(props.type === 'privacy' ? sjPrivacyHtml : sjUsetermsHtml)
+    } else {
+      response = await fetch(props.type === 'privacy' ? privacyHtml : usetermsHtml)
+    }
 
     if (!response.ok) {
       throw new Error('Network response was not ok')
@@ -46,7 +53,9 @@ function keydownHandle(event) {
   if (event.key === 'Escape') emit('closePopup')
 }
 
+const hostname = ref('baroform')
 onMounted(() => {
+  hostname.value = window.location.hostname.includes('sjnetwork') ? 'sjnetwork' : 'baroform'
   document.addEventListener('keydown', keydownHandle)
   loadHtml()
 })

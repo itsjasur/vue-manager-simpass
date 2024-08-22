@@ -32,280 +32,11 @@ export const EMAILOPTIONS = [
   { value: '@hotmail.com', label: '@hotmail.com' },
 ]
 
-export const PLANSINFO = [
-  {
-    code: 'PR',
-    carriers: [
-      {
-        code: 'KT',
-
-        mvnos: [
-          {
-            wishCount: 2,
-            code: 'COM',
-            customerForms: [
-              'cust_type_cd',
-              'contact',
-              'name',
-              'birthday',
-              'id_no',
-              'country',
-              'address',
-              'addressdetail',
-            ],
-
-            usimForms: [
-              //
-              'usim_plan_nm',
-              'usim_model_list',
-              'usim_no',
-              'usim_act_cd',
-            ],
-          },
-        ],
-      },
-      {
-        code: 'LG',
-        mvnos: [
-          {
-            wishCount: 3,
-            code: 'HPM',
-            customerForms: [
-              'cust_type_cd',
-              'contact',
-              'name',
-              'birthday',
-              'id_no',
-              'country',
-              'address',
-              'addressdetail',
-            ],
-
-            usimForms: [
-              //
-              'usim_plan_nm',
-              'usim_model_list',
-              'usim_no',
-              'usim_fee_cd',
-              'usim_act_cd',
-            ],
-          },
-
-          {
-            code: 'ISM',
-            wishCount: 3,
-            customerForms: [
-              'cust_type_cd',
-              'contact',
-              'name',
-              'birthday',
-              'id_no',
-              'country',
-              'address',
-              'addressdetail',
-            ],
-
-            usimForms: [
-              //
-              'usim_plan_nm',
-              'usim_model_list',
-              'usim_no',
-              'usim_act_cd',
-            ],
-          },
-        ],
-      },
-    ],
-  },
-
-  {
-    code: 'PO',
-    paymentForms: [
-      //
-      'paid_transfer_cd',
-      'account_name',
-      'account_birthday',
-      'account_agency',
-      'account_number',
-    ],
-
-    // deputyForms: [
-    //   //
-    //   'deputy_name',
-    //   'deputy_birthday',
-    //   'relationship_cd',
-    //   'deputy_contact',
-    // ],
-    carriers: [
-      {
-        code: 'SK',
-
-        mvnos: [
-          {
-            wishCount: 2,
-            code: 'SVM',
-            customerForms: [
-              //
-              'cust_type_cd',
-              'contact',
-              'name',
-              'birthday_full',
-              'address',
-              'addressdetail',
-            ],
-            usimForms: [
-              //
-              'usim_plan_nm',
-              'usim_no',
-              'usim_fee_cd',
-              'data_block_cd',
-              'phone_bill_block_cd',
-              'usim_act_cd',
-            ],
-          },
-        ],
-      },
-      {
-        code: 'KT',
-
-        mvnos: [
-          {
-            wishCount: 2,
-            code: 'KTM',
-
-            usimForms: [
-              //
-              'usim_plan_nm',
-              'usim_model_list',
-              'usim_no',
-              'usim_fee_cd',
-              'data_block_cd',
-              'phone_bill_block_cd',
-              'plan_fee_cd',
-              'usim_act_cd',
-            ],
-            customerForms: [
-              //
-              'cust_type_cd',
-              'contact',
-              'name',
-              'birthday',
-              'gender_cd',
-              'address',
-              'addressdetail',
-            ],
-          },
-          {
-            code: 'KTS',
-
-            usimForms: [
-              //
-              'usim_plan_nm',
-              'usim_model_list',
-              'usim_no',
-              'data_block_cd',
-              'phone_bill_block_cd',
-              'usim_act_cd',
-            ],
-            customerForms: [
-              //
-              'cust_type_cd',
-              'contact',
-              'name',
-              'birthday',
-              'address',
-              'addressdetail',
-            ],
-          },
-        ],
-      },
-      {
-        code: 'LG',
-
-        mvnos: [
-          {
-            wishCount: 3,
-            code: 'HPM',
-
-            usimForms: [
-              //
-              'usim_plan_nm',
-              'usim_model_list',
-              'usim_no',
-              'usim_fee_cd',
-              'usim_act_cd',
-            ],
-            customerForms: [
-              'cust_type_cd',
-              'contact',
-              'name',
-              'birthday',
-              'id_no',
-              'country',
-              'address',
-              'addressdetail',
-            ],
-          },
-          {
-            wishCount: 2,
-            code: 'HVS',
-            usimForms: [
-              //
-              'usim_plan_nm',
-              'usim_model_list',
-              'usim_no',
-              'usim_fee_cd',
-              'extra_service_cd',
-              'data_roming_block_cd',
-              'plan_fee_cd',
-              'usim_act_cd',
-            ],
-            customerForms: [
-              //
-              'cust_type_cd',
-              'contact',
-              'name',
-              'birthday',
-              'address',
-              'addressdetail',
-              'gender_cd',
-            ],
-          },
-          {
-            wishCount: 2,
-            code: 'UPM',
-            usimForms: [
-              //
-              'usim_plan_nm',
-              'usim_model_list',
-              'usim_no',
-              'usim_fee_cd',
-              'extra_service_cd',
-              'data_roming_block_cd',
-              'usim_act_cd',
-            ],
-            customerForms: [
-              //
-              'cust_type_cd',
-              'contact',
-              'name',
-              'birthday',
-              'address',
-              'addressdetail',
-            ],
-          },
-        ],
-      },
-    ],
-  },
-]
-
 import * as cleavePatterns from '../utils/cleavePatterns'
 import { reactive } from 'vue'
 
 export const FORMS = reactive({
-  //USIM INFO
-
+  //PAYMENT FORMS
   paid_transfer_cd: {
     value: null,
     type: 'select',
@@ -437,7 +168,7 @@ export const FORMS = reactive({
     hasDefault: false,
     required: true,
     errorMessage: null,
-    label: '일련번호',
+    label: 'USIM 일련번호',
   },
   usim_fee_cd: {
     value: null,
@@ -451,6 +182,7 @@ export const FORMS = reactive({
     label: '유심비용청구',
   },
 
+  //EXTRA
   extra_service_cd: {
     value: null,
     type: 'select',
@@ -587,6 +319,8 @@ export const FORMS = reactive({
     errorMessage: null,
   },
 
+  //CUSTOMER FORMS
+
   cust_type_cd: {
     value: null,
     type: 'select',
@@ -717,11 +451,13 @@ export const FORMS = reactive({
     required: false,
     errorMessage: null,
     type: 'input',
-    maxwidth: '180px',
+    maxwidth: '200px',
     error: null,
     placeholder: '우림이비지센터 1차 1210호',
     label: '상세주소',
   },
+
+  //DEPUTY FORMS
 
   deputy_name: {
     label: '법정대리인 이름',
@@ -800,3 +536,60 @@ export const FORMS = reactive({
 //   { value: '@naver.com', label: '@naver.com' },
 //   { value: null, label: '직접입력' },
 // ]
+
+// <!--OLD  FORMS -->
+// <template v-for="(typeFormNames, index) of availableForms" :key="index">
+//   <template v-if="typeFormNames.length > 0">
+//     <div class="partition">
+//       <div v-if="index === 'usim'" class="title">요금제 정보</div>
+//       <div v-if="index === 'customer'" class="title">고객 정보</div>
+//       <div v-if="index === 'deputy'" class="title">법정대리인</div>
+//       <div v-if="index === 'payment'" class="title">
+//         <span> 자동이체 </span>
+//         <a-checkbox class="checkbox left-margin" v-model:checked="selfRegisterChecked">가입자와 동일</a-checkbox>
+//       </div>
+
+//       <template v-for="(formName, index) in typeFormNames" :key="index">
+//         <div class="group" :style="{ maxWidth: FIXED_FORMS[formName].maxwidth }">
+//           <label>{{ FIXED_FORMS[formName].label }}</label>
+
+//           <!-- input -->
+//           <template v-if="FIXED_FORMS[formName].type === 'input'">
+//             <div class="group-input-moon" v-if="formName === 'usim_plan_nm'">
+//               <input v-model="FIXED_FORMS[formName].value" v-bind="inputBindings(formName)" />
+//               <button @click="changeUsimPlan">변경</button>
+//             </div>
+
+//             <input v-else v-model="FIXED_FORMS[formName].value" v-bind="inputBindings(formName)" />
+//           </template>
+
+//           <!-- select -->
+//           <template v-if="FIXED_FORMS[formName].type === 'select'">
+//             <a-select
+//               v-model:value="FIXED_FORMS[formName].value"
+//               :style="{ width: '100%' }"
+//               @change="generateInitialForms"
+//               :options="FIXED_FORMS[formName].options"
+//               v-bind="inputBindings(formName)"
+//             >
+//             </a-select>
+//           </template>
+
+//           <!-- cleave -->
+//           <template v-if="FIXED_FORMS[formName].type === 'cleave'">
+//             <CleaveInput
+//               :options="FIXED_FORMS[formName].pattern"
+//               :value="FIXED_FORMS[formName].value"
+//               v-bind="inputBindings(formName)"
+//               @update:modelValue="handleCleaveInput($event, formName)"
+//             />
+//           </template>
+
+//           <p v-if="formSubmitted && !filledCheckValues[formName]" class="input-error-message">
+//             {{ FIXED_FORMS[formName].errorMessage }}
+//           </p>
+//         </div>
+//       </template>
+//     </div>
+//   </template>
+// </template>

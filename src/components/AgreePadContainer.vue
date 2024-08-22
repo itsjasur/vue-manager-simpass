@@ -41,7 +41,6 @@ const closePopup = () => {
 }
 
 function savePadData(data) {
-  console.log(data)
   agreePadData.value = data
   emits('updateAgreePadData', agreePadData.value)
 }
