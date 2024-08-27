@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" id="favicon" href="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+    />
+
+    <title>바로폼</title>
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="" id="og-url" />
+    <meta property="og:title" content="바로폼" id="og-title" />
+    <meta property="og:description" content="" id="og-description" />
+    <meta property="og:image" content="" id="og-image" />
+
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+  </head>
+
+  <body>
+    <div id="app"></div>
+
+    <script type="module" src="/src/main.js"></script>
+
+    <script>
+      function setTitleAndMeta() {
+        var hostname = window.location.hostname
+        var favicon = document.getElementById('favicon')
+        var ogTitle = document.getElementById('og-title')
+        var ogDescription = document.getElementById('og-description')
+        var ogUrl = document.getElementById('og-url')
+        var ogImage = document.getElementById('og-image')
+
+        var title, description, faviconPath, imagePath
+
+        if (hostname.includes('sjnetwork')) {
+          title = 'SJ개통센터'
+          description = 'SJ개통센터 회원가입'
+          faviconPath = '/sjfavicon.png'
+          imagePath = 'https://image.simpass.co.kr/logo/sjnetworks.png'
+        } else {
+          title = '바로폼'
+          description = '간편신청 바로폼'
+          faviconPath = '/baroformfavicon.png'
+          imagePath = 'https://image.simpass.co.kr/logo/baroform.png'
+        }
+
+        // sets document title
+        document.title = title
+
+        // sets favicon
+        favicon.href = faviconPath
+
+        // settin Open Graph  info
+        ogTitle.content = title
+        ogDescription.content = description
+        ogUrl.content = window.location.href
+        ogImage.content = imagePath
+      }
+
+      // Run the function when the page loads
+      window.onload = setTitleAndMeta
+    </script>
+  </body>
+</html>

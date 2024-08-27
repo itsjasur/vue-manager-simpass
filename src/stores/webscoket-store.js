@@ -1,6 +1,4 @@
 import { defineStore } from 'pinia'
-import { FIREBASEVAPIDKEY } from '@/../sensitive'
-import { messaging, getToken } from '../firebase'
 
 export const useWebSocketStore = defineStore('webSocket', {
   state: () => ({
@@ -19,23 +17,23 @@ export const useWebSocketStore = defineStore('webSocket', {
       // this.socket = new WebSocket(`ws://localhost:8000/ws/${accessToken}`)
       // this.socket = new WebSocket(`wss://chat.baroform.com/ws/${accessToken}`)
       // this.socket = new WebSocket(`https://chat.baroform.com/ws/${accessToken}`)
-      this.socket = new WebSocket(import.meta.env.VITE_CHAT_SERVER_URL + `ws/${accessToken}`)
 
+      this.socket = new WebSocket(import.meta.env.VITE_CHAT_SERVER_URL + `ws/${accessToken}`)
       this.socket.onopen = async () => {
         console.log('Socket connected')
         this.connectionStatus = 'Connected'
         this.isConnected = true
         this.clearReconnectInterval()
 
-        try {
-          var currentFcmToken = await getToken(messaging, { vapidKey: FIREBASEVAPIDKEY })
-          console.log(currentFcmToken)
-          if (currentFcmToken) {
-            this.socket.send(JSON.stringify({ action: 'update_fcm_token', fcmToken: currentFcmToken }))
-          }
-        } catch (e) {
-          console.log(e)
-        }
+        // try {
+        //   var currentFcmToken = await getToken(messaging, { vapidKey: FIREBASEVAPIDKEY })
+        //   console.log(currentFcmToken)
+        //   if (currentFcmToken) {
+        //     this.socket.send(JSON.stringify({ action: 'update_fcm_token', fcmToken: currentFcmToken }))
+        //   }
+        // } catch (e) {
+        //   console.log(e)
+        // }
       }
 
       this.socket.onclose = () => {

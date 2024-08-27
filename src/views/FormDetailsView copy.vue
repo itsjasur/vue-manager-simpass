@@ -63,11 +63,8 @@
                 />
               </template>
 
-              <p
-                v-if="formSubmitted && FIXED_FORMS[formName].required && FIXED_FORMS[formName].error() !== null"
-                class="input-error-message"
-              >
-                {{ FIXED_FORMS[formName].error() }}
+              <p v-if="formSubmitted && !filledCheckValues[formName]" class="input-error-message">
+                {{ FIXED_FORMS[formName].errorMessage }}
               </p>
             </div>
           </template>
@@ -194,7 +191,9 @@ import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
 import { onMounted, onUnmounted, reactive, ref, watch, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { FORMS } from '../assets/constants'
+
 import { PLANSINFO, displayingForms, generateDisplayingForms } from '../assets/plans_forms'
+
 import _ from 'lodash'
 import SignImageRowContainer from '../components/SignImageRowContainer.vue'
 import { useSearchaddressStore } from '../stores/select-address-popup'
@@ -233,13 +232,10 @@ const router = useRouter()
 const FIXED_FORMS = reactive(_.cloneDeep(FORMS))
 
 //setting address and addressdetail to store value
-watch(
-  () => selectAddressPopup.address,
-  (newValue, oldValue) => {
-    FIXED_FORMS.address.value = selectAddressPopup.address
-    FIXED_FORMS.addressdetail.value = selectAddressPopup.buildingName
-  }
-)
+watchEffect(() => {
+  FIXED_FORMS.address.value = selectAddressPopup.address
+  FIXED_FORMS.addressdetail.value = selectAddressPopup.buildingName
+})
 
 //this inits page
 onMounted(fetchData)
@@ -266,7 +262,9 @@ async function fetchData() {
 
     const decodedResponse = await response.json()
     serverData.value = decodedResponse.data
-    // console.log(serverData.value)
+
+    console.log(serverData.value)
+
     //setting usim plan name everytime it refetches
     FIXED_FORMS.usim_plan_nm.value = serverData.value.usim_plan_info.usim_plan_nm
 
@@ -358,12 +356,21 @@ function generateInitialForms() {
       availableForms.value.push('deputy_birthday_full')
     }
   }
+
+  //checkable forms in order to submit or showing error
+  filledCheckValues.value = Object.fromEntries(
+    availableForms.value.map((formName) => [
+      formName,
+      FIXED_FORMS[formName]?.value ? true : !FIXED_FORMS[formName]?.required,
+    ])
+  )
 }
 
 //sets default values
 function setDefault() {
   for (const formName in FIXED_FORMS) {
     //setting empty default error messages
+    if (!FIXED_FORMS[formName].value) FIXED_FORMS[formName].errorMessage = FIXED_FORMS[formName].error
 
     if (
       FIXED_FORMS[formName].type === 'select' &&
@@ -502,6 +509,51 @@ const partnerSignImageData = ref()
 //i agreee pad
 const agreePadData = ref()
 
+// const filledCheckValues = ref({})
+// for (const formName in FIXED_FORMS) {
+//   watch(
+//     () => FIXED_FORMS[formName].value,
+//     (newValue, oldValue) => {
+//       let field = FIXED_FORMS[formName]
+//       let isValid = true
+//       field.errorMessage = null
+
+//       // Phone number validation
+//       if (['deputy_contact', 'contact', 'phone_number'].includes(formName)) {
+//         if (newValue && newValue?.replaceAll('-', '')?.length < 10) {
+//           field.errorMessage = '전화번호를 정확하게 입력하세요.'
+//           isValid = false
+//         }
+//       }
+
+//       // Card expiry validation
+//       else if (formName === 'card_yy_mm' && field.value?.replaceAll('/', '')?.length < 4) {
+//         field.errorMessage = '카드 만료일은 MM(월) 및 YY(년)여야 합니다.'
+//         isValid = false
+//       }
+
+//       // Birthday validation
+//       else if (
+//         ['birthday', 'deputy_birthday', 'account_birthday'].includes(formName) &&
+//         field.value?.replaceAll('-', '')?.length < 6
+//       ) {
+//         field.errorMessage = '올바른 날짜를 입력하십시오'
+//         isValid = false
+//       }
+
+//       // Required field validation
+//       if (field.required && !field.value) {
+//         field.errorMessage = field.error
+//         isValid = false
+//       }
+
+//       // Set filledCheckValues.value based on final validation state
+//       filledCheckValues.value[formName] = Boolean(isValid)
+//     },
+//     { immediate: true }
+//   )
+// }
+
 //SUBMIT //FORM DATA REQUEST
 const formSubmitting = ref(false)
 const formSubmitted = ref(false)
@@ -509,55 +561,41 @@ const formData = new FormData()
 
 async function submit() {
   formSubmitted.value = true
-
-  //here checking if any required form available is filled, if not return and show snackbar
-  for (var formname of availableForms.value) {
-    if (FIXED_FORMS[formname].required && FIXED_FORMS[formname].error() !== null) {
-      useSnackbarStore().show(`채워지지 않은 필드가 있습니다 (${FIXED_FORMS[formname]?.label})`)
-      // console.log('not filler formname: ', formname)
-      return
-    }
-  }
-
-  //here all the image pads are being checked
-  if (!signAfterPrintChecked.value) {
-    if (!nameImageData.value || !signImageData.value) {
-      useSnackbarStore().show('가입자서명을 하지 않았습니다.')
-      return
-    }
-
-    if (!selfRegisterChecked.value) {
-      if (!paymentNameImageData.value || !paymentSignImageData.value) {
-        useSnackbarStore().show('후불이체동의 서명을 하지 않았습니다.')
-        return
-      }
-    }
-
-    if (availableForms.value.includes('deputy_name')) {
-      if (!deputyNameImageData.value || !deputySignImageData.value) {
-        useSnackbarStore().show('법정대리인서명을 하지 않았습니다.')
-        return
-      }
-    }
-
-    if (serverData.value?.usim_plan_info?.mvno_cd === 'UPM') {
-      if (!agreePadData.value) {
-        useSnackbarStore().show('판매자서명을 하지 않았습니다.')
-        return
-      }
-    }
-
-    if (serverData?.chk_partner_sign === 'N' && serverData?.usim_plan_info?.mvno_cd === 'UPM') {
-      if (!partnerNameImageData.value || !partnerSignImageData.value) {
-        useSnackbarStore().show('가입약관에 동의하지 않았습니다.')
-        return
-      }
-    }
-  }
-
   formSubmitting.value = true
 
-  await fetchForms()
+  //removing froms
+  // delete filledCheckValues.value.formsSignPad
+  // delete filledCheckValues.value.paymentSignPad
+  // delete filledCheckValues.value.deputySignPad
+  // delete filledCheckValues.value.agreeSignPad
+
+  // if (!signAfterPrintChecked.value) {
+  //   filledCheckValues.value.formsSignPad = Boolean(nameImageData.value && signImageData.value)
+
+  //   if (!selfRegisterChecked.value)
+  //     filledCheckValues.value.paymentSignPad = Boolean(paymentNameImageData.value && paymentSignImageData.value)
+
+  //   if (availableForms.value.includes('deputy_name'))
+  //     filledCheckValues.value.deputySignPad = Boolean(deputyNameImageData.value && deputySignImageData.value)
+
+  //   console.log('deputyname error here')
+  //   console.log('sign after print is : ', signAfterPrintChecked.value)
+
+  //   if (serverData.value?.usim_plan_info?.mvno_cd === 'UPM')
+  //     filledCheckValues.value.agreeSignPad = Boolean(agreePadData.value)
+  // }
+
+  availableForms.value.array.forEach((element) => {
+    console.log(element)
+  })
+
+  return
+
+  // if (Object.values(filledCheckValues.value).every(Boolean)) {
+  //   await fetchForms()
+  // } else useSnackbarStore().show('채워지지 않은 필드가 있습니다.')
+
+  formSubmitting.value = false
 }
 
 async function fetchForms() {
@@ -594,66 +632,61 @@ async function fetchForms() {
     'phone_number',
   ]
 
-  // {formname: 'contact', value: '0101231231212'}
-  var formsAndValues = {}
-
-  for (var formName of availableForms.value) {
-    if (dashRemovables.includes(formName)) {
-      formsAndValues[formName] = FIXED_FORMS[formName]?.value?.replaceAll('-', '')
-    } else {
-      formsAndValues[formName] = FIXED_FORMS[formName].value
+  const avlFormNames = availableForms.value
+  for (var formName of avlFormNames) {
+    // console.log(formName)
+    if (dashRemovables.includes(formName) && FIXED_FORMS[formName].value !== null && FIXED_FORMS[formName].value) {
+      FIXED_FORMS[formName].value = FIXED_FORMS?.[formName]?.value?.replaceAll('-', '')
     }
-  }
 
-  for (const [formName, value] of Object.entries(formsAndValues)) {
-    if (formName === 'wish_number' && value) {
-      const wishList = value.split(' / ')
+    if (formName === 'wish_number' && FIXED_FORMS[formName]?.value) {
+      const wishList = FIXED_FORMS[formName]?.value.split(' / ')
       wishList.forEach((item, index) => {
         const key = 'request_no_' + (index + 1)
         formData.set(key, item)
       })
       //
     } else if (formName === 'country') {
-      formData.set('country_cd', value)
+      formData.set('country_cd', FIXED_FORMS[formName].value)
       //
     } else if (formName === 'address') {
-      formData.set('address', value + ' ' + formsAndValues?.addressdetail)
+      formData.set('address', FIXED_FORMS[formName].value + ' ' + FIXED_FORMS['addressdetail'].value)
     } else if (formName === 'usim_model_list') {
-      formData.set('usim_model_no', value)
+      formData.set('usim_model_no', FIXED_FORMS[formName].value)
       //
     } else if (formName === 'gender_cd') {
-      formData.set('gender', value)
+      formData.set('gender', FIXED_FORMS[formName].value)
       //
     } else if (formName === 'data_roming_block_cd') {
-      formData.set('data_roming_block', value)
+      formData.set('data_roming_block', FIXED_FORMS[formName].value)
       //
     } else if (formName === 'data_block_cd') {
-      formData.set('data_block', value)
+      formData.set('data_block', FIXED_FORMS[formName].value)
       //
     } else if (formName === 'phone_bill_block_cd') {
-      formData.set('phone_bill_block', value)
+      formData.set('phone_bill_block', FIXED_FORMS[formName].value)
       //
     } else if (formName === 'extra_service_cd') {
-      formData.set('extra_service', value)
+      formData.set('extra_service', FIXED_FORMS[formName].value)
       //
     } else if (formName === 'birthday_full') {
-      formData.set('birthday', value)
+      formData.set('birthday', FIXED_FORMS[formName].value)
       //
     } else if (formName === 'deputy_birthday_full') {
-      formData.set('deputy_birthday', value)
+      formData.set('deputy_birthday', FIXED_FORMS[formName].value)
       //
     } else if (formName === 'account_birthday_full') {
-      formData.set('account_birthday', value)
+      formData.set('account_birthday', FIXED_FORMS[formName].value)
       //
     } else if (formName === 'usim_plan_nm') {
     } else {
-      formData.set(formName, value)
+      formData.set(formName, FIXED_FORMS[formName].value)
     }
   }
 
-  // for (const [key, value] of formData.entries()) {
-  //   console.log(key, value)
-  // }
+  for (const [key, value] of formData.entries()) {
+    console.log(key, value)
+  }
 
   try {
     const response = await fetchWithTokenRefresh('agent/actApply', {
@@ -673,8 +706,6 @@ async function fetchForms() {
     }
   } catch (error) {
     useSnackbarStore().show(error.toString())
-  } finally {
-    formSubmitting.value = false
   }
 }
 </script>

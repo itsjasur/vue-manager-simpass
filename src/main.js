@@ -19,4 +19,10 @@ app.use(pinia)
 app.use(router)
 app.use(Antd)
 
-app.mount('#app')
+// app.mount('#app')
+
+if (document.getElementById('app')) {
+  app.mount('#app')
+} else if (document.getElementById('app-sjnetwork')) {
+  app.mount('#app-sjnetwork')
+}

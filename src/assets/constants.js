@@ -32,8 +32,15 @@ export const EMAILOPTIONS = [
   { value: '@hotmail.com', label: '@hotmail.com' },
 ]
 
+import {
+  expiryDate,
+  validateBirthday,
+  validatePhoneNumber,
+  validateShortBirthday,
+  validateEmpty,
+} from '@/utils/validators'
 import * as cleavePatterns from '../utils/cleavePatterns'
-import { reactive } from 'vue'
+import { computed, reactive } from 'vue'
 
 export const FORMS = reactive({
   //PAYMENT FORMS
@@ -41,12 +48,13 @@ export const FORMS = reactive({
     value: null,
     type: 'select',
     maxwidth: '180px',
-    error: '결제구분 선택하세요.',
     placeholder: '결제구분 선택하세요',
     label: '결제구분',
     hasDefault: true,
     required: true,
-    errorMessage: null,
+    error() {
+      return validateEmpty(this.value, '결제구분 입력하세요')
+    },
   },
 
   account_name: {
@@ -54,12 +62,13 @@ export const FORMS = reactive({
     // value: 'TEST 예금주명',
     type: 'input',
     maxwidth: '180px',
-    error: '예금주명 입력하세요.',
     placeholder: '홍길동',
     label: '예금주명',
     hasDefault: false,
     required: true,
-    errorMessage: null,
+    error() {
+      return validateEmpty(this.value, '예금주명 입력하세요')
+    },
   },
 
   account_birthday: {
@@ -68,12 +77,13 @@ export const FORMS = reactive({
     type: 'cleave',
     pattern: cleavePatterns.birthdayPattern,
     maxwidth: '150px',
-    error: '생년월일 입력하세요.',
     placeholder: '91-01-31',
     label: '예금주 생년월일',
     hasDefault: false,
     required: true,
-    errorMessage: null,
+    error() {
+      return validateShortBirthday(this.value)
+    },
   },
   account_birthday_full: {
     value: null,
@@ -81,12 +91,13 @@ export const FORMS = reactive({
     type: 'cleave',
     pattern: cleavePatterns.birthdayPatternFull,
     maxwidth: '150px',
-    error: '생년월일 입력하세요.',
     placeholder: '1991-01-31',
     label: '예금주 생년월일',
     hasDefault: false,
     required: true,
-    errorMessage: null,
+    error() {
+      return validateBirthday(this.value)
+    },
   },
 
   account_agency: {
@@ -94,12 +105,13 @@ export const FORMS = reactive({
     // value: 'TEST AGENCY',
     type: 'input',
     maxwidth: '180px',
-    error: '은행(카드사)명 입력하세요.',
     placeholder: '하나은행',
     label: '은행(카드사)명',
     hasDefault: false,
     required: true,
-    errorMessage: null,
+    error() {
+      return validateEmpty(this.value, '은행(카드사)명 입력하세요')
+    },
   },
 
   account_number: {
@@ -107,12 +119,13 @@ export const FORMS = reactive({
     // value: '289347298372',
     type: 'input',
     maxwidth: '180px',
-    error: '계좌번호(카드번호) 입력하세요.',
     placeholder: '1234567890',
     label: '계좌번호(카드번호)',
     hasDefault: false,
     required: true,
-    errorMessage: null,
+    error() {
+      return validateEmpty(this.value, '계좌번호(카드번호) 입력하세요')
+    },
   },
 
   card_yy_mm: {
@@ -124,12 +137,13 @@ export const FORMS = reactive({
       dateMin: '06/24',
     },
     maxwidth: '200px',
-    error: '카드유효기간을 정확하게 입력하세요.',
     placeholder: '11/29',
     label: '카드유효기간 (MM/YY)',
     hasDefault: false,
     required: true,
-    errorMessage: null,
+    error() {
+      return expiryDate(this.value)
+    },
   },
 
   //USIM INFO
@@ -138,24 +152,27 @@ export const FORMS = reactive({
     value: null,
     type: 'input',
     maxwidth: '400px',
-    error: '요금제을 선택하세요.',
     placeholder: '요금제 선택하세요.',
-    label: '요금제',
     hasDefault: true,
     required: true,
-    errorMessage: null,
+    label: '요금제',
+    error() {
+      return validateEmpty(this.value, '요금제을 선택하세요')
+    },
   },
 
   usim_model_list: {
     value: null,
     type: 'select',
     maxwidth: '180px',
-    error: 'USIM 모델명을 선택하세요.',
     placeholder: '모델명을 선택하세요',
     hasDefault: false,
     required: false,
-    errorMessage: null,
     label: 'USIM 모델명',
+    error: 'USIM 모델명을 선택하세요.',
+    error() {
+      return validateEmpty(this.value, '요금제을 선택하세요')
+    },
   },
 
   usim_no: {
@@ -163,23 +180,26 @@ export const FORMS = reactive({
     // value: '12312312',
     type: 'input',
     maxwidth: '180px',
-    error: '일련번호 입력하세요.',
     placeholder: '00000000',
     hasDefault: false,
     required: true,
-    errorMessage: null,
     label: 'USIM 일련번호',
+
+    error() {
+      return validateEmpty(this.value, '일련번호 입력하세요.')
+    },
   },
   usim_fee_cd: {
     value: null,
     type: 'select',
     maxwidth: '180px',
-    error: '유심비용청구을 선택하세요',
     placeholder: '유심비용청구을 선택하세요',
     hasDefault: true,
     required: true,
-    errorMessage: null,
     label: '유심비용청구',
+    error() {
+      return validateEmpty(this.value, '유심비용청구을 입력하세요.')
+    },
   },
 
   //EXTRA
@@ -187,12 +207,13 @@ export const FORMS = reactive({
     value: null,
     type: 'select',
     maxwidth: '180px',
-    error: '부가서비스 선택하세요',
     placeholder: '부가서비스을 선택하세요',
     hasDefault: true,
     required: true,
-    errorMessage: null,
     label: '부가서비스',
+    error() {
+      return validateEmpty(this.value, '부가서비스 선택하세요')
+    },
   },
 
   data_block_cd: {
@@ -200,11 +221,13 @@ export const FORMS = reactive({
     label: '데이터차단',
     type: 'select',
     maxwidth: '180px',
-    error: '데이터 차단 서비스 선택하세요.',
     placeholder: '데이터 차단 서비스 선택하세요',
     hasDefault: true,
     required: true,
-    errorMessage: null,
+
+    error() {
+      return validateEmpty(this.value, '데이터 차단 서비스 선택하세요.')
+    },
   },
 
   data_roming_block_cd: {
@@ -212,11 +235,12 @@ export const FORMS = reactive({
     label: '해외데이터로밍',
     type: 'select',
     maxwidth: '180px',
-    error: '해외데이터로밍을 선택하세요.',
     placeholder: '해외데이터로밍을 선택하세요',
     hasDefault: true,
     required: true,
-    errorMessage: null,
+    error() {
+      return validateEmpty(this.value, '해외데이터로밍을 선택하세요.')
+    },
   },
 
   plan_fee_cd: {
@@ -224,33 +248,36 @@ export const FORMS = reactive({
     value: null,
     type: 'select',
     maxwidth: '180px',
-    error: '가입비을 선택하세요.',
     placeholder: '가입비을 선택하세요',
     hasDefault: true,
     required: true,
-    errorMessage: null,
+    error() {
+      return validateEmpty(this.value, '가입비을 선택하세요.')
+    },
   },
   phone_bill_block_cd: {
     label: '휴대폰결제',
     value: null,
     type: 'select',
     maxwidth: '180px',
-    error: '휴대폰결제을 선택하세요.',
     placeholder: '휴대폰결제을 선택하세요',
     hasDefault: true,
     required: true,
-    errorMessage: null,
+    error() {
+      return validateEmpty(this.value, '휴대폰결제을 선택하세요.')
+    },
   },
   usim_act_cd: {
     label: '개통구분',
     value: null,
     type: 'select',
     maxwidth: '180px',
-    error: '개통구분을 선택하세요.',
     placeholder: '개통구분을 선택하세요',
     hasDefault: true,
     required: true,
-    errorMessage: null,
+    error() {
+      return validateEmpty(this.value, '개통구분을 선택하세요.')
+    },
   },
 
   wish_number: {
@@ -258,11 +285,11 @@ export const FORMS = reactive({
     value: null,
     type: 'cleave',
     maxwidth: '180px',
-    error: null,
     placeholder: '희망번호',
     hasDefault: false,
     required: false,
-    errorMessage: null,
+    error: null,
+    error: () => null,
   },
 
   mnp_carrier_type: {
@@ -270,11 +297,12 @@ export const FORMS = reactive({
     value: null,
     type: 'select',
     maxwidth: '180px',
-    error: '이동 유형을 선택하세요.',
     placeholder: '선불',
     hasDefault: true,
     required: true,
-    errorMessage: null,
+    error() {
+      return validateEmpty(this.value, '이동 유형을 선택하세요.')
+    },
   },
 
   phone_number: {
@@ -286,13 +314,14 @@ export const FORMS = reactive({
       phoneRegionCode: 'KR',
       delimiter: '-',
     },
-    maxwidth: '180px',
-    error: '가입/이동 전화번호을 입력하세요.',
+    maxwidth: '200px',
     placeholder: '010-0000-0000',
     label: '가입/이동 전화번호',
     hasDefault: false,
     required: true,
-    errorMessage: null,
+    error() {
+      return validatePhoneNumber(this.value)
+    },
   },
 
   mnp_pre_carrier: {
@@ -300,23 +329,25 @@ export const FORMS = reactive({
     value: null,
     type: 'select',
     maxwidth: '180px',
-    error: '이전통신사을 선택하세요.',
     placeholder: '선불',
     hasDefault: true,
     required: true,
-    errorMessage: null,
+    error() {
+      return validateEmpty(this.value, '이전통신사을 선택하세요.')
+    },
   },
 
   mnp_pre_carrier_nm: {
     value: null,
     type: 'input',
     maxwidth: '200px',
-    error: '이전 통신사 기타명을 입력하세요.',
     placeholder: '이전 통신사 기타명',
     label: '이전 통신사 기타명',
     hasDefault: false,
     required: true,
-    errorMessage: null,
+    error() {
+      return validateEmpty(this.value, '이전 통신사 기타명을 입력하세요.')
+    },
   },
 
   //CUSTOMER FORMS
@@ -325,17 +356,18 @@ export const FORMS = reactive({
     value: null,
     type: 'select',
     maxwidth: '200px',
-    error: '고객유형 선택하세요.',
     placeholder: '고객유형 선택하세요',
     hasDefault: true,
     required: true,
-    errorMessage: null,
     label: '고객유형',
+
+    error() {
+      return validateEmpty(this.value, '고객유형 선택하세요.')
+    },
   },
 
   contact: {
     value: null,
-    // value: '010-1234-1234',
     type: 'cleave',
     pattern: {
       phone: true,
@@ -343,52 +375,56 @@ export const FORMS = reactive({
       delimiter: '-',
     },
     maxwidth: '200px',
-    error: '연락처 입력하세요.',
     placeholder: '010-0000-0000',
     label: '개통번호외 연락번호',
     hasDefault: true,
     required: true,
-    errorMessage: null,
+    error() {
+      return validatePhoneNumber(this.value)
+    },
   },
 
   country: {
     type: 'input',
     maxwidth: '180px',
-    error: '국적 선택하세요.',
     placeholder: '대한민국',
     hasDefault: true,
     required: true,
-    errorMessage: null,
+
     value: null,
     label: '국적',
+    error() {
+      return validateEmpty(this.value, '국적 선택하세요.')
+    },
   },
 
   id_no: {
     //
     type: 'input',
     maxwidth: '200px',
-    error: '신분증번호/여권번호 입력하세요.',
     placeholder: '910131-0000000',
     value: null,
     // value: '123214323',
     hasDefault: true,
     required: true,
-    errorMessage: null,
     label: '신분증번호/여권번호',
+    error() {
+      return validateEmpty(this.value, '신분증번호/여권번호 입력하세요.')
+    },
   },
 
   name: {
     //
     type: 'input',
     maxwidth: '400px',
-    error: '가입자명 입력하세요.',
     placeholder: '홍길동',
     hasDefault: true,
     required: true,
-    errorMessage: null,
     label: '가입자명',
     value: null,
-    // value: 'TEST NAME',
+    error() {
+      return validateEmpty(this.value, '가입자명 입력하세요.')
+    },
   },
 
   birthday: {
@@ -398,12 +434,14 @@ export const FORMS = reactive({
     maxwidth: '150px',
     hasDefault: true,
     required: true,
-    errorMessage: null,
-    error: '생년월일 입력하세요.',
+
     placeholder: '91-01-31',
     value: null,
     // value: '99-01-12',
     label: '생년월일',
+    error() {
+      return validateShortBirthday(this.value)
+    },
   },
   birthday_full: {
     //
@@ -412,36 +450,39 @@ export const FORMS = reactive({
     maxwidth: '150px',
     hasDefault: true,
     required: true,
-    errorMessage: null,
-    error: '생년월일 입력하세요.',
+
     placeholder: '1991-01-31',
     value: null,
     label: '생년월일',
+    error() {
+      return validateBirthday(this.value)
+    },
   },
 
   gender_cd: {
     value: null,
     type: 'select',
     maxwidth: '100px',
-    error: '성별 입력하세요.',
     placeholder: '남',
     hasDefault: true,
     required: true,
-    errorMessage: null,
     label: '성별',
+    error() {
+      return validateEmpty(this.value, '성별 입력하세요.')
+    },
   },
 
   address: {
-    //
     value: null,
     type: 'input',
     maxwidth: '400px',
-    error: '주소 입력하세요.',
     hasDefault: true,
     required: true,
-    errorMessage: null,
     placeholder: '서울시 구로구 디지털로33길 28',
     label: '주소',
+    error() {
+      return validateEmpty(this.value, '주소 입력하세요.')
+    },
   },
 
   addressdetail: {
@@ -449,12 +490,13 @@ export const FORMS = reactive({
     value: null,
     hasDefault: false,
     required: false,
-    errorMessage: null,
+
     type: 'input',
     maxwidth: '200px',
     error: null,
     placeholder: '우림이비지센터 1차 1210호',
     label: '상세주소',
+    error: () => null,
   },
 
   //DEPUTY FORMS
@@ -464,11 +506,12 @@ export const FORMS = reactive({
     value: null,
     type: 'input',
     maxwidth: '400px',
-    error: '법정대리인 이름 입력하세요.',
     placeholder: '법정대리인 이름',
     hasDefault: false,
     required: true,
-    errorMessage: null,
+    error() {
+      return validateEmpty(this.value, '법정대리인 이름 입력하세요.')
+    },
   },
 
   deputy_birthday: {
@@ -477,11 +520,12 @@ export const FORMS = reactive({
     maxwidth: '150px',
     hasDefault: true,
     required: true,
-    errorMessage: null,
-    error: '법정대리인 생년월일 입력하세요.',
     placeholder: '91-01-31',
     value: null,
     label: '법정대리인 생년월일',
+    error() {
+      return validateShortBirthday(this.value)
+    },
   },
   deputy_birthday_full: {
     type: 'cleave',
@@ -489,11 +533,13 @@ export const FORMS = reactive({
     maxwidth: '150px',
     hasDefault: true,
     required: true,
-    errorMessage: null,
-    error: '법정대리인 생년월일 입력하세요.',
+
     placeholder: '1991-01-31',
     value: null,
     label: '법정대리인 생년월일',
+    error() {
+      return validateBirthday(this.value)
+    },
   },
 
   relationship_cd: {
@@ -501,12 +547,13 @@ export const FORMS = reactive({
     value: null,
     type: 'select',
     maxwidth: '100px',
-    error: '관계 선택하세요.',
     placeholder: '부',
     hasDefault: true,
     required: true,
-    errorMessage: null,
     label: '관계',
+    error() {
+      return validateEmpty(this.value, '관계 선택하세요.')
+    },
   },
 
   deputy_contact: {
@@ -518,12 +565,13 @@ export const FORMS = reactive({
       delimiter: '-',
     },
     maxwidth: '200px',
-    error: '대리인 연락처 입력하세요.',
     placeholder: '010-0000-0000',
     label: '대리인 연락처',
     hasDefault: false,
     required: true,
-    errorMessage: null,
+    error() {
+      return validatePhoneNumber(this.value, '관계 선택하세요.')
+    },
   },
 })
 
@@ -536,60 +584,3 @@ export const FORMS = reactive({
 //   { value: '@naver.com', label: '@naver.com' },
 //   { value: null, label: '직접입력' },
 // ]
-
-// <!--OLD  FORMS -->
-// <template v-for="(typeFormNames, index) of availableForms" :key="index">
-//   <template v-if="typeFormNames.length > 0">
-//     <div class="partition">
-//       <div v-if="index === 'usim'" class="title">요금제 정보</div>
-//       <div v-if="index === 'customer'" class="title">고객 정보</div>
-//       <div v-if="index === 'deputy'" class="title">법정대리인</div>
-//       <div v-if="index === 'payment'" class="title">
-//         <span> 자동이체 </span>
-//         <a-checkbox class="checkbox left-margin" v-model:checked="selfRegisterChecked">가입자와 동일</a-checkbox>
-//       </div>
-
-//       <template v-for="(formName, index) in typeFormNames" :key="index">
-//         <div class="group" :style="{ maxWidth: FIXED_FORMS[formName].maxwidth }">
-//           <label>{{ FIXED_FORMS[formName].label }}</label>
-
-//           <!-- input -->
-//           <template v-if="FIXED_FORMS[formName].type === 'input'">
-//             <div class="group-input-moon" v-if="formName === 'usim_plan_nm'">
-//               <input v-model="FIXED_FORMS[formName].value" v-bind="inputBindings(formName)" />
-//               <button @click="changeUsimPlan">변경</button>
-//             </div>
-
-//             <input v-else v-model="FIXED_FORMS[formName].value" v-bind="inputBindings(formName)" />
-//           </template>
-
-//           <!-- select -->
-//           <template v-if="FIXED_FORMS[formName].type === 'select'">
-//             <a-select
-//               v-model:value="FIXED_FORMS[formName].value"
-//               :style="{ width: '100%' }"
-//               @change="generateInitialForms"
-//               :options="FIXED_FORMS[formName].options"
-//               v-bind="inputBindings(formName)"
-//             >
-//             </a-select>
-//           </template>
-
-//           <!-- cleave -->
-//           <template v-if="FIXED_FORMS[formName].type === 'cleave'">
-//             <CleaveInput
-//               :options="FIXED_FORMS[formName].pattern"
-//               :value="FIXED_FORMS[formName].value"
-//               v-bind="inputBindings(formName)"
-//               @update:modelValue="handleCleaveInput($event, formName)"
-//             />
-//           </template>
-
-//           <p v-if="formSubmitted && !filledCheckValues[formName]" class="input-error-message">
-//             {{ FIXED_FORMS[formName].errorMessage }}
-//           </p>
-//         </div>
-//       </template>
-//     </div>
-//   </template>
-// </template>

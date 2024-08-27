@@ -148,18 +148,21 @@ const columns = ref([
     dataIndex: 'sales_fee',
     key: 'sales_fee',
     sorter: (a, b) => a.sales_fee ?? 0 - b.sales_fee ?? 0,
+    align: 'end',
   },
   {
     title: '기본료',
     dataIndex: 'basic_fee',
     key: 'basic_fee',
     sorter: (a, b) => a.basic_fee ?? 0 - b.basic_fee ?? 0,
+    align: 'end',
   },
   {
     title: '프로모션할인금액',
     dataIndex: 'discount_fee',
     key: 'discount_fee',
     sorter: (a, b) => a.discount_fee ?? 0 - b.discount_fee ?? 0,
+    align: 'end',
   },
 
   {

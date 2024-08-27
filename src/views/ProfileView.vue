@@ -167,7 +167,10 @@ async function fetchProfileData() {
       const decodedResponse = await response.json()
       if (decodedResponse.data && decodedResponse.data.info) {
         let info = decodedResponse.data.info
+
         data.value = info
+
+        console.log(data.value)
 
         pname.value = info.partner_nm
         pcode.value = info.partner_cd
@@ -196,7 +199,10 @@ const formData = new FormData()
 
 async function submit() {
   // //checks if all values are filled
-  if (!signData.value || !sealData.value) return useSnackbarStore().show('서명/사인 하지 않았습니다')
+  if (!signData.value || !sealData.value) {
+    useSnackbarStore().show('서명/사인 하지 않았습니다')
+    return
+  }
 
   //adding sign images data
   formData.set('partner_sign', signData.value ?? '')
@@ -244,7 +250,7 @@ async function changePassword() {
       method: 'POST',
       body: {
         id: data.value.id,
-        username: data.value.username,
+        username: data.value.partner_cd,
         password: oldPassword.value,
         new_password: newPassword.value,
       },
