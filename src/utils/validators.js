@@ -146,3 +146,19 @@ export function validateEmpty(value, error) {
 
   return null
 }
+
+export function validate010phoneNumber(value, error) {
+  // Remove all spaces from the input
+  value = value?.replaceAll(' ', '')
+
+  if (value == null || value === '') {
+    return error
+  }
+
+  // Check if the format is correct (0XX-XXX-XXXX or 0XX-XXXX-XXXX)
+  if (!/^0\d{1,2}(-|)\d{3,4}-\d{4}$/.test(value)) {
+    return '번호를 정확하게 입력하세요.'
+  }
+
+  return null
+}

@@ -38,9 +38,10 @@ import {
   validatePhoneNumber,
   validateShortBirthday,
   validateEmpty,
+  validate010phoneNumber,
 } from '@/utils/validators'
 import * as cleavePatterns from '../utils/cleavePatterns'
-import { computed, reactive } from 'vue'
+import { reactive } from 'vue'
 
 export const FORMS = reactive({
   //PAYMENT FORMS
@@ -380,7 +381,8 @@ export const FORMS = reactive({
     hasDefault: true,
     required: true,
     error() {
-      return validatePhoneNumber(this.value)
+      // return validatePhoneNumber(this.value)
+      return validate010phoneNumber(this.value, '개통번호외 연락번호 입력하세요')
     },
   },
 
@@ -570,7 +572,8 @@ export const FORMS = reactive({
     hasDefault: false,
     required: true,
     error() {
-      return validatePhoneNumber(this.value, '관계 선택하세요.')
+      // return validatePhoneNumber(this.value, '관계 선택하세요.')
+      return validate010phoneNumber(this.value, '대리인 연락번호 입력하세요')
     },
   },
 })

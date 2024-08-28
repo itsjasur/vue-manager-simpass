@@ -25,7 +25,9 @@
             <a-checkbox class="checkbox left-margin" v-model:checked="selfRegisterChecked">가입자와 동일</a-checkbox>
           </div>
 
-          <div v-else :class="part.type === 'empty' ? 'empty_title' : 'title'">{{ part.title }}</div>
+          <div v-else :class="part.type === 'empty' ? 'empty_title' : 'title'">
+            {{ part.title }}
+          </div>
 
           <template v-for="(formName, formIndex) of part.forms" :key="formIndex">
             <div class="group" :style="{ maxWidth: FIXED_FORMS[formName].maxwidth }">
@@ -109,7 +111,7 @@
           }
         "
         title="가입자서명"
-        :errorMessage="!nameImageData && !signImageData && formSubmitted ? '가입자서명을 하지 않았습니다.' : null"
+        :errorMessage="(!nameImageData || !signImageData) && formSubmitted ? '가입자서명을 하지 않았습니다.' : null"
       />
       <!-- payment pad-->
       <SignImageRowContainer
@@ -123,7 +125,7 @@
         "
         title="자동이체 서명"
         :errorMessage="
-          !paymentNameImageData && !paymentSignImageData && formSubmitted
+          (!paymentNameImageData || !paymentSignImageData) && formSubmitted
             ? '후불이체동의 서명을 하지 않았습니다.'
             : null
         "
@@ -140,7 +142,7 @@
         "
         title="법정대리인 서명"
         :errorMessage="
-          !deputyNameImageData && !deputySignImageData && formSubmitted ? '법정대리인서명을 하지 않았습니다.' : null
+          (!deputyNameImageData || !deputySignImageData) && formSubmitted ? '법정대리인서명을 하지 않았습니다.' : null
         "
       />
       <!-- partner sign pad -->
@@ -154,7 +156,7 @@
         "
         title="판매자 서명"
         :errorMessage="
-          !partnerNameImageData && !partnerSignImageData && formSubmitted ? '판매자서명을 하지 않았습니다.' : null
+          (!partnerNameImageData || !partnerSignImageData) && formSubmitted ? '판매자서명을 하지 않았습니다.' : null
         "
       />
 
@@ -193,8 +195,7 @@ import { useSnackbarStore } from '@/stores/snackbar'
 import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
 import { onMounted, onUnmounted, reactive, ref, watch, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { FORMS } from '../assets/constants'
-import { PLANSINFO, displayingForms, generateDisplayingForms } from '../assets/plans_forms'
+import { FORMS, PLANSINFO, displayingForms, generateDisplayingForms } from '../assets/plans_forms'
 import _ from 'lodash'
 import SignImageRowContainer from '../components/SignImageRowContainer.vue'
 import { useSearchaddressStore } from '../stores/select-address-popup'
@@ -204,6 +205,8 @@ import { useDeviceTypeStore } from '@/stores/device-type-store'
 import AgreePadContainer from '../components/AgreePadContainer.vue'
 import ImageViewPopup from '../components/ImageViewPopup.vue'
 import { base64ToBlobUrl } from '@/utils/helpers'
+import * as cleavePatterns from '../utils/cleavePatterns'
+import { validateBirthday } from '@/utils/validators'
 
 const availableForms = ref([])
 
@@ -347,15 +350,13 @@ function generateInitialForms() {
   }
 
   if (serverData.value['usim_plan_info']['mvno_cd'] === 'SVM') {
-    const index = availableForms.value.indexOf('account_birthday')
-    if (index !== -1) {
-      availableForms.value.splice(index, 1)
-      availableForms.value.push('account_birthday_full')
-    }
-    const index1 = availableForms.value.indexOf('deputy_birthday')
-    if (index1 !== -1) {
-      availableForms.value.splice(index1, 1)
-      availableForms.value.push('deputy_birthday_full')
+    const birthdays = ['birthday', 'account_birthday', 'deputy_birthday']
+    for (var i of birthdays) {
+      FIXED_FORMS[i].pattern = cleavePatterns.birthdayPatternFull
+      FIXED_FORMS[i].placeholder = '1991-01-31'
+      FIXED_FORMS[i].error = function () {
+        return validateBirthday(this.value)
+      }
     }
   }
 }
@@ -400,7 +401,7 @@ const inputBindings = (formName) => {
   }
 
   //setting payment
-  if (['account_name', 'account_birthday', 'account_birthday_full'].includes(formName)) {
+  if (['account_name', 'account_birthday'].includes(formName)) {
     bindings.readonly = selfRegisterChecked.value
   }
 
@@ -424,11 +425,9 @@ watchEffect(() => {
   if (selfRegisterChecked.value) {
     FIXED_FORMS.account_name.value = FIXED_FORMS.name.value
     FIXED_FORMS.account_birthday.value = FIXED_FORMS.birthday.value
-    FIXED_FORMS.account_birthday_full.value = FIXED_FORMS.birthday_full.value
   } else {
     FIXED_FORMS.account_name.value = ''
     FIXED_FORMS.account_birthday.value = ''
-    FIXED_FORMS.account_birthday_full.value = ''
   }
 })
 
@@ -436,7 +435,11 @@ watchEffect(() => {
 const handleCleaveInput = (formattedValue, formName) => {
   FIXED_FORMS[formName].value = formattedValue
 
-  if (['birthday', 'deputy_birthday', 'account_birthday'].includes(formName)) {
+  //if not seven mobile validate short date
+  if (
+    ['birthday', 'deputy_birthday', 'account_birthday'].includes(formName) &&
+    serverData.value['usim_plan_info']['mvno_cd'] !== 'SVM'
+  ) {
     const today = new Date()
     const currYear = today.getFullYear() % 100
 
@@ -514,7 +517,6 @@ async function submit() {
   for (var formname of availableForms.value) {
     if (FIXED_FORMS[formname].required && FIXED_FORMS[formname].error() !== null) {
       useSnackbarStore().show(`채워지지 않은 필드가 있습니다 (${FIXED_FORMS[formname]?.label})`)
-      // console.log('not filler formname: ', formname)
       return
     }
   }
@@ -586,9 +588,6 @@ async function fetchForms() {
     'birthday',
     'deputy_birthday',
     'account_birthday',
-    'birthday_full',
-    'deputy_birthday_full',
-    'account_birthday_full',
     'deputy_contact',
     'contact',
     'phone_number',
@@ -635,16 +634,6 @@ async function fetchForms() {
       //
     } else if (formName === 'extra_service_cd') {
       formData.set('extra_service', value)
-      //
-    } else if (formName === 'birthday_full') {
-      formData.set('birthday', value)
-      //
-    } else if (formName === 'deputy_birthday_full') {
-      formData.set('deputy_birthday', value)
-      //
-    } else if (formName === 'account_birthday_full') {
-      formData.set('account_birthday', value)
-      //
     } else if (formName === 'usim_plan_nm') {
     } else {
       formData.set(formName, value)
