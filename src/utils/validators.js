@@ -87,7 +87,7 @@ export function validateRentryPass(oldValue, newValue) {
 export function validateForNoneEmpty(value, name) {
   value = value?.replaceAll(' ', '')
 
-  if (value == null || value.isEmpty) {
+  if (value == null || value.isEmpty || value === '') {
     return `${name} 입력하세요.`
   }
 
@@ -97,7 +97,7 @@ export function validateForNoneEmpty(value, name) {
 //date as '24-08-31'
 export function validateShortBirthday(value) {
   // checking if the field is empty
-  if (value == null || value.isEmpty) return '생년월일 입력하세요.'
+  if (value == null || value.isEmpty || value === '') return '생년월일 입력하세요.'
 
   // Check if the format is correct (YY-MM-DD)
   if (!/^\d{2}-\d{2}-\d{2}$/.test(value)) {
@@ -112,7 +112,7 @@ export function validateBirthday(value) {
   value = value?.replaceAll(' ', '')
 
   // checking if the field is empty
-  if (value == null || value.isEmpty) return '생년월일 입력하세요.'
+  if (value == null || value.isEmpty || value === '') return '생년월일 입력하세요.'
 
   // Check if the format is correct (YY-MM-DD)
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
@@ -127,7 +127,7 @@ export function expiryDate(value) {
   value = value?.replaceAll(' ', '')
 
   // checking if the field is empty
-  if (value == null || value.isEmpty) return '카드유효기간을 입력하세요.'
+  if (value == null || value.isEmpty || value === '') return '카드유효기간을 입력하세요.'
 
   // Check if the format is correct (YY-MM-DD)
   if (!/^\d{2}\/\d{2}$/.test(value)) {
@@ -140,7 +140,7 @@ export function expiryDate(value) {
 export function validateEmpty(value, error) {
   value = value?.replaceAll(' ', '')
 
-  if (value == null || value.isEmpty) {
+  if (value == null || value.isEmpty || value === '') {
     return error
   }
 

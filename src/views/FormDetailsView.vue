@@ -276,6 +276,8 @@ async function fetchData() {
     // usim list select required
     FIXED_FORMS.usim_model_list.required = serverData.value?.chk_usim_model === 'Y'
 
+    console.log(decodedResponse.data)
+
     generateInitialForms()
   } catch (error) {
     useSnackbarStore().show(error.toString())
@@ -314,7 +316,7 @@ function generateInitialForms() {
     FIXED_FORMS.wish_number.placeholder = wishArray.map((e) => '1234').join(' / ')
   }
 
-  //adding transferable number when type is 신규가입 mvno is UPM (umobile)
+  //adding transferable number when type is 신규가입 mvno is UPM (codemobile)
   if (FIXED_FORMS?.usim_act_cd?.value === 'N' && serverData.value?.usim_plan_info?.mvno_cd === 'COM') {
     availableForms.value.push('phone_number')
     FIXED_FORMS.phone_number.required = false
@@ -350,6 +352,8 @@ function generateInitialForms() {
   }
 
   if (serverData.value['usim_plan_info']['mvno_cd'] === 'SVM') {
+    if (serverData.value['usim_plan_info']['combine']) availableForms.value.push('extra_service_cd')
+
     const birthdays = ['birthday', 'account_birthday', 'deputy_birthday']
     for (var i of birthdays) {
       FIXED_FORMS[i].pattern = cleavePatterns.birthdayPatternFull
