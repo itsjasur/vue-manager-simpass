@@ -217,9 +217,14 @@ watch(availableForms, (newList, oldList) => {
 const imageViewerRef = ref()
 const imageBlobUrls = ref([])
 const canPrintImages = ref(false)
+
 function openImageViewPopup(base64Images) {
-  imageBlobUrls.value = base64Images?.map((i) => base64ToBlobUrl(i)) || []
-  imageViewerRef.value.showPopup()
+  if (base64Images.length > 0) {
+    imageBlobUrls.value = base64Images?.map((i) => base64ToBlobUrl(i)) || []
+    imageViewerRef.value.showPopup()
+  } else {
+    useSnackbarStore().show('이미지가 없습니다!')
+  }
 }
 function closeImageViewPopup() {
   imageViewerRef.value.closePopup()
@@ -321,6 +326,7 @@ function generateInitialForms() {
     availableForms.value.push('phone_number')
     FIXED_FORMS.phone_number.required = false
     FIXED_FORMS.phone_number.pattern.prefix = null
+    FIXED_FORMS.phone_number.value = ''
   }
 
   if (FIXED_FORMS?.usim_act_cd?.value === 'M') {

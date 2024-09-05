@@ -1,97 +1,72 @@
 <template>
-  <div v-if="userInfo" class="chat-container" @drop.prevent="onDrop" @dragover.prevent>
-    <div class="chat-popup-header">
-      <div style="width: 150px">
-        <a-select
-          v-model:value="selectedAgentCode"
-          :getPopupContainer="(triggerNode) => triggerNode.parentNode"
-          :style="{ width: '100%' }"
-          @change="webSocketStore.joinRoom(selectedAgentCode)"
-          :options="agentList.map((i) => ({ value: i.agent_cd, label: i.agent_nm })) ?? []"
-        >
-        </a-select>
-        <!-- :options="statuses.map((i) => ({ value: i.cd, label: i.value })) ?? [{ value: 'N/A', label: 'N/A' }]" -->
-      </div>
-      <span @click="chatPopupStore.close()" class="material-symbols-outlined close-button"> cancel </span>
-    </div>
-
-    <div class="chats-section" ref="chatContainer">
-      <div class="welcome">
-        <span>환영하다: {{ userInfo.name }}!</span>
-        <span>연결 상태: {{ webSocketStore.connectionStatus }}</span>
-      </div>
-
-      <template v-for="(chat, index) in webSocketStore.chats" :key="index">
-        <template v-if="chat.attachment_paths.length > 0">
-          <template v-for="(attachmentPath, pathIndex) in chat.attachment_paths" :key="pathIndex">
-            <img
-              v-if="attachmentPath"
-              :src="attachmentPath"
-              @load="scrollToBottom"
-              alt=""
-              :class="['attachment-img', { ismyattachment: chat.sender === userInfo.username }]"
-            />
-          </template>
-        </template>
-
-        <template v-if="chat.text">
-          <div :class="['chat-bubble', { ismychat: chat.sender === userInfo.username }]">
-            {{ chat.text }}
-          </div>
+  <div class="chats-section" ref="chatContainer">
+    <template v-for="(chat, index) in webSocketStore.chats" :key="index">
+      <template v-if="chat.attachment_paths.length > 0">
+        <template v-for="(attachmentPath, pathIndex) in chat.attachment_paths" :key="pathIndex">
+          <img
+            v-if="attachmentPath"
+            :src="attachmentPath"
+            @load="scrollToBottom"
+            alt=""
+            :class="['attachment-img', { ismyattachment: chat.sender === webSocketStore.username }]"
+          />
         </template>
       </template>
-    </div>
 
-    <div v-if="selectedAgentCode" class="bottom-actions">
-      <div v-if="attachments.length > 0" class="attachments-row">
-        <div v-for="(file, index) in attachments" :key="index" class="attached-images">
-          <img :src="file.url" :alt="'image index: ' + index" />
-          <div class="overlay">
-            <div @click="removeAttachment(index)" class="delete-icon">&#10005;</div>
-          </div>
+      <template v-if="chat.text">
+        <div :class="['chat-bubble', { ismychat: chat.sender === webSocketStore.username }]">
+          {{ chat.text }}
+        </div>
+      </template>
+    </template>
+  </div>
+
+  <div class="bottom-actions">
+    <div v-if="attachments.length > 0" class="attachments-row">
+      <div v-for="(file, index) in attachments" :key="index" class="attached-images">
+        <img :src="file.url" :alt="'image index: ' + index" />
+        <div class="overlay">
+          <div @click="removeAttachment(index)" class="delete-icon">&#10005;</div>
         </div>
       </div>
+    </div>
 
-      <div class="input-row">
-        <input
-          id="file-input"
-          @change="handleFileUpload"
-          type="file"
-          class="file-input"
-          accept="image/*"
-          multiple
-          style="display: none"
-        />
-        <label for="file-input" class="attach-images-icon">
-          <span class="material-symbols-outlined"> add_photo_alternate </span>
-        </label>
+    <div class="input-row">
+      <input
+        id="file-input"
+        @change="handleFileUpload"
+        type="file"
+        class="file-input"
+        accept="image/*"
+        multiple
+        style="display: none"
+      />
+      <label for="file-input" class="attach-images-icon">
+        <span class="material-symbols-outlined"> add_photo_alternate </span>
+      </label>
 
-        <span @click="sendNewMessage" class="send-message-icon material-symbols-outlined"> send </span>
-        <a-textarea
-          size="large"
-          @keydown="handleKeyDown"
-          v-model:value="newMessage"
-          type="text"
-          :auto-size="{ minRows: 1, maxRows: 5 }"
-        />
-      </div>
+      <span @click="sendNewMessage" class="send-message-icon material-symbols-outlined"> send </span>
+      <a-textarea
+        size="large"
+        @keydown="handleKeyDown"
+        v-model:value="newMessage"
+        type="text"
+        :auto-size="{ minRows: 1, maxRows: 5 }"
+      />
     </div>
   </div>
 </template>
 
 <script setup>
-import { useChatPopupStore } from '@/stores/chat-popup-store'
 import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useSnackbarStore } from '@/stores/snackbar'
 import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
 import { useWebSocketStore } from '@/stores/webscoket-store'
 
-const chatPopupStore = useChatPopupStore()
+const webSocketStore = useWebSocketStore()
+
 const userInfo = ref()
 const chatContainer = ref(null)
-
-const selectedAgentCode = ref(null)
-
 const newMessage = ref('')
 
 // adds logic for the action to take on Enter without Shift
@@ -102,39 +77,9 @@ const handleKeyDown = (event) => {
   }
 }
 
-const scrollToBottom = () => {
-  nextTick(() => {
-    if (chatContainer.value) {
-      chatContainer.value.scrollTop = chatContainer.value.scrollHeight
-      webSocketStore.resetRoomUnreadCount()
-    }
-  })
-}
-
-const webSocketStore = useWebSocketStore()
-
-// function resetRoomUnreadCount() {
-//   socket.emit('reset_room_unread_count', {
-//     roomId: selectedAgentCode.value + '_' + userInfo.value.username,
-//   })
-// }
-
-watch(
-  () => webSocketStore.chats,
-  (newv, oldv) => {
-    console.log('chats changed')
-    scrollToBottom()
-  },
-  { deep: true }
-)
-
 onMounted(async () => {
-  chatContainer.value = document.querySelector('.container') //chat container to scroll up or down
-  fetchData()
-})
-
-onUnmounted(() => {
-  webSocketStore.chats = []
+  chatContainer.value = document.querySelector('.container')
+  webSocketStore.joinRoom()
 })
 
 //drop to attach files handler
@@ -188,6 +133,15 @@ async function uploadFiles() {
   return uploadedFilesPaths
 }
 
+const scrollToBottom = () => {
+  nextTick(() => {
+    if (chatContainer.value) {
+      chatContainer.value.scrollTop = chatContainer.value.scrollHeight
+      webSocketStore.resetRoomUnreadCount()
+    }
+  })
+}
+
 async function sendNewMessage() {
   const attachmentPaths = await uploadFiles()
 
@@ -196,108 +150,24 @@ async function sendNewMessage() {
 
     newMessage.value = ''
     attachments.value = []
-  }
-}
 
-const agentList = ref([])
-async function fetchAgentList() {
-  try {
-    const response = await fetchWithTokenRefresh('agent/agentlist', { method: 'GET' })
-
-    if (!response.ok) {
-      chatPopupStore.close()
-      throw 'Fetch data error'
-    }
-    const decodedResponse = await response.json()
-    agentList.value = decodedResponse?.data?.agentlist
-
-    if (agentList.value?.length > 0) {
-      selectedAgentCode.value = agentList.value?.[0]?.agent_cd
-      if (selectedAgentCode.value) webSocketStore.joinRoom(selectedAgentCode.value)
-    }
-  } catch (error) {
-    chatPopupStore.close()
-    useSnackbarStore().show(error.toString())
-  }
-}
-async function fetchData() {
-  try {
-    const response = await fetchWithTokenRefresh('agent/userInfo', { method: 'GET' })
-
-    if (!response.ok) {
-      chatPopupStore.close()
-      throw 'Fetch data error'
-    }
-    const decodedResponse = await response.json()
-    userInfo.value = decodedResponse.data.info
-    await fetchAgentList()
-  } catch (error) {
-    chatPopupStore.close()
-    useSnackbarStore().show(error.toString())
+    scrollToBottom()
   }
 }
 </script>
 
 <style scoped>
-.chat-container {
-  position: absolute;
-  right: 20px;
-  bottom: 0;
-  width: 500px;
-  box-shadow: 0 0 20px #00000045;
-  background-color: #fff;
-  border-radius: 10px 10px 0 0;
-
-  display: flex;
-  flex-flow: column;
-  z-index: 1400;
-}
-
-.chat-popup-header {
-  height: 55px;
-  padding: 0 20px;
-  align-items: center;
-  display: flex;
-  justify-content: space-between;
-  background-color: #ffffff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border-radius: 10px 10px 0 0;
-}
-
 .chats-section {
-  padding: 20px;
+  padding: 20px 0;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  height: 500px;
+  height: 100%;
   overflow-y: auto;
+  flex-direction: column-reverse;
 }
 
-@media (max-width: 900px) {
-  .chat-container {
-    height: 100%;
-    width: 100%;
-    left: 0px;
-    right: 0px;
-  }
-  .chats-section {
-    height: 100%;
-  }
-  .chat-popup-header {
-    height: 65px;
-  }
-}
-
-.welcome {
-  display: flex;
-  flex-flow: column;
-  align-items: center;
-  gap: 10px;
-  font-size: 18px;
-  font-weight: 500;
-  margin-bottom: 40px;
-}
 .chat-bubble {
   background-color: #787878;
   color: #fff;
@@ -329,7 +199,6 @@ async function fetchData() {
 }
 
 .bottom-actions {
-  padding: 10px;
   margin-bottom: 10px;
 }
 .attachments-row {
@@ -346,7 +215,6 @@ async function fetchData() {
 .attached-images {
   height: 80px;
   width: 80px;
-  /* object-fit: cover; */
   position: relative;
   border-radius: 8px;
 }
@@ -354,6 +222,7 @@ async function fetchData() {
   border-radius: 8px;
   width: 100%;
   height: 100%;
+  object-fit: contain;
 }
 .overlay {
   position: absolute;

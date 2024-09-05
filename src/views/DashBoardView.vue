@@ -14,7 +14,7 @@
       </div>
     </div>
 
-    <Chat v-if="chatPopupStore.active" />
+    <ChatView v-if="chatPopupStore.active" />
 
     <div v-else class="open-chat-button" @click="chatPopupStore.open()">
       <span class="material-symbols-outlined"> mode_comment </span>
@@ -44,10 +44,12 @@ import { useSideMenuStore } from '../stores/side-menu'
 import SelectPlanPopup from '@/components/SelectPlanPopup.vue'
 import { useSelectPlansPopup } from '@/stores/select-plans-popup'
 import { useChatPopupStore } from '@/stores/chat-popup-store'
-import Chat from '../components/Chat.vue'
 import { useSnackbarStore } from '@/stores/snackbar'
 import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
 import { useWebSocketStore } from '@/stores/webscoket-store'
+// import Chat from '../components/Chat.vue'
+// import ChatRooms from '../components/ChatRooms.vue'
+import ChatView from './ChatView.vue'
 
 const webSocketStore = useWebSocketStore()
 

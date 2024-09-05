@@ -7,7 +7,6 @@ export const useDeviceTypeStore = defineStore('deviceType', {
 
   actions: {
     isDeviceMobile() {
-      // const userAgent = navigator.userAgent.toLowerCase()
       const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0
       this.isMobile = isTouchDevice
       // console.log('touch device ', isTouchDevice)

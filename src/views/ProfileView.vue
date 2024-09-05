@@ -1,7 +1,7 @@
 <template>
   <div class="profile_container">
     <div class="title">가입신청/고객정보</div>
-    <!-- <div class="title">{{ userAgent }}</div> -->
+
     <div class="row">
       <div class="groups">
         <label>판매점 아이디 </label>
@@ -266,11 +266,6 @@ async function changePassword() {
     isLoading.value = false
   }
 }
-
-// const userAgent = ref('')
-// onMounted(() => {
-//   userAgent.value = navigator.userAgent.toLowerCase()
-// })
 </script>
 
 <style scoped>

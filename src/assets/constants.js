@@ -7,9 +7,6 @@ export const SIDEMENUNAMES = [
   '신청서 (접수/개통) 현황',
 ]
 
-export const BASEURL = import.meta.env.DEV ? 'http://192.168.0.251:8091/api/' : 'https://ta.simpaass.co.kr/api/'
-// export const import.meta.env.VITE_API_BASE_URL = 'https://ta.simpass.co.kr/api/'
-
 export const PLANTYPES = [
   { cd: 'PO', label: '후불' },
   { cd: 'PR', label: '선불' },
