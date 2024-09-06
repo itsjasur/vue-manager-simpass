@@ -169,9 +169,7 @@ async function fetchProfileData() {
         let info = decodedResponse.data.info
 
         data.value = info
-
-        console.log(data.value)
-
+        // console.log(data.value)
         pname.value = info.partner_nm
         pcode.value = info.partner_cd
         contact.value = info.phone_number
@@ -257,7 +255,7 @@ async function changePassword() {
     })
 
     const decodedResponse = await response.json()
-    console.log(decodedResponse)
+    // console.log(decodedResponse)
 
     useSnackbarStore().show(decodedResponse?.message ?? 'Password change error')
   } catch (error) {

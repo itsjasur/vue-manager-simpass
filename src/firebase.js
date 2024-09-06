@@ -37,7 +37,7 @@ const initializeMessaging = async () => {
     const isSupportedBrowser = await isSupported()
     if (isSupportedBrowser) {
       messaging = getMessaging(app)
-      console.log('Firebase Cloud Messaging is supported and initialized.')
+      // console.log('Firebase Cloud Messaging is supported and initialized.')
     } else {
       console.log("This browser doesn't support Firebase Cloud Messaging.")
     }
@@ -47,6 +47,6 @@ const initializeMessaging = async () => {
 }
 
 // Initialize messaging
-initializeMessaging()
+// initializeMessaging()
 
 export { messaging, getToken, onMessage, initializeMessaging }
