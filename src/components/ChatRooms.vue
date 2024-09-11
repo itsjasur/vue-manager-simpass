@@ -1,7 +1,7 @@
 <template>
   <div class="chatrooms_container">
     <template v-for="(room, index) in webSocketStore.rooms" :key="index">
-      <div class="chatroom" @click="selectAgent(room)">
+      <div class="chatroom" @click="selectRoom(room)">
         <div class="circle_avatar"></div>
         <div>{{ room.agent_name }}</div>
         <div v-if="room.partner_unread_count > 0" class="chatroom_unread_count_badge">
@@ -23,12 +23,6 @@ const chatPopupStore = useChatPopupStore()
 
 onMounted(fetchData)
 
-onMounted(() => {
-  console.log('chatrooms mounted')
-})
-
-const agentList = ref([])
-
 async function fetchAgentList() {
   try {
     const response = await fetchWithTokenRefresh('agent/agentlist', { method: 'GET' })
@@ -38,10 +32,11 @@ async function fetchAgentList() {
       throw 'Fetch data error'
     }
     const decodedResponse = await response.json()
-    agentList.value = decodedResponse?.data?.agentlist
+    const agentList = decodedResponse?.data?.agentlist
 
     const avlAgentRooms = []
-    agentList.value.forEach((i) => {
+
+    agentList.forEach((i) => {
       avlAgentRooms.push({
         agent_code: i.agent_cd,
         agent_name: i.agent_nm,
@@ -79,9 +74,9 @@ async function fetchData() {
   }
 }
 
-function selectAgent(room) {
+function selectRoom(room) {
   webSocketStore.selectedRoom = room
-  webSocketStore.getRoomInfo(room.agent_code)
+  webSocketStore.joinNewRoom(room.agent_code)
   chatPopupStore.showingChatrooms = false
 }
 </script>

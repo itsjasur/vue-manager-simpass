@@ -36,7 +36,6 @@ export const useWebSocketStore = defineStore('webSocket', {
 
         try {
           var currentFcmToken = await getToken(messaging, { vapidKey: FIREBASEVAPIDKEY })
-
           if (currentFcmToken) {
             this.socket.send(JSON.stringify({ action: 'update_fcm_token', fcmToken: currentFcmToken }))
           }
@@ -69,22 +68,32 @@ export const useWebSocketStore = defineStore('webSocket', {
         }
 
         if (data?.type === 'room_chats') {
+          // room_info will come when user joins new room
+          if (data?.room_info) {
+            this.selectedRoom = { ...this.selectedRoom, ...data.room_info }
+          }
+
           let chatz = data.chats
           this.chats = [...chatz].reverse()
+          this.resetRoomUnreadCount()
         }
 
-        if (data?.type === 'room_info') {
-          if (data.room_info) {
-            this.selectedRoom = {
-              ...this.selectedRoom,
-              ...data.room_info,
+        if (data?.type === 'room_modified') {
+          // console.log(data?.modified_room)
+          const modifiedRoom = data?.modified_room
+          const index = this.rooms.findIndex((room) => room.room_id === modifiedRoom?.room_id)
+          // console.log('index ', index)
+          if (index !== -1)
+            this.rooms[index] = {
+              ...this.rooms[index],
+              ...modifiedRoom,
             }
-          }
         }
 
         if (data?.type === 'new_chat') {
           if (this.selectedRoom.room_id === data?.new_chat.room_id) {
             this.chats.unshift(data.new_chat)
+            this.resetRoomUnreadCount()
           }
         }
       }
@@ -97,11 +106,11 @@ export const useWebSocketStore = defineStore('webSocket', {
     },
 
     //this gets room info
-    getRoomInfo(agentCode) {
+    joinNewRoom(agentCode) {
       if (this.socket && this.socket.readyState === WebSocket.OPEN) {
         this.socket.send(
           JSON.stringify({
-            action: 'get_room_info',
+            action: 'join_new_room',
             agentCode: agentCode,
           })
         )
@@ -142,7 +151,7 @@ export const useWebSocketStore = defineStore('webSocket', {
             chatPopupStore.close()
             useSnackbarStore().show(error.toString())
           }
-        }, 5000)
+        }, 20000)
       }
     },
 

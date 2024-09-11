@@ -1,5 +1,5 @@
 <template>
-  <div class="chats-section" ref="chatContainer">
+  <div class="chats-section" ref="chatContainer" @drop.prevent="onDrop" @dragover.prevent>
     <template v-for="(chat, index) in webSocketStore.chats" :key="index">
       <template v-if="chat.attachment_paths.length > 0">
         <template v-for="(attachmentPath, pathIndex) in chat.attachment_paths" :key="pathIndex">
@@ -65,7 +65,6 @@ import { useWebSocketStore } from '@/stores/webscoket-store'
 
 const webSocketStore = useWebSocketStore()
 
-const userInfo = ref()
 const chatContainer = ref(null)
 const newMessage = ref('')
 
@@ -77,9 +76,8 @@ const handleKeyDown = (event) => {
   }
 }
 
-onMounted(async () => {
+onMounted(() => {
   chatContainer.value = document.querySelector('.container')
-  webSocketStore.joinRoom()
 })
 
 //drop to attach files handler

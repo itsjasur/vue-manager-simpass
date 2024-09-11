@@ -5,59 +5,19 @@
         <span class="header-title">{{ props.title }}</span>
         <span @click="$emit('closePopup')" class="material-symbols-outlined close-button"> cancel </span>
       </div>
-      <div class="html-content" v-html="htmlContent"></div>
+      <TermsView :page="props.type" />
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
-import privacyHtml from '@/assets/privacy.html?url'
-import usetermsHtml from '@/assets/useterms.html?url'
-import sjPrivacyHtml from '@/assets/sj_privacy.html?url'
-import sjUsetermsHtml from '@/assets/sj_useterms.html?url'
+import TermsView from '@/views/TermsView.vue'
 
 const emit = defineEmits(['closePopup'])
 
 const props = defineProps({
   title: { type: String, default: '' },
   type: { type: String, default: 'privacy' },
-})
-
-const htmlContent = ref('')
-
-// Function to fetch the HTML file content
-async function loadHtml() {
-  try {
-    let response
-    if (hostname.value === 'sjnetwork') {
-      response = await fetch(props.type === 'privacy' ? sjPrivacyHtml : sjUsetermsHtml)
-    } else {
-      response = await fetch(props.type === 'privacy' ? privacyHtml : usetermsHtml)
-    }
-
-    if (!response.ok) {
-      throw new Error('Network response was not ok')
-    }
-    htmlContent.value = await response.text()
-  } catch (error) {
-    console.error('Error loading HTML file:', error)
-  }
-}
-
-onUnmounted(() => {
-  document.removeEventListener('keydown', keydownHandle)
-})
-
-function keydownHandle(event) {
-  if (event.key === 'Escape') emit('closePopup')
-}
-
-const hostname = ref('baroform')
-onMounted(() => {
-  hostname.value = window.location.hostname.includes('sjnetwork') ? 'sjnetwork' : 'baroform'
-  document.addEventListener('keydown', keydownHandle)
-  loadHtml()
 })
 </script>
 
@@ -94,13 +54,6 @@ onMounted(() => {
     height: 100%;
     border-radius: 0px;
   }
-}
-
-.html-content {
-  padding: 0 30px;
-  /* padding-bottom: 100px; */
-  box-sizing: border-box;
-  overflow-y: auto;
 }
 
 .close-button {

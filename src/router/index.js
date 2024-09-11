@@ -22,26 +22,27 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: LoginView,
-      meta: {
-        requiresAuth: false, // No authentication required
-      },
+      meta: { requiresAuth: false },
     },
 
     {
       path: '/signup',
       name: 'signup',
       component: SignupView,
-      meta: {
-        requiresAuth: false,
-      },
+      meta: { requiresAuth: false },
     },
     {
       path: '/sign-seal-submit/:id',
       name: 'sign-seal-submit',
       component: SignSealSubmitView,
-      meta: {
-        requiresAuth: false,
-      },
+      meta: { requiresAuth: false },
+    },
+    {
+      path: '/terms/:page',
+      name: 'terms',
+      component: () => import('../views/TermsView.vue'),
+      meta: { requiresAuth: false },
+      props: true,
     },
     {
       path: '/',

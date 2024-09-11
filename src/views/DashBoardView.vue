@@ -37,15 +37,13 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref, watch } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 import SideMenu from '../components/SideMenu.vue'
 import Header from '../components/Header.vue'
 import { useSideMenuStore } from '../stores/side-menu'
 import SelectPlanPopup from '@/components/SelectPlanPopup.vue'
 import { useSelectPlansPopup } from '@/stores/select-plans-popup'
 import { useChatPopupStore } from '@/stores/chat-popup-store'
-import { useSnackbarStore } from '@/stores/snackbar'
-import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
 import { useWebSocketStore } from '@/stores/webscoket-store'
 // import Chat from '../components/Chat.vue'
 // import ChatRooms from '../components/ChatRooms.vue'
