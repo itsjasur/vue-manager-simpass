@@ -425,9 +425,11 @@ async function submit() {
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
     await delay(2000)
 
-    emit('closePopup')
-    warning.open('접수완료', ['정상적으로 거래접수가 완료되었습니다.'])
-    router.push('/')
+    if (decodedResponse.result === 'SUCCESS') {
+      emit('closePopup')
+      warning.open('접수완료', ['정상적으로 거래접수가 완료되었습니다.'])
+      router.push('/')
+    }
   } catch (error) {
     useSnackbarStore().show(error.toString())
   } finally {

@@ -1,22 +1,52 @@
 <template>
   <div class="chats-section" ref="chatContainer" @drop.prevent="onDrop" @dragover.prevent>
     <template v-for="(chat, index) in webSocketStore.chats" :key="index">
-      <template v-if="chat.attachment_paths.length > 0">
-        <template v-for="(attachmentPath, pathIndex) in chat.attachment_paths" :key="pathIndex">
+      <!-- <div :class="['chat-bubble', { ismychat: chat.sender === webSocketStore.username }]">
+        {{ chat.text }}
+      </div> -->
+
+      <template v-if="chat.text || chat.attachment_paths">
+        <template v-if="chat.sender !== webSocketStore.username">
+          <div class="chat_container_wrapper">
+            <div class="agent_image_box"></div>
+            <div class="chat_container_content">
+              <div class="sender_agent_name">{{ chat?.sender_agent_info?.name }}</div>
+              <template v-if="chat.text">
+                <div class="chat-bubble">
+                  {{ chat.text }}
+                </div>
+              </template>
+              <template v-if="chat.attachment_paths.length > 0">
+                <img
+                  v-for="(attachmentPath, pathIndex) in chat.attachment_paths"
+                  :key="pathIndex"
+                  :src="attachmentPath"
+                  @load="scrollToBottom"
+                  alt=""
+                  class="attachment_img"
+                />
+              </template>
+            </div>
+          </div>
+        </template>
+        <template v-else>
+          <template v-if="chat.text">
+            <div class="chat-bubble my_chat">
+              {{ chat.text }}
+            </div>
+          </template>
+        </template>
+
+        <template v-if="chat.attachment_paths.length > 0">
           <img
-            v-if="attachmentPath"
+            v-for="(attachmentPath, pathIndex) in chat.attachment_paths"
+            :key="pathIndex"
             :src="attachmentPath"
             @load="scrollToBottom"
             alt=""
-            :class="['attachment-img', { ismyattachment: chat.sender === webSocketStore.username }]"
+            class="attachment_img my_images"
           />
         </template>
-      </template>
-
-      <template v-if="chat.text">
-        <div :class="['chat-bubble', { ismychat: chat.sender === webSocketStore.username }]">
-          {{ chat.text }}
-        </div>
       </template>
     </template>
   </div>
@@ -166,33 +196,70 @@ async function sendNewMessage() {
   flex-direction: column-reverse;
 }
 
+.chat_container_wrapper {
+  display: flex;
+  flex-flow: row;
+  width: 100%;
+  gap: 5px;
+}
+
+.agent_image_box {
+  width: 45px;
+  height: 45px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  border-radius: 50%;
+  background-color: #cfcfcf;
+}
+
+.chat_container_content {
+  display: flex;
+  flex-flow: column;
+  gap: 10px;
+  /* width: auto; */
+  max-width: 70%;
+}
+
+.sender_agent_name {
+  font-size: 13px;
+  padding: 0;
+  margin-bottom: -8px;
+  color: #787878;
+  width: 100%;
+}
+
 .chat-bubble {
   background-color: #787878;
   color: #fff;
-  border-radius: 20px;
-  /* line-height: 1; */
+  border-radius: 6px;
   word-wrap: break-word;
-  word-break: break-word; /*  prevents overflow of long words */
-  white-space: pre-wrap; /*  preserves line breaks */
-
+  word-break: break-word;
+  white-space: pre-wrap;
   align-self: flex-start;
-  max-width: 60%;
-  padding: 10px;
+  padding: 7px;
 }
-.ismychat {
+
+.my_chat {
   background-color: #19a619;
   align-self: flex-end;
   text-align: end;
   padding: 10px;
 }
-.attachment-img {
+
+.attachment_img {
   max-height: 200px;
-  max-width: 50%;
-  /* object-fit: cover; */
+  max-width: 200px;
+  /* object-fit: fill; */
+  /* width: 100%; */
   align-self: flex-start;
   border-radius: 10px;
 }
-.ismyattachment {
+
+.my_images {
   align-self: flex-end;
 }
 
