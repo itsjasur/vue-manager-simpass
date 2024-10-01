@@ -108,6 +108,12 @@ const router = createRouter({
           component: BusinessPartners,
           meta: { requiresAuth: true },
         },
+        {
+          path: '/htmls',
+          name: 'htmls',
+          component: () => import('../views/HtmlsView.vue'),
+          meta: { requiresAuth: true },
+        },
       ],
     },
     // this catchs any  route

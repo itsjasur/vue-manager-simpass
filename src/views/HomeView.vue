@@ -35,12 +35,10 @@
         </div>
       </div>
 
-      <div
-        @click="
+      <!-- @click="
           warningStore.open(`현재 정책보기 서비스는 개발진행중 입니다.`, ['빠른시일내 서비스 제공해 드리겠습니다. ^^'])
-        "
-        class="card"
-      >
+        " -->
+      <div @click="router.push('/htmls')" class="card">
         <div class="img">
           <img src="../assets/icons/docs.png" alt="" />
         </div>

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Redirect to App Store or Play Store</title>
+  </head>
+  <body>
+    <h1>Redirecting...</h1>
+    <p>If you are not redirected, <a id="manual-redirect" href="#" rel="noopener noreferrer">Click here</a>.</p>
+
+    <script>
+      function getMobileOperatingSystem() {
+        var userAgent = navigator.userAgent || navigator.vendor || window.opera
+
+        // checks for Android
+        if (/android/i.test(userAgent)) {
+          return 'Android'
+        }
+
+        // checks for iOS (iPhone, iPad, iPod)
+        if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+          return 'iOS'
+        }
+
+        return 'unknown'
+      }
+
+      const detectAndServe = () => {
+        const os = getMobileOperatingSystem()
+
+        if (os === 'Android') {
+          window.location.href = 'https://play.google.com/store/apps/details?id=com.baroform.app'
+        } else if (os === 'iOS') {
+          window.location.href = 'https://apps.apple.com/us/app/%EB%B0%94%EB%A1%9C%ED%8F%BC/id6698853530'
+        } else {
+          window.location.href = 'https://baroform.com'
+        }
+      }
+
+      // redirects immediately
+      detectAndServe()
+
+      // sets up manual redirect link
+      document.getElementById('manual-redirect').addEventListener('click', function (e) {
+        e.preventDefault()
+        detectAndServe()
+      })
+    </script>
+  </body>
+</html>
