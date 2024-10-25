@@ -31,6 +31,7 @@ async function fetchAgentList() {
       chatPopupStore.close()
       throw 'Fetch data error'
     }
+
     const decodedResponse = await response.json()
     const agentList = decodedResponse?.data?.agentlist
 

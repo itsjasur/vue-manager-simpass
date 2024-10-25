@@ -25,9 +25,14 @@
     </div>
 
     <div class="mvnos">
-      <div class="card" v-for="(item, index) in mvnos" :key="index" @click="selectMvno(item)">
-        <img :src="item.image_url" :alt="item.mvno_nm" width="100%" />
-        <img class="logo" :src="logoFinder(item.carrier_cd)" :alt="item.carrier_nm" height="100%" />
+      <div class="card favorites_card" @click="selectMvno({}, true)">
+        <span class="material-symbols-outlined favorite_icon">kid_star</span>
+        <p style="padding: 0; margin: 0; font-weight: 600; margin-top: 5px">즐겨찾기</p>
+      </div>
+
+      <div class="card" v-for="(item, index) in mvnos" :key="index" @click="selectMvno(item, false)">
+        <img class="image" :src="item.image_url" :alt="item.mvno_nm" width="70%" />
+        <img class="logo" :src="logoFinder(item.carrier_cd)" :alt="item.carrier_nm" />
       </div>
     </div>
   </div>
@@ -61,9 +66,9 @@ function changeCarrier(cd) {
   fetchData()
 }
 
-function selectMvno(item) {
+function selectMvno(item, onlyFavorites = false) {
   selectPlansPopup.searchText = ''
-  selectPlansPopup.open(selectedType.value, item.carrier_cd, item.mvno_cd)
+  selectPlansPopup.open(selectedType.value, item.carrier_cd, item.mvno_cd, onlyFavorites)
 }
 
 async function fetchData() {
@@ -116,7 +121,7 @@ onMounted(async () => {
 }
 
 .mvnos {
-  display: flex; /* Display the carrier buttons in a row */
+  display: flex;
   gap: 20px;
   flex-flow: wrap;
 }
@@ -128,17 +133,42 @@ onMounted(async () => {
 }
 
 .card {
-  position: relative;
+  display: flex;
+  flex-flow: column;
   width: 200px;
-  padding: 50px 30px;
-  z-index: 1;
+  height: 140px;
+  align-items: center;
+  justify-content: center;
+  padding: unset;
+  margin: unset;
+  position: relative;
+  /* padding: 50px 30px; */
+  /* z-index: 1; */
 }
 
 .card .logo {
   position: absolute;
   right: 5%;
   top: 8%;
-  height: 10%;
+  height: 12%;
+}
+
+.favorites_card {
+  display: flex;
+  flex-flow: column;
+  /* gap: 10px; */
+}
+
+.favorites_card .favorite_icon {
+  font-size: 40px;
+  user-select: none;
+  padding: 5px;
+  color: orange;
+  font-variation-settings:
+    'FILL' 1,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
 }
 
 @media (max-width: 600px) {
@@ -157,14 +187,18 @@ onMounted(async () => {
   }
 
   .button {
-    flex: 1 0 calc(50% - 20px); /* each item takes half of the container width with a gap of 20px */
-    max-width: calc(50% - 10px); /* ensures items don't exceed half of the container width */
+    flex: 1 0 calc(50% - 20px);
+    max-width: calc(50% - 10px);
   }
 
   .card {
-    flex: 1 0 calc(50% - 20px); /* each item takes half of the container width with a gap of 20px */
-    max-width: calc(50% - 10px); /* ensures items don't exceed half of the container width */
-    padding: 8vw 8vw;
+    flex: 1 0 calc(50% - 20px);
+    max-width: calc(50% - 10px);
   }
 }
 </style>
+
+<!--
+  flex: 1 0 calc(50% - 20px); /* each item takes half of the container width with a gap of 20px */
+  max-width: calc(50% - 10px); /* ensures items don't exceed half of the container width */
+} -->

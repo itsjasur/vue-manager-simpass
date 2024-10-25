@@ -27,7 +27,6 @@
       <div class="group-row">
         <div class="group">
           <label>사업자번호*</label>
-
           <CleaveInput
             v-model="serverData.business_num"
             placeholder="000-00-00000"

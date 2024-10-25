@@ -45,6 +45,16 @@
 
         <a-table class="table" :columns="columns" :data-source="dataList" bordered :pagination="false" size="middle">
           <template #bodyCell="{ column, text, record }">
+            <template v-if="column.dataIndex === 'favorites'">
+              <span
+                @click="addToFavourites(record)"
+                class="material-symbols-outlined favorite_icon"
+                :class="{ added_favorites: record.favorites === 'Y' }"
+              >
+                kid_star
+              </span>
+            </template>
+
             <template v-if="text && (column.dataIndex === 'basic_fee' || column.dataIndex === 'sales_fee')">
               <div>{{ text?.toLocaleString() }}원</div>
             </template>
@@ -137,6 +147,14 @@ const selectPlan = (selectedPlan) => {
 
 const columns = ref([
   {
+    // title: '***',
+    dataIndex: 'favorites',
+    key: 'favorites',
+    // sorter: (a, b) => (a.favorite ?? '').localeCompare(b.favorite),
+    // sortDirections: ['descend', 'ascend'],
+    width: 50,
+  },
+  {
     title: '요금제명',
     dataIndex: 'usim_plan_nm',
     key: 'usim_plan_nm',
@@ -208,14 +226,17 @@ async function fetchMvnos() {
 }
 
 const fetchData = async () => {
+  console.log('only favorites ', popup.onlyFavorites)
+
   try {
     const response = await fetchWithTokenRefresh('agent/planlist', {
       method: 'POST',
       body: {
-        carrier_type: popup.type, // 선불:PR ,후불:PO
-        carrier_cd: popup.carrierCd, // SKT : SK ,KT : KT,LG U+ : LG
-        mvno_cd: popup.mvnoCd,
-        usim_plan_nm: popup.searchText,
+        carrier_type: popup.onlyFavorites ? '' : popup.type, // 선불:PR ,후불:PO
+        carrier_cd: popup.onlyFavorites ? '' : popup.carrierCd, // SKT : SK ,KT : KT,LG U+ : LG
+        mvno_cd: popup.onlyFavorites ? '' : popup.mvnoCd,
+        usim_plan_nm: popup.onlyFavorites ? '' : popup.searchText,
+        favorites: popup.onlyFavorites,
       },
     })
 
@@ -235,6 +256,23 @@ const fetchData = async () => {
 function keydownHandle(event) {
   if (event.key === 'Escape') {
     popup.close()
+  }
+}
+
+async function addToFavourites(record) {
+  record.favorites = record?.favorites === 'Y' ? 'N' : 'Y'
+
+  try {
+    const response = await fetchWithTokenRefresh('agent/setMyPlan', {
+      method: 'POST',
+      body: {
+        usim_plan_id: record.id,
+        favorites: record.favorites === 'Y',
+      },
+    })
+    if (!response.ok) throw 'Fetch data error'
+  } catch (error) {
+    useSnackbarStore().show(error.toString())
   }
 }
 
@@ -280,6 +318,24 @@ onUnmounted(() => {
   height: 100%;
   width: 100%;
   overflow: auto;
+}
+
+.favorite_icon {
+  user-select: none;
+  padding: 5px;
+  color: #ccc;
+  font-variation-settings:
+    'FILL' 1,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+}
+.favorite_icon:hover {
+  cursor: pointer;
+}
+
+.added_favorites {
+  color: orange;
 }
 
 @media (min-width: 1400px) {

@@ -59,7 +59,7 @@ function openPopup(id) {
 function closePopup(result, needsRefresh) {
   openOrUpdateHtml.value.closePopup()
   if (needsRefresh) currentPage.value = 1
-  if (result) fetchHtmlContents()
+  if (result) fetchHtmls()
 }
 
 // list of string htmls
@@ -73,7 +73,7 @@ const rowLimit = ref(10)
 function onPagChange(curPage, perPage) {
   currentPage.value = curPage
   rowLimit.value = perPage
-  fetchHtmlContents()
+  fetchHtmls()
 }
 
 const columns = ref([
@@ -111,8 +111,7 @@ const columns = ref([
   // }
 ])
 
-const fetchHtmlContents = async () => {
-  await fetchUserInfo()
+const fetchHtmls = async () => {
   try {
     const response = await fetch(import.meta.env.VITE_CHAT_SERVER_URL + 'get-htmls', {
       method: 'POST',
@@ -137,19 +136,7 @@ const fetchHtmlContents = async () => {
   }
 }
 
-const username = ref()
-async function fetchUserInfo() {
-  try {
-    const response = await fetchWithTokenRefresh('admin/myInfo', { method: 'GET' })
-    if (!response.ok) throw 'Fetch profile data error'
-    const decodedResponse = await response.json()
-    username.value = decodedResponse?.data?.info?.username
-  } catch (error) {
-    useSnackbarStore().show(error.toString())
-  }
-}
-
-onMounted(fetchHtmlContents)
+onMounted(fetchHtmls)
 </script>
 
 <style scoped>

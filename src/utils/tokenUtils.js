@@ -48,6 +48,7 @@ export async function fetchWithTokenRefresh(url, options = {}) {
     options.body = JSON.stringify(options.body)
     options.headers['Content-Type'] = 'application/json'
   }
+  // console.log(options.body)
 
   try {
     let response = await fetch(fullUrl, options)
