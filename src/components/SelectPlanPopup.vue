@@ -150,10 +150,35 @@ const columns = ref([
     // title: '***',
     dataIndex: 'favorites',
     key: 'favorites',
-    // sorter: (a, b) => (a.favorite ?? '').localeCompare(b.favorite),
-    // sortDirections: ['descend', 'ascend'],
     width: 50,
   },
+
+  ...(popup.onlyFavorites
+    ? [
+        {
+          title: '통신망',
+          dataIndex: 'carrier_nm',
+          key: 'carrier_nm',
+          sorter: (a, b) => (a.carrier_nm ?? '').localeCompare(b.carrier_nm),
+          sortDirections: ['descend', 'ascend'],
+        },
+        {
+          title: '통신사',
+          dataIndex: 'mvno_nm',
+          key: 'mvno_nm',
+          sorter: (a, b) => (a.mvno_nm ?? '').localeCompare(b.mvno_nm),
+          sortDirections: ['descend', 'ascend'],
+        },
+        {
+          title: '선/후불',
+          dataIndex: 'carrier_type_nm',
+          key: 'carrier_type_nm',
+          sorter: (a, b) => (a.carrier_type_nm ?? '').localeCompare(b.carrier_type_nm),
+          sortDirections: ['descend', 'ascend'],
+        },
+      ]
+    : []),
+
   {
     title: '요금제명',
     dataIndex: 'usim_plan_nm',
@@ -232,10 +257,10 @@ const fetchData = async () => {
     const response = await fetchWithTokenRefresh('agent/planlist', {
       method: 'POST',
       body: {
-        carrier_type: popup.onlyFavorites ? '' : popup.type, // 선불:PR ,후불:PO
-        carrier_cd: popup.onlyFavorites ? '' : popup.carrierCd, // SKT : SK ,KT : KT,LG U+ : LG
-        mvno_cd: popup.onlyFavorites ? '' : popup.mvnoCd,
-        usim_plan_nm: popup.onlyFavorites ? '' : popup.searchText,
+        carrier_type: popup.type, // 선불:PR ,후불:PO
+        carrier_cd: popup.carrierCd, // SKT : SK ,KT : KT,LG U+ : LG
+        mvno_cd: popup.mvnoCd,
+        usim_plan_nm: popup.searchText,
         favorites: popup.onlyFavorites,
       },
     })
@@ -260,6 +285,8 @@ function keydownHandle(event) {
 }
 
 async function addToFavourites(record) {
+  console.log(record)
+
   record.favorites = record?.favorites === 'Y' ? 'N' : 'Y'
 
   try {
