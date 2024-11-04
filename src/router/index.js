@@ -24,11 +24,28 @@ const router = createRouter({
       component: LoginView,
       meta: { requiresAuth: false },
     },
-
     {
       path: '/signup',
       name: 'signup',
       component: SignupView,
+      meta: { requiresAuth: false },
+    },
+    {
+      path: '/id-password-finder',
+      name: 'id-password-finder',
+      component: () => import('../views/IdPasswordFinderView.vue'),
+      meta: { requiresAuth: false },
+    },
+    {
+      path: '/find-id',
+      name: 'find-id',
+      component: () => import('../views/FindIdView.vue'),
+      meta: { requiresAuth: false },
+    },
+    {
+      path: '/find-password',
+      name: 'find-password',
+      component: () => import('../views/FindPasswordView.vue'),
       meta: { requiresAuth: false },
     },
     {

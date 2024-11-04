@@ -20,7 +20,7 @@ const props = defineProps({
 
 defineOptions({ inheritAttrs: false })
 
-const emit = defineEmits(['update:modelValue', 'rawValue'])
+const emit = defineEmits(['update:modelValue', 'rawValue', 'maskedValue'])
 
 const input = ref(null)
 let cleave
@@ -32,6 +32,7 @@ onMounted(() => {
       onValueChanged: (event) => {
         emit('update:modelValue', event.target.value)
         emit('rawValue', event.target.rawValue)
+        emit('maskedValue', event.target.value)
       },
     }
 

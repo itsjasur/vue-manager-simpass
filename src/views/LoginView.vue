@@ -26,9 +26,27 @@
       </button>
       <hr />
 
-      <router-link to="/signup">
-        <button class="signup-button">판매점 회원 가입</button>
-      </router-link>
+      <button @click="router.push('/signup')" class="signup-button">판매점 회원 가입</button>
+
+      <!-- <span @click="router.push('/find-id')" class="text_button">아이디/비밀번호 찾기</span> -->
+
+      <div class="find_id_password">
+        <span @click="router.push('/find-id')" class="text_button">아이디 찾기</span>
+        <div style="width: 1.5px; background-color: #ccc; height: 90%"></div>
+        <span @click="router.push('/find-password')" class="text_button">비밀번호 찾기</span>
+      </div>
+
+      <div></div>
+
+      <!-- <div class="bottom_actions"> -->
+      <!-- <button @click="router.push('/id-password-finder')" class="signup-button">아이디/비밀번호 찾기</button> -->
+      <!-- <router-link to="/signup">
+          <button class="signup-button">판매점 회원 가입</button>
+        </router-link>
+        <router-link to="/id-password-finder">
+          <button class="signup-button">아이디/비밀번호 찾기</button>
+        </router-link> -->
+      <!-- </div> -->
     </div>
 
     <div v-if="hostname === 'sjnetwork'" class="foot-note">
@@ -177,34 +195,49 @@ async function login(event) {
   font-size: 14px;
   text-align: center;
   width: 500px;
-
   display: flex;
   flex-flow: column;
-
-  /* word-break: keep-all; */
-  /* overflow-wrap: break-word; */
-
   white-space: pre-wrap;
   word-break: keep-all;
   word-wrap: break-word;
 }
 
-.submit-button {
+/* .submit-button {
   width: 100%;
-  margin-top: 20px;
-}
+} */
 
 hr {
   border: none;
   border-top: 1px dashed #ccc;
   color: #fff;
-  margin: 10px;
+  margin: 5px;
+}
+
+.find_id_password {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  font-size: 15px;
+  font-weight: 600;
+  color: #3d3d3d;
+  padding: 0;
+  margin: 0;
 }
 
 .signup-button {
   width: 100%;
   background-color: #ffb428;
-  margin-bottom: 30px;
+}
+
+.text_button {
+  cursor: pointer;
+  user-select: none;
+  color: #5e5e5e;
+}
+.text_button:hover {
+  opacity: 0.7;
+  /* color: var(--main-color); */
 }
 
 @media (max-width: 600px) {
@@ -215,7 +248,6 @@ hr {
   .login-container {
     background-color: #fff;
     box-shadow: none;
-
     width: 100%;
     display: flex;
     flex-flow: column;
