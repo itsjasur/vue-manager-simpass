@@ -77,6 +77,8 @@
       <SignImageRowContainer
         :overlayText="data.contractor"
         title="판매자 서명"
+        signComment="판매자 이름을 적어주세요"
+        sealComment="판매자 사인을 해주세요"
         @updateSignSeal="updatePads"
         :signImageData="signData"
         :sealImageData="sealData"

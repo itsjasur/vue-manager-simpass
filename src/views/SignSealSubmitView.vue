@@ -2,7 +2,13 @@
   <div class="main_wrapper">
     <div v-if="!formSubmitted" class="sign_seal_submit_container">
       <p class="title">모바일 또는 테블릿에서 서명/사인 부탁드립니다.</p>
-      <SignImageRowContainer overlayText="" title="사인/서명" @updateSignSeal="updatePads" />
+      <SignImageRowContainer
+        overlayText=""
+        title="사인/서명"
+        @updateSignSeal="updatePads"
+        signComment="이름을 적어주세요"
+        sealComment="사인을 해주세요"
+      />
       <button @click="saveSignData" class="save_sign">사인/서명 저장</button>
     </div>
 

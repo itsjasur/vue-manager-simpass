@@ -72,6 +72,8 @@
         <SignImageRowContainer
           :overlayText="serverData.contractor"
           title="판매자 서명"
+          signComment="판매자 이름을 적어주세요"
+          sealComment="판매자 사인을 해주세요"
           @updateSignSeal="updatePads"
           :errorMessage="submitted && (!signData || !sealData) ? '판매자서명을 하지 않았습니다.' : null"
           :signImageData="signData"
@@ -83,6 +85,8 @@
         <template v-if="signData && sealData">
           <SignImageRowContainer
             title="판매자 서명"
+            signComment="판매자 이름을 적어주세요"
+            sealComment="판매자 사인을 해주세요"
             @updateSignSeal="updatePads"
             :signImageData="signData"
             :sealImageData="sealData"

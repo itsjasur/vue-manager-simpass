@@ -13,16 +13,19 @@
         <a-slider v-model:value="signPenSickness" :min="1" :max="8" :step="1" />
       </div>
 
+      <span style="margin-bottom: 5px; color: orange; font-weight: 600">{{ props.comment }}</span>
+
       <div class="canvas_container" :style="{ maxWidth: props.popupFor === 'sign' ? '700px' : '500px' }">
         <!-- <span class="overlay-text" :style="nameStyle">{{ overlayText }}</span> -->
         <canvas ref="signatureCanvas" class="signature_pad"></canvas>
+        <span class="placeholder_text">{{ popupFor === 'sign' ? '서명' : '사인' }}</span>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 import { useSnackbarStore } from '@/stores/snackbar'
 import SignaturePad from 'signature_pad'
 
@@ -34,6 +37,7 @@ let padData = null
 const props = defineProps({
   overlayText: { type: String, default: '' },
   popupFor: { type: String, required: true },
+  comment: { type: String, default: '' },
 })
 
 const emit = defineEmits(['closePopup', 'savePad'])
@@ -232,7 +236,13 @@ canvas {
   width: 100%;
   height: 100%;
   background-color: #00000012;
+
   border-radius: 6px;
+}
+.placeholder_text {
+  font-size: 50px;
+  font-weight: 700;
+  color: #00000020;
 }
 
 .overlay-text {

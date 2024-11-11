@@ -28,19 +28,21 @@ export const useWebSocketStore = defineStore('webSocket', {
       const accessToken = localStorage.getItem('accessToken')
       if (!accessToken) return
 
-      this.socket = new WebSocket(import.meta.env.VITE_CHAT_SERVER_URL + `ws/${accessToken}`)
-      this.socket.onopen = async () => {
-        console.log('Socket connected')
-        this.isConnected = true
-        this.clearReconnectInterval()
+      if (!this.isConnected) {
+        this.socket = new WebSocket(import.meta.env.VITE_CHAT_SERVER_URL + `ws/${accessToken}`)
+        this.socket.onopen = async () => {
+          console.log('Socket connected')
+          this.isConnected = true
+          this.clearReconnectInterval()
 
-        try {
-          var currentFcmToken = await getToken(messaging, { vapidKey: FIREBASEVAPIDKEY })
-          if (currentFcmToken) {
-            this.socket.send(JSON.stringify({ action: 'update_fcm_token', fcmToken: currentFcmToken }))
+          try {
+            var currentFcmToken = await getToken(messaging, { vapidKey: FIREBASEVAPIDKEY })
+            if (currentFcmToken) {
+              this.socket.send(JSON.stringify({ action: 'update_fcm_token', fcmToken: currentFcmToken }))
+            }
+          } catch (e) {
+            console.log(e)
           }
-        } catch (e) {
-          console.log(e)
         }
       }
 

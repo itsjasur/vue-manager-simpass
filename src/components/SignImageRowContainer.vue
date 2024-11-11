@@ -29,20 +29,23 @@
     <SignPadPopupContent
       @closePopup="closePopup"
       @savePad="savePadData"
+      :comment="popupFor === 'sign' ? props.signComment : sealComment"
       :popupFor="popupFor"
-      :overlayText="popupFor === 'sign' ? props.overlayText : ''"
     />
   </GlobalPopupWithOverlay>
 </template>
 
 <script setup>
-import { nextTick, onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import SignPadPopupContent from './SignPadPopupContent.vue'
 import GlobalPopupWithOverlay from './GlobalPopupWithOverlay.vue'
 import { useDeviceTypeStore } from '@/stores/device-type-store'
 
 const props = defineProps({
   errorMessage: { type: String, default: null },
+  signComment: { type: String, default: '' },
+  sealComment: { type: String, default: '' },
+
   title: { type: String, default: 'Sign title' },
   overlayText: { type: String, default: '' },
   signImageData: { type: String, default: null },

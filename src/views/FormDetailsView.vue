@@ -104,6 +104,8 @@
       <!-- form sign pad -->
       <SignImageRowContainer
         :overlayText="FIXED_FORMS.name?.value"
+        signComment="가입자 이름을 적어주세요"
+        sealComment="가입자 사인을 해주세요"
         @updateSignSeal="
           (signData, sealData) => {
             nameImageData = signData
@@ -116,6 +118,8 @@
       <!-- payment pad-->
       <SignImageRowContainer
         v-if="serverData?.usim_plan_info?.carrier_type === 'PO' && !selfRegisterChecked"
+        signComment="자동이체 이름을 적어주세요"
+        sealComment="자동이체 사인을 해주세요"
         :overlayText="FIXED_FORMS.account_name?.value"
         @updateSignSeal="
           (signData, sealData) => {
@@ -133,6 +137,8 @@
       <!-- deputy sign pad -->
       <SignImageRowContainer
         v-if="FIXED_FORMS?.cust_type_cd?.value === 'COL'"
+        signComment="법정대리인 이름을 적어주세요"
+        sealComment="법정대리인 사인을 해주세요"
         :overlayText="FIXED_FORMS.deputy_name?.value"
         @updateSignSeal="
           (signData, sealData) => {
@@ -148,6 +154,8 @@
       <!-- partner sign pad -->
       <SignImageRowContainer
         v-if="serverData?.chk_partner_sign === 'N' && serverData?.usim_plan_info?.mvno_cd === 'UPM'"
+        signComment="판매자 이름을 적어주세요"
+        sealComment="판매자 사인을 해주세요"
         @updateSignSeal="
           (signData, sealData) => {
             partnerNameImageData = signData
@@ -207,6 +215,7 @@ import ImageViewPopup from '../components/ImageViewPopup.vue'
 import { base64ToBlobUrl } from '@/utils/helpers'
 import * as cleavePatterns from '../utils/cleavePatterns'
 import { validateBirthday } from '@/utils/validators'
+import { errorMessages } from 'vue/compiler-sfc'
 
 const availableForms = ref([])
 
