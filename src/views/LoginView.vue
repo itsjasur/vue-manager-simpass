@@ -107,8 +107,8 @@ async function login(event) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        username: username.value,
-        password: password.value,
+        username: username.value.replaceAll(' ', ''),
+        password: password.value.replaceAll(' ', ''),
       }),
     })
 

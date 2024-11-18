@@ -17,7 +17,7 @@ import { useChatPopupStore } from '@/stores/chat-popup-store'
 import { useSnackbarStore } from '@/stores/snackbar'
 import { useWebSocketStore } from '@/stores/webscoket-store'
 import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
-import { onMounted, ref } from 'vue'
+import { onMounted } from 'vue'
 const webSocketStore = useWebSocketStore()
 const chatPopupStore = useChatPopupStore()
 
@@ -78,6 +78,7 @@ async function fetchData() {
 function selectRoom(room) {
   webSocketStore.selectedRoom = room
   webSocketStore.joinNewRoom(room.agent_code)
+  // webSocketStore.joinRoom(room.agent_code)
   chatPopupStore.showingChatrooms = false
 }
 </script>

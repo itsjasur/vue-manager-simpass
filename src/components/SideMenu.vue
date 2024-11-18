@@ -11,6 +11,9 @@
         <span class="menu-title">{{ item.name }}</span>
       </div>
     </template>
+
+    <!-- <div class="">Logout</div> -->
+    <button class="logout_button" @click="logout">로그 아웃</button>
   </div>
 </template>
 
@@ -22,10 +25,14 @@ import { useRoute, useRouter } from 'vue-router'
 
 import sjlogo from '@/assets/sjlogo.png'
 import baroformlogo from '@/assets/baroformlogo.png'
+import { useAuthenticationStore } from '@/stores/authentication'
+import { useRouteMemoryStore } from '@/stores/router-memory-store'
 
 const hostname = ref('baroform')
 onMounted(() => {
   hostname.value = window.location.hostname.includes('sjnetwork') ? 'sjnetwork' : 'baroform'
+
+  hostname.value = 'sjnetwork'
 })
 
 const sideMenuStore = useSideMenuStore()
@@ -48,26 +55,30 @@ function isActive(path) {
   if (route.name === 'form-details' && path === '/registration-forms') return true
   if (path === route.path) return true
 }
+function logout() {
+  useRouteMemoryStore().clear() //clearing intended route afters redirected
+  useAuthenticationStore().isAutoLoggedOut = false
+  useAuthenticationStore().logout()
+}
 </script>
 
 <style scoped>
 .menu {
-  min-width: 300px;
-  width: 100%;
+  width: 300px;
+  box-sizing: border-box;
   height: 100%;
   background-color: rgb(38, 38, 38);
   display: flex;
   flex-flow: column;
   gap: 15px;
   overflow-y: auto;
+  padding: 0 20px;
 }
 
 .logo_container {
   height: auto;
   width: 100%;
-  padding-left: 20px;
-  padding-top: 20px;
-  padding-bottom: 20px;
+  margin: 20px 0;
   box-sizing: border-box;
 }
 
@@ -100,7 +111,6 @@ a {
   align-items: center;
   gap: 10px;
   /* background-color: #ffffff2c; */
-  margin: 0 15px;
   border-radius: 5px;
   padding: 0 10px;
   min-height: 50px;
@@ -119,5 +129,12 @@ a {
 
 .currentlyOpen {
   background-color: #ffffff25;
+}
+
+.logout_button {
+  background-color: #ffffff25;
+  font-weight: 600;
+  margin-top: auto;
+  margin-bottom: 20px;
 }
 </style>

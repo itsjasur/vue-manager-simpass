@@ -165,7 +165,6 @@ const scrollToBottom = () => {
   nextTick(() => {
     if (chatContainer.value) {
       chatContainer.value.scrollTop = chatContainer.value.scrollHeight
-      webSocketStore.resetRoomUnreadCount()
     }
   })
 }
@@ -178,7 +177,6 @@ async function sendNewMessage() {
 
     newMessage.value = ''
     attachments.value = []
-
     scrollToBottom()
   }
 }

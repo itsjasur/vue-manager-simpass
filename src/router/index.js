@@ -30,12 +30,7 @@ const router = createRouter({
       component: SignupView,
       meta: { requiresAuth: false },
     },
-    {
-      path: '/id-password-finder',
-      name: 'id-password-finder',
-      component: () => import('../views/IdPasswordFinderView.vue'),
-      meta: { requiresAuth: false },
-    },
+
     {
       path: '/find-id',
       name: 'find-id',

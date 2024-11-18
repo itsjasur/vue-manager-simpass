@@ -64,7 +64,8 @@ onMounted(fetchHtmlContent)
 .html_content_container {
   background-color: var(--main-background-color);
   border-radius: 8px;
-  width: 900px;
+  /* width: 900px; */
+  width: 100%;
   display: flex;
   flex-flow: column;
   box-sizing: border-box;

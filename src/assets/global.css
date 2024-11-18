@@ -15,18 +15,17 @@ body {
   font-family: Arial, sans-serif;
 }
 
-button {
-  width: 100%;
-  min-height: 40px;
-  height: 40px;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s;
+.button {
   font-size: 15px;
+  width: auto;
+  line-height: 1;
+  box-sizing: border-box;
+  border-radius: 4px;
+  color: #fff;
+  text-align: center;
+  align-content: center;
   user-select: none; /* unselectable */
-  background-color: var(--main-color);
+  background-color: #ababab;
 }
 
 button:disabled {
@@ -134,6 +133,12 @@ input:focus {
 
 .material-symbols-outlined {
   font-variation-settings: 'wght' 300;
+}
+
+.ant-picker {
+  padding: 0 10px;
+  height: 40px;
+  width: 100%;
 }
 
 .ant-select-open {

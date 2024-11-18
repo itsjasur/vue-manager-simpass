@@ -1,5 +1,61 @@
 <template>
   <div class="htmls_container">
+    <!-- filters -->
+    <div class="top_filters">
+      <div class="filter_group">
+        <label>대리점</label>
+        <a-select
+          v-model:value="selectedAgent"
+          :style="{ width: '100%' }"
+          :options="[
+            { value: '', label: '전체' },
+            ...(policyData?.agent_cd_list?.map((i) => ({ value: i.agent_cd, label: i.agent_nm })) || []),
+          ]"
+        >
+        </a-select>
+      </div>
+
+      <div class="filter_group">
+        <label>유형</label>
+        <a-select
+          v-model:value="selectedType"
+          :style="{ width: '100%' }"
+          @change="fetchHtmlHtmls"
+          :options="[
+            { value: '', label: '전체' },
+            ...(policyData?.carrier_type?.map((i) => ({ value: i.cd, label: i.value })) || []),
+          ]"
+        >
+        </a-select>
+      </div>
+
+      <div class="filter_group">
+        <label>변경통신사</label>
+        <a-select
+          v-model:value="selectedMvno"
+          :style="{ width: '100%' }"
+          :options="[
+            { value: '', label: '전체' },
+            ...(policyData?.mvno_cd_list?.map((i) => ({ value: i.mvno_cd, label: i.mvno_nm })) || []),
+          ]"
+        >
+        </a-select>
+      </div>
+
+      <div class="filter_group">
+        <label>정책년월</label>
+        <a-date-picker
+          v-model:value="selectedMonth"
+          @change="
+            (event) => {
+              console.log(event)
+            }
+          "
+          picker="month"
+        ></a-date-picker>
+      </div>
+    </div>
+
     <!-- table -->
     <div class="table-part">
       <a-pagination
@@ -31,8 +87,18 @@
             <template v-if="column.dataIndex === 'title'">
               <span class="clickable_title" @click="openPopup(record.id)">{{ text }}</span>
             </template>
-            <template v-if="column.dataIndex === 'num'">
-              <span class="clickable_title" @click="openPopup(record.id)">{{ text }}</span>
+
+            <template v-if="column.dataIndex === 'selectedMvnos'">
+              <div class="selected_mvnos">
+                <div
+                  v-for="(mvno_cd, index) in text"
+                  :key="index"
+                  :style="{ backgroundColor: getRandomColor() }"
+                  class="selected_mvno_box"
+                >
+                  {{ policyData.mvno_cd_list?.find((i) => i.mvno_cd === mvno_cd)?.mvno_nm }}
+                </div>
+              </div>
             </template>
           </template>
         </a-table>
@@ -48,6 +114,15 @@ import { useSnackbarStore } from '@/stores/snackbar'
 import { ref, onMounted } from 'vue'
 import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
 import HtmlVIewerPopup from '@/components/HtmlVIewerPopup.vue'
+import dayjs from 'dayjs'
+
+function getRandomColor() {
+  // Generate random RGB values
+  const r = Math.floor(Math.random() * 150 + 55) // 55-255 for better visibility
+  const g = Math.floor(Math.random() * 200 + 5)
+  const b = Math.floor(Math.random() * 200 + 50)
+  return `rgb(${r}, ${g}, ${b})`
+}
 
 const openOrUpdateHtml = ref(false)
 const selectedId = ref(null)
@@ -59,7 +134,7 @@ function openPopup(id) {
 function closePopup(result, needsRefresh) {
   openOrUpdateHtml.value.closePopup()
   if (needsRefresh) currentPage.value = 1
-  if (result) fetchHtmls()
+  if (result) fetchHtmlHtmls()
 }
 
 // list of string htmls
@@ -73,7 +148,7 @@ const rowLimit = ref(10)
 function onPagChange(curPage, perPage) {
   currentPage.value = curPage
   rowLimit.value = perPage
-  fetchHtmls()
+  fetchHtmlHtmls()
 }
 
 const columns = ref([
@@ -90,34 +165,47 @@ const columns = ref([
     dataIndex: 'title',
     key: 'title',
     sorter: (a, b) => (a.title ?? '').localeCompare(b.title ?? ''),
-    // width: '60%'
+    // width: '40%'
     // width: 500
+  },
+  {
+    title: '정책년월',
+    dataIndex: 'policyDateMonth',
+    key: 'policyDateMonth',
+    sorter: (a, b) => (a.policyDateMonth ?? '').localeCompare(b.policyDateMonth ?? ''),
+    width: 100,
+  },
+  {
+    title: '변경통신사',
+    dataIndex: 'selectedMvnos',
+    key: 'selectedMvnos',
+    sorter: (a, b) => (a.selectedMvnos ?? '').localeCompare(b.selectedMvnos ?? ''),
+    // width: 120
   },
   {
     title: '날짜',
     dataIndex: 'updatedAt',
     key: 'updatedAt',
     sorter: (a, b) => (a.updatedAt ?? '').localeCompare(b.updatedAt ?? ''),
-    width: 200,
+    width: 150,
   },
-
-  // {
-  //   title: '열기',
-  //   dataIndex: 'open',
-  //   key: 'open',
-  //   width: 120,
-  //   // align: 'start'
-  //   alignContent: 'center'
-  // }
 ])
 
-const fetchHtmls = async () => {
+const fetchHtmlHtmls = async () => {
+  console.log(selectedType.value)
+
   try {
+    const accessToken = localStorage.getItem('accessToken')
+
     const response = await fetch(import.meta.env.VITE_CHAT_SERVER_URL + 'get-htmls', {
       method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        pageNumber: currentPage.value,
-        perPage: rowLimit.value,
+        access_token: accessToken,
+        carrier_type: selectedType.value,
+        selected_agent: selectedAgent.value,
+        per_page: rowLimit.value,
+        page_number: currentPage.value,
       }),
     })
 
@@ -129,31 +217,83 @@ const fetchHtmls = async () => {
     htmlContents.value = decodedResponse.htmls
     totalCount.value = decodedResponse.total_count
 
-    console.log(decodedResponse.htmls)
+    // console.log(decodedResponse.htmls)
   } catch (error) {
-    console.error('Error uplading html:', error)
+    // console.error('Error uplading html:', error)
     useSnackbarStore().show(error.toString())
   }
 }
 
-onMounted(fetchHtmls)
+const username = ref()
+async function fetchUserInfo() {
+  try {
+    const response = await fetchWithTokenRefresh('admin/myInfo', { method: 'GET' })
+    if (!response.ok) throw 'Fetch profile data error'
+    const decodedResponse = await response.json()
+    username.value = decodedResponse?.data?.info?.username
+  } catch (error) {
+    useSnackbarStore().show(error.toString())
+  }
+}
+const policyData = ref()
+const selectedType = ref('')
+const selectedAgent = ref('')
+const selectedMvno = ref('')
+const selectedMonth = ref()
+
+async function fetchPlicyinfo() {
+  // console.log('fetch policy info called')
+  try {
+    const response = await fetchWithTokenRefresh('agent/getPolicyInitInfo', { method: 'GET' })
+    const decodedResponse = await response.json()
+    // console.log(decodedResponse.data)
+    if (!response.ok) throw 'Fetch plicy info error'
+    policyData.value = decodedResponse?.data
+  } catch (error) {
+    useSnackbarStore().show(error.toString())
+  } finally {
+  }
+}
+
+onMounted(async () => {
+  await fetchUserInfo()
+  await fetchHtmlHtmls()
+})
+onMounted(fetchPlicyinfo)
 </script>
 
 <style scoped>
 .htmls_container {
   /* display: flex; */
   /* flex-flow: column; */
+  /* box-sizing: border-box; */
+  /* margin-bottom: 100px; */
+
   margin: 20px;
-  box-sizing: border-box;
-  margin-bottom: 100px;
+  display: flex;
+  flex-flow: column;
+  gap: 20px;
+}
+
+.top_filters {
+  display: flex;
+  gap: 20px;
+  max-width: 1200px;
+  min-width: 800px;
+}
+
+.filter_group {
+  width: 100%;
 }
 
 .pagination {
   margin-bottom: 10px;
 }
+
 .pagination :deep(button) {
   min-height: unset;
 }
+
 .add_new_button {
   width: auto;
   min-width: 120px;
@@ -163,6 +303,7 @@ onMounted(fetchHtmls)
 
 .table {
   max-width: 1200px;
+  min-width: 800px;
   box-sizing: border-box;
 }
 
@@ -185,12 +326,27 @@ onMounted(fetchHtmls)
   font-size: 20px;
 }
 
-/* .clickable_title {
-  text-decoration: underline;
-} */
+.selected_mvnos {
+  display: flex;
+  flex-flow: wrap;
+  gap: 10px;
+}
+.selected_mvno_box {
+  padding: 3px 10px;
+  border-radius: 500px;
+  color: #fff;
+  min-width: 50px;
+  text-align: center;
+}
 
 .clickable_title:hover {
   color: var(--main-color);
   cursor: pointer;
+}
+
+@media (min-width: 600px) {
+  .plan-card {
+    display: none;
+  }
 }
 </style>

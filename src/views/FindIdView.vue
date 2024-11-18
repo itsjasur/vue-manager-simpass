@@ -17,14 +17,14 @@
             <span>정보 보호를 위해 아이디의 일부만 보여집니다.</span>
           </div>
           <div style="margin-top: 10px; display: flex; gap: 20px">
-            <button>로그인</button>
-            <button @click="findIdFunc()" style="background-color: #a5a5a5">비밀번호 찾기</button>
+            <button @click="router.push('/login')">로그인</button>
+            <button @click="router.push('/find-password')" style="background-color: #a5a5a5">비밀번호 찾기</button>
           </div>
         </template>
         <template v-else>
           <span class="material-symbols-outlined center_large_icon" style="color: red"> error </span>
           <span style="text-align: center">고객님의 아이디가 존재하지 않습니다</span>
-          <button style="width: 120px; align-self: center">뒤로</button>
+          <button @click="goBack" style="width: 120px; align-self: center">뒤로</button>
         </template>
       </template>
 
@@ -32,10 +32,11 @@
         <div class="group">
           <label>사업자번호 </label>
           <CleaveInput
-            v-model="businessNumber"
             placeholder="000-00-00000"
+            v-model="businessNumber"
             :options="cleavePatterns.businessNumberPattern"
           />
+
           <p v-if="submitted && !businessNumber" class="input-error-message">사업자번호를 입력하세요</p>
         </div>
         <div class="group">
@@ -48,10 +49,13 @@
         <div class="group">
           <label>휴대전화</label>
           <CleaveInput
+            :modelValue="phoneNumber"
             placeholder="010-1234-5678"
             :options="cleavePatterns.phoneNumberPattern"
-            @maskedValue="phoneNumber = $event"
+            v-model="phoneNumber"
           />
+          <!-- @rawValue="phoneNumber = $event" -->
+          <!-- @maskedValue="phoneNumber = $event" -->
           <p v-if="submitted && validatePhoneNumber(phoneNumber) !== null" class="input-error-message">
             {{ validatePhoneNumber(phoneNumber) }}
           </p>
@@ -69,6 +73,9 @@
 import { ref } from 'vue'
 import * as cleavePatterns from '../utils/cleavePatterns'
 import { validatePhoneNumber } from '@/utils/validators'
+import { useSnackbarStore } from '@/stores/snackbar'
+import { useRouter } from 'vue-router'
+const router = useRouter()
 
 const idRequested = ref(false)
 const foundPartnerId = ref()
@@ -80,7 +87,10 @@ const phoneNumber = ref()
 
 const partnerId = ref()
 
-function checkPartnerId() {
+async function checkPartnerId() {
+  // console.log(businessNumber.value.replaceAll('-', ''))
+  // console.log(phoneNumber.value.value.replaceAll('-', ''))
+
   submitted.value = true
 
   if (
@@ -92,9 +102,33 @@ function checkPartnerId() {
   }
 
   idRequested.value = true
-  foundPartnerId.value = 'jasur'
 
-  console.log('ready to proceed')
+  try {
+    const response = await fetch(import.meta.env.VITE_API_BASE_URL + 'auth/findId', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        business_num: businessNumber.value.replaceAll('-', ''), // 사업자번호
+        contractor: partnerName.value, // 대표자(판매자)명
+        phone_number: phoneNumber.value.replaceAll('-', ''), //휴대폰 번호
+      }),
+    })
+    const decodedResponse = await response.json()
+
+    if (decodedResponse.result === 'SUCCESS') {
+      foundPartnerId.value = decodedResponse.username
+    } else {
+      throw decodedResponse.message ?? '잘못된 정보입니다'
+    }
+
+    console.log('it came to here')
+  } catch (err) {
+    useSnackbarStore().show(err.toString())
+  }
+}
+
+function goBack() {
+  idRequested.value = false
 }
 </script>
 

@@ -8,24 +8,23 @@
       <MenuTitle class="header-title" />
     </div>
 
-    <button @click="logout">로그 아웃</button>
-    <!-- <div class="button" @click="sideMenuStore.toggle()">Logout</div> -->
+    <!-- <button @click="logout">로그 아웃</button> -->
   </div>
 </template>
 
 <script setup>
 import MenuTitle from '../components/MenuTitle.vue'
 import { useSideMenuStore } from '../stores/side-menu'
-import { useAuthenticationStore } from '../stores/authentication'
-import { useRouteMemoryStore } from '@/stores/router-memory-store'
+// import { useAuthenticationStore } from '../stores/authentication'
+// import { useRouteMemoryStore } from '@/stores/router-memory-store'
 
 const sideMenuStore = useSideMenuStore()
 
-function logout() {
-  useRouteMemoryStore().clear() //clearing intended route afters redirected
-  useAuthenticationStore().isAutoLoggedOut = false
-  useAuthenticationStore().logout()
-}
+// function logout() {
+//   useRouteMemoryStore().clear() //clearing intended route afters redirected
+//   useAuthenticationStore().isAutoLoggedOut = false
+//   useAuthenticationStore().logout()
+// }
 </script>
 
 <style scoped>
@@ -41,7 +40,7 @@ function logout() {
   /* background-color: #fff; */
 }
 
-.header-row button {
+/* .header-row button {
   padding: 10px;
   text-align: center;
   min-height: unset;
@@ -49,7 +48,7 @@ function logout() {
   line-height: 1;
   width: auto;
   background-color: #b2b2b2;
-}
+} */
 .left {
   display: flex;
   align-items: center;

@@ -28,21 +28,19 @@ export const useWebSocketStore = defineStore('webSocket', {
       const accessToken = localStorage.getItem('accessToken')
       if (!accessToken) return
 
-      if (!this.isConnected) {
-        this.socket = new WebSocket(import.meta.env.VITE_CHAT_SERVER_URL + `ws/${accessToken}`)
-        this.socket.onopen = async () => {
-          console.log('Socket connected')
-          this.isConnected = true
-          this.clearReconnectInterval()
+      this.socket = new WebSocket(import.meta.env.VITE_CHAT_SERVER_URL + `ws/${accessToken}`)
+      this.socket.onopen = async () => {
+        console.log('Socket connected')
+        this.isConnected = true
+        this.clearReconnectInterval()
 
-          try {
-            var currentFcmToken = await getToken(messaging, { vapidKey: FIREBASEVAPIDKEY })
-            if (currentFcmToken) {
-              this.socket.send(JSON.stringify({ action: 'update_fcm_token', fcmToken: currentFcmToken }))
-            }
-          } catch (e) {
-            console.log(e)
+        try {
+          var currentFcmToken = await getToken(messaging, { vapidKey: FIREBASEVAPIDKEY })
+          if (currentFcmToken) {
+            this.socket.send(JSON.stringify({ action: 'update_fcm_token', fcmToken: currentFcmToken }))
           }
+        } catch (e) {
+          console.log(e)
         }
       }
 
@@ -132,14 +130,16 @@ export const useWebSocketStore = defineStore('webSocket', {
     },
 
     sendMessage(text, attachmentPaths) {
-      this.socket.send(
-        JSON.stringify({
-          action: 'new_message',
-          text: text,
-          attachmentPaths: attachmentPaths,
-          roomId: this.selectedRoom.room_id,
-        })
-      )
+      if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+        this.socket.send(
+          JSON.stringify({
+            action: 'new_message',
+            text: text,
+            attachmentPaths: attachmentPaths,
+            roomId: this.selectedRoom.room_id,
+          })
+        )
+      }
     },
 
     attemptReconnect() {
@@ -153,7 +153,7 @@ export const useWebSocketStore = defineStore('webSocket', {
             chatPopupStore.close()
             useSnackbarStore().show(error.toString())
           }
-        }, 20000)
+        }, 5000)
       }
     },
 

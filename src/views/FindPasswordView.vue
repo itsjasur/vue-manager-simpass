@@ -60,10 +60,7 @@
             />
             <button @click="getSmsCode()" style="flex: 2">인증번호 받기</button>
           </div>
-          <p
-            v-if="(smsCodeTried || submitted) && validatePhoneNumber(phoneNumber) !== null"
-            class="input-error-message"
-          >
+          <p v-if="submitted && validatePhoneNumber(phoneNumber) !== null" class="input-error-message">
             {{ validatePhoneNumber(phoneNumber) }}
           </p>
         </div>
@@ -80,7 +77,8 @@
         </div>
 
         <div></div>
-        <button @click="verifySmsCode()" class="find_pass_button">본인인증</button>
+        <button v-if="smsCodeSent" @click="verifySmsCode" class="find_pass_button">본인인증</button>
+        <div></div>
       </template>
 
       <div></div>
@@ -89,14 +87,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import * as cleavePatterns from '../utils/cleavePatterns'
 import { validatePhoneNumber, validatePass, validateRentryPass } from '@/utils/validators'
 import { useSnackbarStore } from '@/stores/snackbar'
 import { useRouter } from 'vue-router'
 const router = useRouter()
 
-const smsCodeTried = ref(false)
 const smsCodeSent = ref(false)
 const verificationSuccessful = ref(false)
 
@@ -109,35 +106,105 @@ const passwordRentry = ref()
 const passwordChangeSuccess = ref(false)
 
 // STEP 1 get sms code
-function getSmsCode() {
-  smsCodeTried.value = true
-  if (validatePhoneNumber(phoneNumber.value) === null) {
-    smsCodeSent.value = true
-  }
-}
-// STEP 2 verify sms code
-function verifySmsCode() {
+async function getSmsCode() {
   submitted.value = true
+
+  console.log('clicked')
 
   if (!partnerId.value || validatePhoneNumber(phoneNumber.value) !== null) return
-  if (!smsCodeSent.value) {
-    useSnackbarStore().show('인증번호 요청해주세요.')
+
+  try {
+    const response = await fetch(import.meta.env.VITE_API_BASE_URL + 'auth/reqCertNo', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: partnerId.value, // 아이디
+        phone_number: phoneNumber.value.replaceAll('-', ''), //휴대폰 번호
+        agent_cd: hostnameCode.value,
+      }),
+    })
+    const decodedResponse = await response.json()
+    console.log(decodedResponse)
+
+    if (decodedResponse.result === 'SUCCESS') {
+      smsCodeSent.value = true
+    } else {
+      throw decodedResponse.message ?? '잘못된 정보입니다'
+    }
+  } catch (err) {
+    useSnackbarStore().show(err.toString())
+  }
+}
+
+const receiptId = ref()
+// STEP 2 verify sms code
+async function verifySmsCode() {
+  submitted.value = true
+
+  if (!partnerId.value || validatePhoneNumber(phoneNumber.value) !== null || confirmationCode.value.length < 6) return
+
+  try {
+    const response = await fetch(import.meta.env.VITE_API_BASE_URL + 'auth/chkCertNo', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: partnerId.value, // 아이디
+        phone_number: phoneNumber.value.replaceAll('-', ''), //휴대폰 번호
+        cert_no: confirmationCode.value,
+      }),
+    })
+    const decodedResponse = await response.json()
+    console.log(decodedResponse)
+
+    if (decodedResponse.result === 'SUCCESS') {
+      receiptId.value = decodedResponse.receipt_id
+      verificationSuccessful.value = true
+    } else {
+      throw decodedResponse.message ?? '잘못된 정보입니다'
+    }
+  } catch (err) {
+    useSnackbarStore().show(err.toString())
+  }
+}
+async function updatePassword() {
+  submitted.value = true
+
+  if (
+    !receiptId.value ||
+    validatePass(password.value) !== null ||
+    validateRentryPass(password.value, passwordRentry.value) !== null
+  ) {
     return
   }
 
-  if (confirmationCode.value) {
-    console.log('read to call api')
-    verificationSuccessful.value = true
-    submitted.value = false
+  try {
+    const response = await fetch(import.meta.env.VITE_API_BASE_URL + 'auth/initPw', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: partnerId.value, // 아이디
+        phone_number: phoneNumber.value.replaceAll('-', ''), //휴대폰 번호
+        password: password.value,
+        receipt_id: receiptId.value,
+      }),
+    })
+    const decodedResponse = await response.json()
+    console.log(decodedResponse)
+
+    if (decodedResponse.result === 'SUCCESS') {
+      passwordChangeSuccess.value = true
+    } else {
+      throw decodedResponse.message ?? '잘못된 정보입니다'
+    }
+  } catch (err) {
+    useSnackbarStore().show(err.toString())
   }
 }
-function updatePassword() {
-  submitted.value = true
-  if (!partnerId.value || validatePhoneNumber(phoneNumber.value) === null || confirmationCode?.value?.length !== 6) {
-    passwordChangeSuccess.value = true
-    return
-  }
-}
+
+const hostnameCode = ref('')
+onMounted(() => {
+  hostnameCode.value = window.location.hostname.includes('sjnetwork') ? 'SJ' : ''
+})
 </script>
 
 <style scoped>
