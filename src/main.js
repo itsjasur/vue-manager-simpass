@@ -4,10 +4,10 @@ import router from './router'
 
 import { createPinia } from 'pinia'
 import Antd from 'ant-design-vue'
-// import 'ant-design-vue/dist/reset.css'
 import './assets/global.css'
 import CleaveInput from './components/CleaveInput.vue'
 import GlobalPopupWithOverlay from './components/GlobalPopupWithOverlay.vue'
+// import 'ant-design-vue/dist/reset.css'
 
 const app = createApp(App)
 

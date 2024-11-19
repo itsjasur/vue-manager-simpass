@@ -1,5 +1,6 @@
 <template>
   <a-config-provider
+    :locale="ko_KR"
     :theme="{
       token: {
         colorPrimary: '#00d42a', //primary
@@ -21,15 +22,15 @@
       },
     }"
   >
-  </a-config-provider>
-  <router-view />
-  <Loading />
-  <Snackbar />
-  <Warning />
+    <router-view />
+    <Loading />
+    <Snackbar />
+    <Warning />
 
-  <template v-if="useSearchaddressStore().active">
-    <SearchAddressPopup />
-  </template>
+    <template v-if="useSearchaddressStore().active">
+      <SearchAddressPopup />
+    </template>
+  </a-config-provider>
 </template>
 
 <script setup>
@@ -45,6 +46,11 @@ import Loading from './components/Loading.vue'
 import sound from '@/assets/sound.mp3'
 import { useSearchaddressStore } from './stores/select-address-popup'
 import { initializeMessaging, messaging, onMessage } from './firebase'
+
+import ko_KR from 'ant-design-vue/es/locale/ko_KR'
+import dayjs from 'dayjs'
+import 'dayjs/locale/ko'
+dayjs.locale('ko')
 
 const router = useRouter()
 const authStore = useAuthenticationStore()

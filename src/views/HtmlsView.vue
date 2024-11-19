@@ -2,41 +2,30 @@
   <div class="htmls_container">
     <!-- filters -->
     <div class="top_filters">
+      <div class="top_filter_buttons">
+        <button
+          @click="selectType('PR')"
+          :style="{ backgroundColor: selectedType === 'PR' ? 'var(--main-color)' : null }"
+        >
+          선불
+        </button>
+        <button
+          @click="selectType('PO')"
+          :style="{ backgroundColor: selectedType === 'PO' ? 'var(--main-color)' : null }"
+        >
+          후불
+        </button>
+      </div>
+
       <div class="filter_group">
         <label>대리점</label>
         <a-select
           v-model:value="selectedAgent"
           :style="{ width: '100%' }"
+          @change="fetchHtmlsList"
           :options="[
             { value: '', label: '전체' },
-            ...(policyData?.agent_cd_list?.map((i) => ({ value: i.agent_cd, label: i.agent_nm })) || []),
-          ]"
-        >
-        </a-select>
-      </div>
-
-      <div class="filter_group">
-        <label>유형</label>
-        <a-select
-          v-model:value="selectedType"
-          :style="{ width: '100%' }"
-          @change="fetchHtmlHtmls"
-          :options="[
-            { value: '', label: '전체' },
-            ...(policyData?.carrier_type?.map((i) => ({ value: i.cd, label: i.value })) || []),
-          ]"
-        >
-        </a-select>
-      </div>
-
-      <div class="filter_group">
-        <label>변경통신사</label>
-        <a-select
-          v-model:value="selectedMvno"
-          :style="{ width: '100%' }"
-          :options="[
-            { value: '', label: '전체' },
-            ...(policyData?.mvno_cd_list?.map((i) => ({ value: i.mvno_cd, label: i.mvno_nm })) || []),
+            ...(agentCdList?.map((i) => ({ value: i.agent_cd, label: i.agent_nm })) || []),
           ]"
         >
         </a-select>
@@ -44,15 +33,7 @@
 
       <div class="filter_group">
         <label>정책년월</label>
-        <a-date-picker
-          v-model:value="selectedMonth"
-          @change="
-            (event) => {
-              console.log(event)
-            }
-          "
-          picker="month"
-        ></a-date-picker>
+        <a-date-picker v-model:value="selectedMonth" @change="fetchHtmlsList" picker="month"></a-date-picker>
       </div>
     </div>
 
@@ -103,6 +84,37 @@
           </template>
         </a-table>
       </div>
+
+      <div class="html_cards">
+        <div v-for="(html, index) in htmlContents" :key="index" @click="openPopup(html.id)" class="html_card">
+          <div class="html_card_row">
+            <span>정책년월:</span>
+            <span style=""> {{ html.policyDateMonth }}</span>
+          </div>
+          <div class="html_card_row">
+            <span>제목:</span>
+            <span style=""> {{ html.title }}</span>
+          </div>
+          <div class="html_card_row">
+            <span>변경통신사:</span>
+            <div class="selected_mvnos">
+              <div
+                v-for="(mvno_cd, index) in html.selectedMvnos"
+                :key="index"
+                :style="{ backgroundColor: getRandomColor() }"
+                class="selected_mvno_box"
+              >
+                {{ policyData.mvno_cd_list?.find((i) => i.mvno_cd === mvno_cd)?.mvno_nm }}
+              </div>
+            </div>
+          </div>
+
+          <div class="html_card_row">
+            <span>날짜:</span>
+            <span style=""> {{ html.createdAt }}</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   <GlobalPopupWithOverlay ref="openOrUpdateHtml">
@@ -115,6 +127,11 @@ import { ref, onMounted } from 'vue'
 import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
 import HtmlVIewerPopup from '@/components/HtmlVIewerPopup.vue'
 import dayjs from 'dayjs'
+
+function selectType(type) {
+  selectedType.value = selectedType.value === type ? '' : type
+  fetchHtmlsList()
+}
 
 function getRandomColor() {
   // Generate random RGB values
@@ -134,7 +151,7 @@ function openPopup(id) {
 function closePopup(result, needsRefresh) {
   openOrUpdateHtml.value.closePopup()
   if (needsRefresh) currentPage.value = 1
-  if (result) fetchHtmlHtmls()
+  if (result) fetchHtmlsList()
 }
 
 // list of string htmls
@@ -148,7 +165,7 @@ const rowLimit = ref(10)
 function onPagChange(curPage, perPage) {
   currentPage.value = curPage
   rowLimit.value = perPage
-  fetchHtmlHtmls()
+  fetchHtmlsList()
 }
 
 const columns = ref([
@@ -169,6 +186,18 @@ const columns = ref([
     // width: 500
   },
   {
+    title: 'Agent',
+    dataIndex: 'selectedAgent',
+    key: 'selectedAgent',
+    sorter: (a, b) => (a.selectedAgent ?? '').localeCompare(b.selectedAgent ?? ''),
+  },
+  {
+    title: 'Type',
+    dataIndex: 'carrierType',
+    key: 'carrierType',
+    sorter: (a, b) => (a.selectedAgent ?? '').localeCompare(b.selectedAgent ?? ''),
+  },
+  {
     title: '정책년월',
     dataIndex: 'policyDateMonth',
     key: 'policyDateMonth',
@@ -184,16 +213,33 @@ const columns = ref([
   },
   {
     title: '날짜',
-    dataIndex: 'updatedAt',
-    key: 'updatedAt',
-    sorter: (a, b) => (a.updatedAt ?? '').localeCompare(b.updatedAt ?? ''),
+    dataIndex: 'createdAt',
+    key: 'createdAt',
+    sorter: (a, b) => (a.createdAt ?? '').localeCompare(b.createdAt ?? ''),
     width: 150,
   },
 ])
 
-const fetchHtmlHtmls = async () => {
-  console.log(selectedType.value)
+const policyData = ref()
+const selectedType = ref('')
+const selectedAgent = ref('')
+const selectedMvno = ref('')
+const selectedMonth = ref()
+const agentCdList = ref()
 
+const username = ref()
+async function fetchUserInfo() {
+  try {
+    const response = await fetchWithTokenRefresh('admin/myInfo', { method: 'GET' })
+    if (!response.ok) throw 'Fetch profile data error'
+    const decodedResponse = await response.json()
+    username.value = decodedResponse?.data?.info?.username
+  } catch (error) {
+    useSnackbarStore().show(error.toString())
+  }
+}
+
+const fetchHtmlsList = async () => {
   try {
     const accessToken = localStorage.getItem('accessToken')
 
@@ -204,6 +250,8 @@ const fetchHtmlHtmls = async () => {
         access_token: accessToken,
         carrier_type: selectedType.value,
         selected_agent: selectedAgent.value,
+        selected_mvno: selectedMvno.value,
+        policy_date_month: selectedMonth?.value?.format('YYYY-MM') ?? null,
         per_page: rowLimit.value,
         page_number: currentPage.value,
       }),
@@ -217,29 +265,19 @@ const fetchHtmlHtmls = async () => {
     htmlContents.value = decodedResponse.htmls
     totalCount.value = decodedResponse.total_count
 
-    // console.log(decodedResponse.htmls)
+    agentCdList.value = policyData.value?.agent_cd_list
+
+    // agentcdlist is regenereted after checking policydata
+    if (selectedType.value) {
+      agentCdList.value = policyData.value?.agent_cd_list?.filter((item) =>
+        item?.carrier_type_list?.includes(selectedType.value)
+      )
+    }
   } catch (error) {
     // console.error('Error uplading html:', error)
     useSnackbarStore().show(error.toString())
   }
 }
-
-const username = ref()
-async function fetchUserInfo() {
-  try {
-    const response = await fetchWithTokenRefresh('admin/myInfo', { method: 'GET' })
-    if (!response.ok) throw 'Fetch profile data error'
-    const decodedResponse = await response.json()
-    username.value = decodedResponse?.data?.info?.username
-  } catch (error) {
-    useSnackbarStore().show(error.toString())
-  }
-}
-const policyData = ref()
-const selectedType = ref('')
-const selectedAgent = ref('')
-const selectedMvno = ref('')
-const selectedMonth = ref()
 
 async function fetchPlicyinfo() {
   // console.log('fetch policy info called')
@@ -256,10 +294,11 @@ async function fetchPlicyinfo() {
 }
 
 onMounted(async () => {
+  // selectedMonth.value = dayjs()
+  await fetchPlicyinfo()
   await fetchUserInfo()
-  await fetchHtmlHtmls()
+  await fetchHtmlsList()
 })
-onMounted(fetchPlicyinfo)
 </script>
 
 <style scoped>
@@ -277,13 +316,25 @@ onMounted(fetchPlicyinfo)
 
 .top_filters {
   display: flex;
+  flex-flow: wrap;
   gap: 20px;
-  max-width: 1200px;
-  min-width: 800px;
+  align-items: flex-end;
+}
+
+.top_filter_buttons {
+  display: flex;
+  flex-flow: wrap;
+  gap: 20px;
+}
+
+.top_filter_buttons button {
+  width: 100px;
+  background-color: #b4b4b4;
 }
 
 .filter_group {
-  width: 100%;
+  max-width: 200px;
+  flex: 1 0 calc(50% - 20px);
 }
 
 .pagination {
@@ -344,8 +395,43 @@ onMounted(fetchPlicyinfo)
   cursor: pointer;
 }
 
-@media (min-width: 600px) {
-  .plan-card {
+.html_cards {
+  display: none;
+  flex-flow: column;
+  gap: 20px;
+}
+
+.html_card {
+  background-color: #fff;
+  border-radius: 4px;
+  padding: 15px;
+  display: flex;
+  flex-flow: column;
+  gap: 10px;
+}
+
+.html_card_row {
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  text-align: end;
+}
+.html_card_row > :nth-child(1) {
+  word-break: keep-all;
+}
+
+.html_card:active,
+.html_card:hover {
+  background-color: #dfdfdf;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .html_cards {
+    display: flex;
+  }
+
+  .table-wrap {
     display: none;
   }
 }
