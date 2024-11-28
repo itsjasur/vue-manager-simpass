@@ -4,16 +4,12 @@
     <div class="top_filters">
       <div class="top_filter_buttons">
         <button
-          @click="selectType('PR')"
-          :style="{ backgroundColor: selectedType === 'PR' ? 'var(--main-color)' : null }"
+          v-for="(item, index) in policyData?.carrier_type"
+          :key="index"
+          @click="selectType(item.cd)"
+          :style="{ backgroundColor: selectedType === item.cd ? 'var(--main-color)' : null }"
         >
-          선불
-        </button>
-        <button
-          @click="selectType('PO')"
-          :style="{ backgroundColor: selectedType === 'PO' ? 'var(--main-color)' : null }"
-        >
-          후불
+          {{ item.value }}
         </button>
       </div>
 
@@ -74,7 +70,7 @@
                 <div
                   v-for="(mvno_cd, index) in text"
                   :key="index"
-                  :style="{ backgroundColor: getRandomColor() }"
+                  :style="{ backgroundColor: getRandomColor(mvno_cd) }"
                   class="selected_mvno_box"
                 >
                   {{ policyData.mvno_cd_list?.find((i) => i.mvno_cd === mvno_cd)?.mvno_nm }}
@@ -126,19 +122,32 @@ import { useSnackbarStore } from '@/stores/snackbar'
 import { ref, onMounted } from 'vue'
 import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
 import HtmlVIewerPopup from '@/components/HtmlVIewerPopup.vue'
-import dayjs from 'dayjs'
 
-function selectType(type) {
-  selectedType.value = selectedType.value === type ? '' : type
-  fetchHtmlsList()
-}
+function getRandomColor(code) {
+  const colors = [
+    '#D66060', // Darker soft red
+    '#D67F60', // Darker soft coral/orange
+    '#D69F60', // Darker soft peach
+    '#5F904A', // Darker soft green
+    '#5F8FBA', // Darker soft blue
+    '#765F9A', // Darker soft purple
+    '#B063A9', // Darker soft magenta
+    '#C3873C', // Darker soft amber
+    '#599497', // Darker soft teal
+    '#976487', // Darker soft rose
+  ]
 
-function getRandomColor() {
-  // Generate random RGB values
-  const r = Math.floor(Math.random() * 150 + 55) // 55-255 for better visibility
-  const g = Math.floor(Math.random() * 200 + 5)
-  const b = Math.floor(Math.random() * 200 + 50)
-  return `rgb(${r}, ${g}, ${b})`
+  const mappedColors = {
+    HVS: colors[0],
+    ISM: colors[1],
+    KTM: colors[2],
+    KTS: colors[3],
+    SVM: colors[4],
+    UPM: colors[5],
+  }
+
+  if (mappedColors?.[code]) return mappedColors[code]
+  return colors[Math.floor(Math.random() * colors.length)]
 }
 
 const openOrUpdateHtml = ref(false)
@@ -182,20 +191,6 @@ const columns = ref([
     dataIndex: 'title',
     key: 'title',
     sorter: (a, b) => (a.title ?? '').localeCompare(b.title ?? ''),
-    // width: '40%'
-    // width: 500
-  },
-  {
-    title: 'Agent',
-    dataIndex: 'selectedAgent',
-    key: 'selectedAgent',
-    sorter: (a, b) => (a.selectedAgent ?? '').localeCompare(b.selectedAgent ?? ''),
-  },
-  {
-    title: 'Type',
-    dataIndex: 'carrierType',
-    key: 'carrierType',
-    sorter: (a, b) => (a.selectedAgent ?? '').localeCompare(b.selectedAgent ?? ''),
   },
   {
     title: '정책년월',
@@ -226,8 +221,21 @@ const selectedAgent = ref('')
 const selectedMvno = ref('')
 const selectedMonth = ref()
 const agentCdList = ref()
-
 const username = ref()
+
+async function selectType(type) {
+  selectedType.value = selectedType.value === type ? '' : type
+  selectedAgent.value = ''
+  await fetchHtmlsList()
+  agentCdList.value = policyData.value?.agent_cd_list
+  // agentcdlist is regenereted after checking policydata
+  if (selectedType.value) {
+    agentCdList.value = policyData.value?.agent_cd_list?.filter((item) =>
+      item?.carrier_type_list?.includes(selectedType.value)
+    )
+  }
+}
+
 async function fetchUserInfo() {
   try {
     const response = await fetchWithTokenRefresh('admin/myInfo', { method: 'GET' })
@@ -264,15 +272,6 @@ const fetchHtmlsList = async () => {
     const decodedResponse = await response.json()
     htmlContents.value = decodedResponse.htmls
     totalCount.value = decodedResponse.total_count
-
-    agentCdList.value = policyData.value?.agent_cd_list
-
-    // agentcdlist is regenereted after checking policydata
-    if (selectedType.value) {
-      agentCdList.value = policyData.value?.agent_cd_list?.filter((item) =>
-        item?.carrier_type_list?.includes(selectedType.value)
-      )
-    }
   } catch (error) {
     // console.error('Error uplading html:', error)
     useSnackbarStore().show(error.toString())
@@ -287,9 +286,10 @@ async function fetchPlicyinfo() {
     // console.log(decodedResponse.data)
     if (!response.ok) throw 'Fetch plicy info error'
     policyData.value = decodedResponse?.data
+
+    agentCdList.value = policyData.value?.agent_cd_list
   } catch (error) {
     useSnackbarStore().show(error.toString())
-  } finally {
   }
 }
 
@@ -303,11 +303,6 @@ onMounted(async () => {
 
 <style scoped>
 .htmls_container {
-  /* display: flex; */
-  /* flex-flow: column; */
-  /* box-sizing: border-box; */
-  /* margin-bottom: 100px; */
-
   margin: 20px;
   display: flex;
   flex-flow: column;
@@ -343,13 +338,6 @@ onMounted(async () => {
 
 .pagination :deep(button) {
   min-height: unset;
-}
-
-.add_new_button {
-  width: auto;
-  min-width: 120px;
-  align-self: end;
-  margin-bottom: 20px;
 }
 
 .table {

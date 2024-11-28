@@ -126,6 +126,12 @@ const router = createRouter({
           component: () => import('../views/HtmlsView.vue'),
           meta: { requiresAuth: true },
         },
+        {
+          path: '/usim-order',
+          name: 'usim-order',
+          component: () => import('../views/UsimOrderView.vue'),
+          meta: { requiresAuth: true },
+        },
       ],
     },
     // this catchs any  route

@@ -92,7 +92,7 @@
       <div class="group-row">
         <div class="group">
           <label>주소*</label>
-          <input v-model="forms.address" @input="validateForms" @click="searchAddressPopup.open()" readonly />
+          <input v-model="forms.address" @input="validateForms" @click="openAddressPopup" readonly />
           <p v-if="submitted && errors.address" class="input-error-message">{{ errors.address }}</p>
         </div>
 
@@ -222,12 +222,15 @@
       :partnerCd="serverData.partner_cd"
     />
   </GlobalPopupWithOverlay>
+
+  <GlobalPopupWithOverlay ref="addressPopupRef">
+    <GlobalSearchAddress @selected="handleAddressSelected" @closePopup="closeAddressPopup" />
+  </GlobalPopupWithOverlay>
 </template>
 
 <script setup>
 import { ref, onMounted, reactive, watchEffect } from 'vue'
 import * as cleavePatterns from '../utils/cleavePatterns'
-import { useSearchaddressStore } from '@/stores/select-address-popup'
 import { useSnackbarStore } from '@/stores/snackbar'
 import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
 import { useRouter } from 'vue-router'
@@ -306,12 +309,18 @@ const imageUploads = reactive({
   bankBook: { initial: null, new: null, required: true, title: '통장 사본 (필수)' },
 })
 
-//setting address and addressdetail to store value
-const searchAddressPopup = useSearchaddressStore()
-watchEffect(() => {
-  forms.address = searchAddressPopup.address
-  forms.addressAdditions = searchAddressPopup.buildingName
-})
+//address select
+const addressPopupRef = ref(null)
+const closeAddressPopup = () => {
+  addressPopupRef.value.closePopup()
+}
+function openAddressPopup() {
+  addressPopupRef.value.showPopup()
+}
+const handleAddressSelected = (data) => {
+  forms.address = data.address
+  forms.addressAdditions = data.buildingName
+}
 
 const partnerInfoFetched = ref(false)
 async function fetchData() {

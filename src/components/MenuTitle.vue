@@ -36,6 +36,9 @@ const title = computed(() => {
   if (route.name === 'form-details') {
     return SIDEMENUNAMES[2]
   }
+  if (route.name === 'usim-order') {
+    return SIDEMENUNAMES[6]
+  }
 
   if (route.name === 'business-request') {
     return '거래요청'

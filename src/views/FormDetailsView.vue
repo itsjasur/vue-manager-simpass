@@ -16,7 +16,6 @@
     </div>
 
     <!-- FORMS -->
-
     <template v-for="(part, index) of displayingForms" :key="index">
       <template v-if="part.forms.length > 0">
         <div class="partition">
@@ -196,17 +195,20 @@
       :canPrint="canPrintImages"
     />
   </GlobalPopupWithOverlay>
+
+  <GlobalPopupWithOverlay ref="addressPopupRef">
+    <GlobalSearchAddress @selected="handleAddressSelected" @closePopup="closeAddressPopup" />
+  </GlobalPopupWithOverlay>
 </template>
 
 <script setup>
 import { useSnackbarStore } from '@/stores/snackbar'
 import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
-import { onMounted, onUnmounted, reactive, ref, watch, watchEffect } from 'vue'
+import { onMounted, reactive, ref, watch, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { FORMS, PLANSINFO, displayingForms, generateDisplayingForms } from '../assets/plans_forms'
 import _ from 'lodash'
 import SignImageRowContainer from '../components/SignImageRowContainer.vue'
-import { useSearchaddressStore } from '../stores/select-address-popup'
 import LoadingSpinner from '../components/Loader.vue'
 import { useSelectPlansPopup } from '../stores/select-plans-popup'
 import { useDeviceTypeStore } from '@/stores/device-type-store'
@@ -215,7 +217,6 @@ import ImageViewPopup from '../components/ImageViewPopup.vue'
 import { base64ToBlobUrl } from '@/utils/helpers'
 import * as cleavePatterns from '../utils/cleavePatterns'
 import { validateBirthday } from '@/utils/validators'
-import { errorMessages } from 'vue/compiler-sfc'
 
 const availableForms = ref([])
 
@@ -240,32 +241,27 @@ function closeImageViewPopup() {
   router.push('/')
 }
 
-//address poup
-const selectAddressPopup = useSearchaddressStore()
-
 const route = useRoute()
 const router = useRouter()
 
 //need to make deep copy in order to reset when page reloads
 const FIXED_FORMS = reactive(_.cloneDeep(FORMS))
 
-//setting address and addressdetail to store value
-watch(
-  () => selectAddressPopup.address,
-  (newValue, oldValue) => {
-    FIXED_FORMS.address.value = selectAddressPopup.address
-    FIXED_FORMS.addressdetail.value = selectAddressPopup.buildingName
-  }
-)
+// address select popup and setting value
+const addressPopupRef = ref(null)
+const closeAddressPopup = () => {
+  addressPopupRef.value.closePopup()
+}
+function openAddressPopup() {
+  addressPopupRef.value.showPopup()
+}
+const handleAddressSelected = (data) => {
+  FIXED_FORMS.address.value = data.address
+  FIXED_FORMS.addressdetail.value = data.buildingName
+}
 
 //this inits page
 onMounted(fetchData)
-
-//clearing up the address store once unmounted
-onUnmounted(() => {
-  selectAddressPopup.address = ''
-  selectAddressPopup.buildingName = ''
-})
 
 //this watches route id (if plan id changed)
 watch(() => route?.params?.id, fetchData)
@@ -325,7 +321,7 @@ function generateInitialForms() {
   if (FIXED_FORMS?.usim_act_cd?.value === 'N') {
     availableForms.value.push('wish_number')
     //wish numbers input with cleave
-    let wishArray = Array(selectedMvnoInfo.wishCount).fill(4) //[4,4,4]
+    let wishArray = Array(selectedMvnoInfo?.wishCount).fill(4) //[4,4,4]
     FIXED_FORMS.wish_number.pattern = { numericOnly: true, delimiter: ' / ', blocks: wishArray } //4,4,4
     FIXED_FORMS.wish_number.placeholder = wishArray.map((e) => '1234').join(' / ')
   }
@@ -425,7 +421,7 @@ const inputBindings = (formName) => {
   }
 
   if (formName === 'address') {
-    bindings.onClick = (event) => selectAddressPopup.open()
+    bindings.onClick = (event) => openAddressPopup()
     bindings.readonly = true
   }
   if (formName === 'account_number') {
@@ -612,7 +608,6 @@ async function fetchForms() {
     'phone_number',
   ]
 
-  // {formname: 'contact', value: '0101231231212'}
   var formsAndValues = {}
 
   for (var formName of availableForms.value) {

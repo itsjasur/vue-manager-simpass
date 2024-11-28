@@ -1,6 +1,4 @@
 <template>
-  <SearchAddressPopup v-if="searchAddressPopup.active" />
-
   <div class="content-container">
     <div class="partition">
       <div class="title">판매점 정보</div>
@@ -72,7 +70,7 @@
       <div class="group-row">
         <div class="group" style="max-width: 60%">
           <label>주소</label>
-          <input @click="searchAddressPopup.open()" v-model="address" placeholder="" readonly />
+          <input @click="openAddressPopup" v-model="address" placeholder="" readonly />
           <p v-if="!address && isSubmitted" class="input-error-message">주소를 입력하세요.</p>
         </div>
 
@@ -145,13 +143,15 @@
       </template>
     </button>
   </div>
+
+  <GlobalPopupWithOverlay ref="addressPopupRef">
+    <GlobalSearchAddress @selected="handleAddressSelected" @closePopup="closeAddressPopup" />
+  </GlobalPopupWithOverlay>
 </template>
 
 <script setup>
 import { ref, watch } from 'vue'
 import { useSnackbarStore } from '@/stores/snackbar'
-import SearchAddressPopup from '../components/SearchAddressPopup.vue'
-import { useSearchaddressStore } from '@/stores/select-address-popup'
 import { useSignUpstore } from '../stores/signup-store'
 import { useRouter } from 'vue-router'
 import LoadingSpinner from '../components/Loader.vue'
@@ -161,21 +161,22 @@ import * as cleavePatterns from '../utils/cleavePatterns'
 import { validatePass, validateRentryPass } from '@/utils/validators'
 
 const warningStore = useWarningStore()
-
 const router = useRouter()
-
 const signUpStore = useSignUpstore()
-const searchAddressPopup = useSearchaddressStore()
-
 const isLoading = ref(false)
 
-watch(
-  () => searchAddressPopup.address,
-  () => {
-    address.value = searchAddressPopup.address
-    addressDetails.value = searchAddressPopup.buildingName
-  }
-)
+//address select
+const addressPopupRef = ref(null)
+const closeAddressPopup = () => {
+  addressPopupRef.value.closePopup()
+}
+function openAddressPopup() {
+  addressPopupRef.value.showPopup()
+}
+const handleAddressSelected = (data) => {
+  address.value = data.address
+  addressDetails.value = data.buildingName
+}
 
 async function checkUsername() {
   isUsernameOk.value = false

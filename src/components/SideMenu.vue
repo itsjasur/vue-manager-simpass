@@ -31,8 +31,6 @@ import { useRouteMemoryStore } from '@/stores/router-memory-store'
 const hostname = ref('baroform')
 onMounted(() => {
   hostname.value = window.location.hostname.includes('sjnetwork') ? 'sjnetwork' : 'baroform'
-
-  hostname.value = 'sjnetwork'
 })
 
 const sideMenuStore = useSideMenuStore()
@@ -47,9 +45,11 @@ const route = useRoute()
 const menuItems = ref([
   { name: SIDEMENUNAMES[0], path: '/home', icon: 'home' },
   { name: SIDEMENUNAMES[1], path: '/profile', icon: 'person' },
+  { name: '정책보기', path: '/htmls', icon: 'docs' },
   { name: SIDEMENUNAMES[2], path: '/registration-forms', icon: 'description' },
   { name: SIDEMENUNAMES[3], path: '/applications', icon: 'checklist_rtl' },
   { name: SIDEMENUNAMES[4], path: '/download-forms', icon: 'file_save' },
+  { name: SIDEMENUNAMES[6], path: '/usim-order', icon: 'local_shipping' },
 ])
 function isActive(path) {
   if (route.name === 'form-details' && path === '/registration-forms') return true
