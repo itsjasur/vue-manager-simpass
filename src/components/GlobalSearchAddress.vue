@@ -78,7 +78,6 @@ onUnmounted(() => {
   height: 100%;
   max-height: 600px;
   overflow: auto;
-
   align-self: center;
 }
 

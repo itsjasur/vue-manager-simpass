@@ -12,24 +12,22 @@
         <span style="font-size: 18px">배송 세부 사항을 확인하세요</span>
 
         <div class="input_group">
-          <label>대표자명</label>
+          <label>수신자명</label>
           <input v-model="name" placeholder="" />
+          <p v-if="isSubmitted && !name" class="input-error-message">수신자명를 입력해주세요.</p>
         </div>
 
         <div class="input_group">
           <label>연락처</label>
-          <CleaveInput
-            placeholder="010-1234-5678"
-            v-model="phoneNumber"
-            :options="cleavePatterns.phoneNumberPattern"
-            @rawValue="phoneNumber = $event"
-          />
+          <CleaveInput placeholder="010-1234-5678" v-model="phoneNumber" :options="cleavePatterns.phoneNumberPattern" />
+          <p v-if="isSubmitted && !phoneNumber" class="input-error-message">연락처를 입력해주세요.</p>
         </div>
 
         <div class="address_group">
           <div class="input_group" style="flex: 3">
             <label>매장주소</label>
             <input v-bind:value="address" @click="openAddressPopup" placeholder="" readonly />
+            <p v-if="isSubmitted && !address" class="input-error-message">매장주소를 입력해주세요.</p>
           </div>
 
           <div class="input_group" style="flex: 2">
@@ -46,6 +44,7 @@
         <div class="filter_group" style="flex: 4">
           <label>대리점</label>
           <a-select
+            :getPopupContainer="(triggerNode) => triggerNode.parentNode"
             v-model:value="selectedAgentCode"
             @change="
               () => {
@@ -57,25 +56,40 @@
             :options="[...(agents?.map((i) => ({ value: i.agent_cd, label: i.agent_nm })) || [])]"
           >
           </a-select>
+          <p v-if="isSubmitted && !selectedAgentCode" class="input-error-message">대리점를 선택하세요.</p>
         </div>
         <div class="filter_group" style="flex: 2">
           <label>통신망</label>
           <a-select
+            :getPopupContainer="(triggerNode) => triggerNode.parentNode"
             @change="selectedMvnoCode = null"
             v-model:value="selectedCarrierCode"
             :style="{ width: '100%' }"
             :options="[...(carriers?.map((i) => ({ value: i.cd, label: i.label })) || [])]"
           >
           </a-select>
+          <p v-if="isSubmitted && !selectedCarrierCode" class="input-error-message">통신망를 선택하세요.</p>
         </div>
         <div class="filter_group" style="flex: 4">
           <label>통신사</label>
-          <a-select v-model:value="selectedMvnoCode" :style="{ width: '100%' }" :options="findMvnos() ?? []">
+          <a-select
+            :getPopupContainer="(triggerNode) => triggerNode.parentNode"
+            v-model:value="selectedMvnoCode"
+            :style="{ width: '100%' }"
+            :options="findMvnos() ?? []"
+          >
           </a-select>
+          <p v-if="isSubmitted && !selectedMvnoCode" class="input-error-message">통신사를 선택하세요.</p>
         </div>
       </div>
 
-      <button style="margin-top: 50px; align-self: center; width: 200px" @click="createOrder()">Save content</button>
+      <div class="input_group" style="max-width: 150px">
+        <label>유심 수량</label>
+        <input type="number" v-model="usimCount" placeholder="" />
+        <p v-if="isSubmitted && (!usimCount || usimCount < 1)" class="input-error-message">수량 입력해주세요.</p>
+      </div>
+
+      <button style="margin-top: 10px; align-self: flex-end; width: 200px" @click="createOrder()">주문하기</button>
     </div>
 
     <GlobalPopupWithOverlay ref="addressPopupRef">
@@ -104,7 +118,6 @@ const handleAddressSelected = (data) => {
   console.log('Building name:', data.buildingName)
 }
 
-const userInfo = ref({})
 const name = ref()
 const phoneNumber = ref()
 
@@ -114,6 +127,9 @@ const addressDetails = ref()
 const selectedAgentCode = ref()
 const selectedCarrierCode = ref()
 const selectedMvnoCode = ref()
+const usimCount = ref(0)
+
+const isSubmitted = ref(true)
 
 function findMvnos() {
   const mvnoCodes = agents.value
@@ -162,29 +178,44 @@ async function fetchProfileData() {
 
     const decodedResponse = await response.json()
     if (decodedResponse.data && decodedResponse.data.info) {
-      userInfo.value = decodedResponse.data.info
-      name.value = userInfo.value.contractor
-      phoneNumber.value = userInfo.value.phone_number
+      const userInfo = decodedResponse.data.info
+      name.value = userInfo?.contractor
+      phoneNumber.value = userInfo?.phone_number
 
-      address.value = userInfo.value.address
-      addressDetails.value = userInfo.value.dtl_address
+      address.value = userInfo?.address
+      addressDetails.value = userInfo?.dtl_address
     }
   } catch (error) {
     useSnackbarStore().show(error.toString())
   }
 }
 
-function createOrder() {}
+function createOrder() {
+  isSubmitted.value = true
+
+  if (
+    !name.value ||
+    !phoneNumber.value ||
+    !address.value ||
+    !selectedAgentCode.value ||
+    !selectedCarrierCode.value ||
+    !selectedMvnoCode.value
+  ) {
+    useSnackbarStore().show('')
+    return
+  }
+}
 
 onMounted(fetchProfileData)
 </script>
 
 <style scoped>
 .usim_order_popup_main_container {
-  background-color: #fff;
+  background-color: white;
+  border-radius: 8px;
   width: 700px;
-  border-radius: 6px;
-  margin: 20px;
+  overflow: auto;
+  align-self: center;
 }
 
 .scrollable_content {

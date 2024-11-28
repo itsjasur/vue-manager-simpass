@@ -25,28 +25,24 @@ const emit = defineEmits(['update:modelValue', 'rawValue', 'maskedValue'])
 const input = ref(null)
 let cleave
 
-const initCleave = () => {
-  if (!input.value) return
-
-  const cleaveOptions = {
-    ...props.options,
-    onValueChanged: (event) => {
-      emit('update:modelValue', event.target.value)
-      emit('rawValue', event.target.rawValue)
-      emit('maskedValue', event.target.value)
-    },
-  }
-
-  cleave = new Cleave(input.value, cleaveOptions)
-}
-
 onMounted(() => {
-  initCleave()
+  if (input.value) {
+    const cleaveOptions = {
+      ...props.options,
+      onValueChanged: (event) => {
+        emit('update:modelValue', event.target.value)
+        emit('rawValue', event.target.rawValue)
+        emit('maskedValue', event.target.value)
+      },
+    }
 
-  if (props.modelValue) {
-    setTimeout(() => {
+    cleave = new Cleave(input.value, cleaveOptions)
+
+    // cleave = new Cleave(input.value, props.options)
+
+    if (props.modelValue) {
       cleave.setRawValue(props.modelValue)
-    }, 0)
+    }
   }
 })
 
@@ -60,9 +56,7 @@ watch(
   () => props.modelValue,
   (newValue) => {
     if (cleave && newValue !== undefined) {
-      if (newValue !== cleave.getFormattedValue()) {
-        cleave.setRawValue(newValue)
-      }
+      cleave.setRawValue(newValue)
     }
   }
 )
@@ -72,10 +66,13 @@ watch(
   (newOptions) => {
     if (cleave) {
       cleave.destroy()
-      initCleave()
-      if (props.modelValue) {
-        cleave.setRawValue(props.modelValue)
-      }
+      cleave = new Cleave(input.value, {
+        ...newOptions,
+        onValueChanged: (event) => {
+          emit('update:modelValue', event.target.value)
+          emit('rawValue', event.target.rawValue)
+        },
+      })
     }
   },
   { deep: true }
