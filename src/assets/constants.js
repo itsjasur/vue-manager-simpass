@@ -29,3 +29,17 @@ export const EMAILOPTIONS = [
   { value: '@hanmail.net', label: '@hanmail.net' },
   { value: '@hotmail.com', label: '@hotmail.com' },
 ]
+
+export const MVNO_CODES = {
+  FRT: '프리티',
+  HVS: '핼로 모바일',
+  ISM: '인스 모바일',
+  KTM: 'KT M모바일',
+  KTS: 'KT Sky Life',
+  SVM: 'SK 7모바일',
+  UPM: 'U+ 유모바일',
+  HPM: '한패스 모바일',
+  CDM: '코드 모바일',
+}
+export const CARRIER_CODES = { KT: 'KT', SK: 'SKT', LG: 'LG U+' }
+export const AGENT_CODES = { SJ: '에스제이', BP: '바로폼' }

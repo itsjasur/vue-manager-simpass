@@ -4,7 +4,7 @@
   <div class="usim_order_popup_main_container">
     <div class="fixed-header">
       <p class="title">유심 주문</p>
-      <span @click="$emit('closePopup')" class="material-symbols-outlined close-button"> cancel </span>
+      <span @click="$emit('closePopup', false)" class="material-symbols-outlined close-button"> cancel </span>
     </div>
 
     <div class="scrollable_content">
@@ -40,56 +40,76 @@
       <div></div>
       <span style="font-size: 18px">USIM 종류를 선택하세요</span>
 
-      <div class="filters_section">
-        <div class="filter_group" style="flex: 4">
-          <label>대리점</label>
-          <a-select
-            :getPopupContainer="(triggerNode) => triggerNode.parentNode"
-            v-model:value="selectedAgentCode"
-            @change="
-              () => {
-                selectedCarrierCode = null
-                selectedMvnoCode = null
-              }
-            "
-            :style="{ width: '100%' }"
-            :options="[...(agents?.map((i) => ({ value: i.agent_cd, label: i.agent_nm })) || [])]"
-          >
-          </a-select>
-          <p v-if="isSubmitted && !selectedAgentCode" class="input-error-message">대리점를 선택하세요.</p>
+      <div class="usim_order_type_list_item" v-for="(item, index) in usimOrderTypeList" :key="index">
+        <span style="font-weight: 600; color: #ccc; font-size: 15px">주문 유형 {{ index + 1 }}</span>
+        <div class="filters_section">
+          <div class="filter_group" style="flex: 2; min-width: 200px">
+            <label>대리점</label>
+            <a-select
+              :getPopupContainer="(triggerNode) => triggerNode.parentNode"
+              v-model:value="item.selectedAgentCode"
+              @change="
+                () => {
+                  item.selectedCarrierCode = null
+                  item.selectedMvnoCode = null
+                }
+              "
+              :style="{ width: '100%' }"
+              :options="Object.entries(AGENT_CODES).map(([key, val]) => ({ value: key, label: val }))"
+            >
+            </a-select>
+            <!-- :options="[...(agents?.map((i) => ({ value: i.agent_cd, label: i.agent_nm })) || [])]" -->
+            <p v-if="isSubmitted && !item.selectedAgentCode" class="input-error-message">대리점를 선택하세요.</p>
+          </div>
+          <div class="filter_group" style="flex: 1; min-width: 120px">
+            <label>통신망</label>
+            <a-select
+              :getPopupContainer="(triggerNode) => triggerNode.parentNode"
+              @change="item.selectedMvnoCode = null"
+              v-model:value="item.selectedCarrierCode"
+              :style="{ width: '100%' }"
+              :options="Object.entries(CARRIER_CODES).map(([key, val]) => ({ value: key, label: val }))"
+            >
+            </a-select>
+            <!-- :options="[...(carriers?.map((i) => ({ value: i.cd, label: i.label })) || [])]" -->
+            <p v-if="isSubmitted && !item.selectedCarrierCode" class="input-error-message">통신망를 선택하세요.</p>
+          </div>
+          <div class="filter_group" style="flex: 2; min-width: 200px">
+            <label>통신사</label>
+            <a-select
+              :getPopupContainer="(triggerNode) => triggerNode.parentNode"
+              v-model:value="item.selectedMvnoCode"
+              :style="{ width: '100%' }"
+              :options="getMvnoOptions(item)"
+            >
+            </a-select>
+            <p v-if="isSubmitted && !item.selectedMvnoCode" class="input-error-message">통신사를 선택하세요.</p>
+          </div>
+
+          <div class="filter_group" style="flex: 1; min-width: 120px">
+            <label>유심 수량</label>
+            <input type="number" v-model="item.usimCount" placeholder="" min="0" step="any" />
+            <p v-if="isSubmitted && (!item.usimCount || item.usimCount < 1)" class="input-error-message">
+              수량 입력해주세요.
+            </p>
+          </div>
         </div>
-        <div class="filter_group" style="flex: 2">
-          <label>통신망</label>
-          <a-select
-            :getPopupContainer="(triggerNode) => triggerNode.parentNode"
-            @change="selectedMvnoCode = null"
-            v-model:value="selectedCarrierCode"
-            :style="{ width: '100%' }"
-            :options="[...(carriers?.map((i) => ({ value: i.cd, label: i.label })) || [])]"
-          >
-          </a-select>
-          <p v-if="isSubmitted && !selectedCarrierCode" class="input-error-message">통신망를 선택하세요.</p>
-        </div>
-        <div class="filter_group" style="flex: 4">
-          <label>통신사</label>
-          <a-select
-            :getPopupContainer="(triggerNode) => triggerNode.parentNode"
-            v-model:value="selectedMvnoCode"
-            :style="{ width: '100%' }"
-            :options="findMvnos() ?? []"
-          >
-          </a-select>
-          <p v-if="isSubmitted && !selectedMvnoCode" class="input-error-message">통신사를 선택하세요.</p>
-        </div>
+
+        <span
+          v-if="usimOrderTypeList.length > 1"
+          class="material-symbols-outlined delete_item_button"
+          @click="usimOrderTypeList.length > 1 ? usimOrderTypeList.splice(index, 1) : null"
+        >
+          delete
+        </span>
       </div>
 
-      <div class="input_group" style="max-width: 150px">
-        <label>유심 수량</label>
-        <input type="number" v-model="usimCount" placeholder="" />
-        <p v-if="isSubmitted && (!usimCount || usimCount < 1)" class="input-error-message">수량 입력해주세요.</p>
-      </div>
+      <button class="add_item_button" @click="usimOrderTypeList.push({ ...emptyItem })">
+        <span class="material-symbols-outlined"> add </span>
+        <span>유형 추가</span>
+      </button>
 
-      <button style="margin-top: 10px; align-self: flex-end; width: 200px" @click="createOrder()">주문하기</button>
+      <button style="margin-top: 0px; align-self: flex-end; width: 200px" @click="createOrder()">주문하기</button>
     </div>
 
     <GlobalPopupWithOverlay ref="addressPopupRef">
@@ -101,8 +121,17 @@
 <script setup>
 import { useSnackbarStore } from '@/stores/snackbar'
 import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import * as cleavePatterns from '../utils/cleavePatterns'
+import { AGENT_CODES, CARRIER_CODES, MVNO_CODES } from '@/assets/constants'
+
+const emit = defineEmits(['closePopup'])
+const props = defineProps({ orderId: { type: String, default: null } })
+
+const agent_info_list = {
+  SJ: { KT: ['KTS', 'KTM'], SK: ['SVM'], LG: ['UPM', 'HVS'] },
+  BP: { KT: ['FRT', 'CDM'], SK: ['FRT'], LG: ['FRT', 'ISM', 'HPM', 'CDM'] },
+}
 
 const addressPopupRef = ref(null)
 const closeAddressPopup = () => {
@@ -123,53 +152,24 @@ const phoneNumber = ref()
 
 const address = ref()
 const addressDetails = ref()
+const isSubmitted = ref(false)
 
-const selectedAgentCode = ref()
-const selectedCarrierCode = ref()
-const selectedMvnoCode = ref()
-const usimCount = ref(0)
-
-const isSubmitted = ref(true)
-
-function findMvnos() {
-  const mvnoCodes = agents.value
-    ?.find((agent) => agent.agent_cd === selectedAgentCode.value)
-    ?.items?.find((item) => item[selectedCarrierCode.value])?.[selectedCarrierCode.value]
-
-  return mvnoCodes?.map((mvnoCd) => ({
-    value: mvnoCd,
-    label: mvnos.value?.find((mvno) => mvno.mvno_cd === mvnoCd)?.mvno_nm,
-  }))
+const emptyItem = {
+  selectedAgentCode: '',
+  selectedCarrierCode: '',
+  selectedMvnoCode: '',
+  usimCount: 0,
 }
+const usimOrderTypeList = reactive([])
 
-const agents = ref([
-  {
-    agent_nm: '에스제이',
-    agent_cd: 'SJ',
-    items: [{ KT: ['KTS', 'KTM'] }, { SK: ['SVM'] }, { LG: ['UPM', 'HVS'] }],
-  },
-  {
-    agent_nm: '바로폼',
-    agent_cd: 'BP',
-    items: [{ KT: ['FRT', 'CDM'] }, { SK: ['FRT'] }, { LG: ['FRT', 'ISM', 'HPM', 'CDM'] }],
-  },
-])
-const mvnos = ref([
-  { mvno_nm: '프리티', mvno_cd: 'FRT' },
-  { mvno_nm: '핼로 모바일', mvno_cd: 'HVS' },
-  { mvno_nm: '인스 모바일', mvno_cd: 'ISM' },
-  { mvno_nm: 'KT M모바일', mvno_cd: 'KTM' },
-  { mvno_nm: 'KT Sky Life', mvno_cd: 'KTS' },
-  { mvno_nm: 'SK 7모바일', mvno_cd: 'SVM' },
-  { mvno_nm: 'U+ 유모바일', mvno_cd: 'UPM' },
-  { mvno_nm: '한패스 모바일', mvno_cd: 'HPM' },
-  { mvno_nm: '코드 모바일', mvno_cd: 'CDM' },
-])
-const carriers = ref([
-  { cd: 'KT', label: 'KT' },
-  { cd: 'SK', label: 'SKT' },
-  { cd: 'LG', label: 'LG U+' },
-])
+// select mvno options are computed based on agent and carrier values
+const getMvnoOptions = computed(() => {
+  return (item) => {
+    if (!item.selectedAgentCode || !item.selectedCarrierCode) return []
+    const mvnoList = agent_info_list?.[item.selectedAgentCode]?.[item.selectedCarrierCode] || []
+    return mvnoList.map((mc) => ({ value: mc, label: MVNO_CODES?.[mc] }))
+  }
+})
 
 async function fetchProfileData() {
   try {
@@ -190,32 +190,123 @@ async function fetchProfileData() {
   }
 }
 
-function createOrder() {
+async function createOrder() {
   isSubmitted.value = true
 
-  if (
-    !name.value ||
-    !phoneNumber.value ||
-    !address.value ||
-    !selectedAgentCode.value ||
-    !selectedCarrierCode.value ||
-    !selectedMvnoCode.value
-  ) {
-    useSnackbarStore().show('')
+  if (!name.value || !phoneNumber.value || !address.value) {
+    useSnackbarStore().show('모든 항목을 채워주세요.')
     return
+  }
+
+  for (var item of usimOrderTypeList) {
+    if (!item.selectedAgentCode || !item.selectedCarrierCode || !item.selectedMvnoCode || item.usimCount < 1) {
+      useSnackbarStore().show('주문 항목의 모든 필드를 채워주세요.')
+      return
+    }
+    console.log(item)
+  }
+
+  try {
+    await fetchProfileData()
+
+    const accessToken = localStorage.getItem('accessToken')
+    if (!accessToken) return
+
+    var newOrder = {
+      order_id: props?.orderId,
+      access_token: accessToken,
+      receiver_name: name.value,
+      phone_number: phoneNumber.value,
+      address: address.value,
+      address_details: addressDetails.value,
+      order_items: [],
+    }
+
+    for (var item of usimOrderTypeList) {
+      newOrder.order_items.push({
+        agent_code: item.selectedAgentCode,
+        carrier_type_code: item.selectedCarrierCode,
+        mvno_code: item.selectedMvnoCode,
+        usim_count: item.usimCount,
+      })
+    }
+
+    const response = await fetch(import.meta.env.VITE_CHAT_SERVER_URL + 'create-or-update-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newOrder),
+    })
+
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
+    const decodedResponse = await response.json()
+    useSnackbarStore().show(decodedResponse?.message ?? 'Order success')
+
+    if (decodedResponse?.success) emit('closePopup', true)
+
+    console.log(decodedResponse)
+  } catch (error) {
+    console.error('Error fetching html:', error)
+    useSnackbarStore().show(error.toString())
   }
 }
 
-onMounted(fetchProfileData)
+// fetch order if order id is given
+async function fetchOrderToEdit() {
+  console.log('fetchordertoedit called', props.orderId)
+
+  try {
+    const accessToken = localStorage.getItem('accessToken')
+    if (!accessToken) return
+
+    const response = await fetch(import.meta.env.VITE_CHAT_SERVER_URL + 'get-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        order_id: props.orderId,
+        access_token: accessToken,
+      }),
+    })
+
+    if (!response.ok) throw new Error(`HTTP error! status: ${response?.status}`)
+    const decodedResponse = await response.json()
+    console.log(decodedResponse)
+
+    for (var item of decodedResponse?.order_items ?? []) {
+      usimOrderTypeList.push({
+        selectedAgentCode: item.agent_code,
+        selectedCarrierCode: item.carrier_type_code,
+        selectedMvnoCode: item.mvno_code,
+        usimCount: item.usim_count,
+      })
+    }
+  } catch (error) {
+    console.error('Error fetching html:', error)
+  }
+}
+
+onMounted(async () => {
+  if (props.orderId) {
+    usimOrderTypeList.length = 0
+    await fetchOrderToEdit()
+  } else {
+    usimOrderTypeList.length = 0
+    usimOrderTypeList.push({ ...emptyItem })
+  }
+  await fetchProfileData()
+})
 </script>
 
 <style scoped>
 .usim_order_popup_main_container {
-  background-color: white;
+  background-color: var(--main-background-color);
   border-radius: 8px;
-  width: 700px;
-  overflow: auto;
-  align-self: center;
+  width: 850px;
+  display: flex;
+  flex-flow: column;
+  margin: 20px;
+  /* height: fit-content; */
+  /* max-width: 95%; */
+  /* max-height: 95%; */
 }
 
 .scrollable_content {
@@ -256,8 +347,38 @@ onMounted(fetchProfileData)
 }
 
 .filter_group {
-  min-width: 100px;
   flex: 1 0 calc(50% - 20px);
+}
+
+.usim_order_type_list_item {
+  border: 2px dashed #cdcdcd;
+  border-radius: 6px;
+  padding: 20px;
+  padding-top: 10px;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-flow: column;
+  gap: 10px;
+  position: relative;
+}
+
+.add_item_button {
+  margin-top: 10px;
+  background-color: #9d9d9d;
+  align-self: flex-start;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  padding: 0 10px;
+}
+
+.delete_item_button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  color: red;
+  cursor: pointer;
 }
 
 /* :nth-child(1) */

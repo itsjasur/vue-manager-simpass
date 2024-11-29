@@ -36,15 +36,11 @@ const fetchHtmlContent = async () => {
   try {
     const response = await fetch(import.meta.env.VITE_CHAT_SERVER_URL + 'get-html', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: props.id }),
     })
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
 
     const decodedResponse = await response.json()
     htmlTitle.value = decodedResponse?.html?.title || ''
