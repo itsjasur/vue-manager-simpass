@@ -7,7 +7,9 @@
       </div>
       <div class="end_items">
         <span class="con_status">{{ webSocketStore.isConnected ? 'Connected' : 'Disconnected' }}</span>
-        <span @click="chatPopupStore.close()" class="material-symbols-outlined close_button"> cancel </span>
+        <span style="cursor: pointer" @click="chatPopupStore.close()" class="material-symbols-outlined close_button">
+          cancel
+        </span>
       </div>
     </div>
 

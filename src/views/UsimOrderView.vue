@@ -42,6 +42,7 @@
                 color: '#fff',
                 borderRadius: '30px',
                 padding: '2px 5px',
+                whiteSpace: 'nowrap',
               }"
             >
               {{ statuses?.[text] }}
@@ -49,15 +50,16 @@
           </template>
 
           <template v-if="column.dataIndex === 'agent_cd'">
-            <div class="order_items">
+            <div class="order_items_content">
               <span v-for="(item, index) in record.order_items" :key="index">
+                <!-- :style="{ fontWeight: 'bold', color: getColor(index) }" -->
                 {{ AGENT_CODES?.[item?.agent_code] ?? '' }}
               </span>
             </div>
           </template>
 
           <template v-if="column.dataIndex === 'carrier_type_code'">
-            <div class="order_items">
+            <div class="order_items_content">
               <span v-for="(item, index) in record.order_items" :key="index">
                 {{ CARRIER_CODES?.[item?.carrier_type_code] ?? '' }}
               </span>
@@ -65,7 +67,7 @@
           </template>
 
           <template v-if="column.dataIndex === 'mvno_cd'">
-            <div class="order_items">
+            <div class="order_items_content">
               <span v-for="(item, index) in record.order_items" :key="index">
                 {{ MVNO_CODES?.[item?.mvno_code] ?? '' }}
               </span>
@@ -73,29 +75,52 @@
           </template>
 
           <template v-if="column.dataIndex === 'usim_count'">
-            <div class="order_items">
-              <span v-for="(item, index) in record.order_items" :key="index" style="color: blue; font-weight: 500">
+            <div class="order_items_content">
+              <span v-for="(item, index) in record.order_items" :key="index">
                 {{ item.usim_count }}
               </span>
             </div>
           </template>
 
-          <template v-if="column.dataIndex === 'edit_order'">
-            <span
-              v-if="record.status === 'confirmed'"
-              class="material-symbols-outlined"
-              style="color: orange; cursor: pointer"
-              @click="openPopup(record?.order_id)"
-            >
-              edit
-            </span>
+          <template v-if="column.dataIndex === 'sender_comment'">
+            <span style="color: orangered">{{ text }}</span>
+          </template>
+
+          <template v-if="column.dataIndex === 'actions'">
+            <div v-if="record.status === 'confirmed'" class="tabel_actions">
+              <span class="material-symbols-outlined" style="color: #3393ff" @click="openPopup(record?.order_id)">
+                edit
+              </span>
+              <span
+                class="material-symbols-outlined"
+                style="color: red"
+                @click="
+                  () => {
+                    selectedOrderId = record?.order_id
+                    isDeleteModalVisible = true
+                  }
+                "
+              >
+                delete
+              </span>
+            </div>
           </template>
         </template>
       </a-table>
     </div>
   </div>
+
+  <a-modal v-model:open="isDeleteModalVisible" :centered="true" title="삭제 확인" :closable="false">
+    <!-- :maskClosable="false" -->
+    <p>주문을 삭제하시겠습니까?? 삭제하면 복구할 수 없습니다.</p>
+    <template #footer>
+      <a-button key="cancel" @click="isDeleteModalVisible = false">취소</a-button>
+      <a-button key="delete" type="primary" danger @click="deleteOrder">삭제</a-button>
+    </template>
+  </a-modal>
+
   <GlobalPopupWithOverlay ref="popupRef">
-    <OrderUsimPopup v-if="orderNewPopupOpen" @closePopup="closePopup" :orderId="selectedOrderId" />
+    <OrderUsimPopup @closePopup="closePopup" :orderId="selectedOrderId" />
   </GlobalPopupWithOverlay>
 </template>
 
@@ -104,15 +129,7 @@ import OrderUsimPopup from '@/components/OrderUsimPopup.vue'
 import { useSnackbarStore } from '@/stores/snackbar'
 import { onMounted, ref } from 'vue'
 import { AGENT_CODES, CARRIER_CODES, MVNO_CODES } from '@/assets/constants' //used don't delete
-
-const popupRef = ref(null)
-const orderNewPopupOpen = ref(false)
-function closePopup(shouldRefresh) {
-  currentPage.value = 1
-  rowLimit.value = 10
-  if (shouldRefresh) fetchData()
-  popupRef.value.closePopup()
-}
+import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
 
 const statuses = {
   confirmed: '주문확인',
@@ -125,14 +142,6 @@ const statusColors = {
   shipped: 'orange',
   delivered: 'grey',
   failed: 'red',
-}
-
-const selectedOrderId = ref(null)
-function openPopup(orderId) {
-  console.log('openpopup', orderId)
-  selectedOrderId.value = orderId
-  orderNewPopupOpen.value = true
-  popupRef.value.showPopup()
 }
 
 const totalCount = ref(0)
@@ -157,7 +166,7 @@ const columns = ref([
   },
 
   {
-    title: '수신자명',
+    title: '판매자명',
     dataIndex: 'receiver_name',
     key: 'receiver_name',
     width: 120,
@@ -224,8 +233,8 @@ const columns = ref([
   },
   {
     title: '수정',
-    dataIndex: 'edit_order',
-    key: 'edit_order',
+    dataIndex: 'actions',
+    key: 'actions',
     align: 'center',
   },
 ])
@@ -246,12 +255,11 @@ const fetchData = async () => {
       }),
     })
 
-    // if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
+    if (!response.ok) throw new Error(`HTTP error! status: ${response?.status}`)
 
     const decodedResponse = await response.json()
     dataList.value = decodedResponse.usim_orders
-
-    console.log(dataList.value)
+    // console.log(dataList.value)
     totalCount.value = decodedResponse.total_count
   } catch (error) {
     console.error('Error fetching orders:', error)
@@ -259,6 +267,61 @@ const fetchData = async () => {
   }
 }
 
+const selectedOrderId = ref(null)
+function openPopup(orderId) {
+  // console.log('openpopup', orderId)
+  selectedOrderId.value = orderId
+  popupRef.value.showPopup()
+}
+
+const popupRef = ref(null)
+function closePopup(shouldRefresh) {
+  currentPage.value = 1
+  rowLimit.value = 10
+  if (shouldRefresh) fetchData()
+  popupRef.value.closePopup()
+}
+
+const isDeleteModalVisible = ref(false)
+
+// deletes order
+async function deleteOrder() {
+  console.log('deleteoder called', selectedOrderId.value)
+
+  try {
+    const accessToken = localStorage.getItem('accessToken')
+    if (!accessToken) return
+
+    const response = await fetch(import.meta.env.VITE_CHAT_SERVER_URL + 'delete-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ order_id: selectedOrderId.value, access_token: accessToken }),
+    })
+
+    if (!response.ok) throw new Error(`HTTP error! status: ${response?.status}`)
+    const decodedResponse = await response.json()
+    console.log(decodedResponse)
+    useSnackbarStore().show(decodedResponse?.message ?? 'Order deleted')
+
+    // close modal
+    isDeleteModalVisible.value = false
+
+    fetchData()
+  } catch (error) {
+    console.error('Error fetching data:', error)
+  }
+}
+
+async function tokenUpdate() {
+  try {
+    const response = await fetchWithTokenRefresh('agent/partnerInfo', { method: 'GET' })
+    if (!response.ok) throw new Error('Fetch profile data error')
+  } catch (error) {
+    useSnackbarStore().show(error.toString())
+  }
+}
+
+onMounted(tokenUpdate)
 onMounted(fetchData)
 </script>
 
@@ -288,19 +351,25 @@ onMounted(fetchData)
   overflow-x: auto;
 }
 
-.order_items {
+.order_items_content {
   display: flex;
   flex-flow: column;
-  gap: 25px;
-  height: fit-content;
+  gap: 30px;
   word-break: keep-all;
-  max-lines: 1;
+  white-space: nowrap;
+  max-width: 100px;
+  overflow: hidden;
   text-overflow: ellipsis;
-  /* background-color: cadetblue; */
-  /* align-content: space-between; */
-  /* justify-content: space-between; */
-  /* align-items: start; */
-  /* background-color: aquamarine; */
-  /* color: red; */
+}
+
+.tabel_actions {
+  display: flex;
+  flex-flow: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.tabel_actions .material-symbols-outlined {
+  cursor: pointer;
 }
 </style>

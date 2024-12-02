@@ -87,6 +87,7 @@ const handleResize = () => {
   width: 0px;
   transition: width 0.3s ease;
   z-index: 1001;
+  overflow-x: none;
 }
 
 .dashboard-side-menu.open {
@@ -95,12 +96,13 @@ const handleResize = () => {
 
 .dashboard-view-content {
   flex: 1;
+  height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   background-color: var(--main-background-color);
-  height: 100%;
-  width: 100%;
   z-index: 1003;
+  overflow-x: hidden;
 }
 
 .dashboard-view-content-header {

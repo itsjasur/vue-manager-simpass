@@ -3,8 +3,8 @@
     :locale="ko_KR"
     :theme="{
       token: {
-        colorPrimary: '#00d42a', //primary
-        colorPrimaryHover: '#00d42a', //primary hover
+        colorPrimary: '#517fff', //primary
+        colorPrimaryHover: '#517fff', //primary hover
         colorBorder: '#cccccc', // border color
         // controlHeight: 40, // input/select/button height
         borderRadius: 4, //all border radius

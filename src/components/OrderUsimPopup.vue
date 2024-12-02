@@ -8,13 +8,13 @@
     </div>
 
     <div class="scrollable_content">
-      <div class="top_user_info_section">
-        <span style="font-size: 18px">배송 세부 사항을 확인하세요</span>
+      <span style="font-size: 18px">배송 세부 사항을 확인하세요</span>
 
+      <div class="top_user_info_section">
         <div class="input_group">
-          <label>수신자명</label>
+          <label>판매자명</label>
           <input v-model="name" placeholder="" />
-          <p v-if="isSubmitted && !name" class="input-error-message">수신자명를 입력해주세요.</p>
+          <p v-if="isSubmitted && !name" class="input-error-message">판매자명를 입력해주세요.</p>
         </div>
 
         <div class="input_group">
@@ -37,7 +37,6 @@
         </div>
       </div>
 
-      <div></div>
       <span style="font-size: 18px">USIM 종류를 선택하세요</span>
 
       <div class="usim_order_type_list_item" v-for="(item, index) in usimOrderTypeList" :key="index">
@@ -106,10 +105,12 @@
 
       <button class="add_item_button" @click="usimOrderTypeList.push({ ...emptyItem })">
         <span class="material-symbols-outlined"> add </span>
-        <span>유형 추가</span>
+        <span>유심 주문 추가</span>
       </button>
 
-      <button style="margin-top: 0px; align-self: flex-end; width: 200px" @click="createOrder()">주문하기</button>
+      <button style="margin-top: 0px; align-self: flex-end; width: 200px" @click="createOrder()">
+        {{ props?.orderId ? '수정하기' : '저장하기' }}
+      </button>
     </div>
 
     <GlobalPopupWithOverlay ref="addressPopupRef">
@@ -179,7 +180,9 @@ async function fetchProfileData() {
     const decodedResponse = await response.json()
     if (decodedResponse.data && decodedResponse.data.info) {
       const userInfo = decodedResponse.data.info
-      name.value = userInfo?.contractor
+
+      console.log(userInfo)
+      name.value = userInfo?.partner_nm
       phoneNumber.value = userInfo?.phone_number
 
       address.value = userInfo?.address
@@ -207,8 +210,6 @@ async function createOrder() {
   }
 
   try {
-    await fetchProfileData()
-
     const accessToken = localStorage.getItem('accessToken')
     if (!accessToken) return
 
@@ -245,7 +246,7 @@ async function createOrder() {
 
     console.log(decodedResponse)
   } catch (error) {
-    console.error('Error fetching html:', error)
+    console.error('Error fetching data:', error)
     useSnackbarStore().show(error.toString())
   }
 }
@@ -280,7 +281,7 @@ async function fetchOrderToEdit() {
       })
     }
   } catch (error) {
-    console.error('Error fetching html:', error)
+    console.error('Error fetching data:', error)
   }
 }
 
