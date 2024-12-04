@@ -8,7 +8,7 @@
     </div>
 
     <div class="scrollable_content">
-      <span style="font-size: 18px">배송 세부 사항을 확인하세요</span>
+      <span style="font-size: 18px">배송 세부 사항</span>
 
       <div class="top_user_info_section">
         <div class="input_group">
@@ -37,7 +37,7 @@
         </div>
       </div>
 
-      <span style="font-size: 18px">USIM 종류를 선택하세요</span>
+      <span style="font-size: 18px">USIM 종류</span>
 
       <div class="usim_order_type_list_item" v-for="(item, index) in usimOrderTypeList" :key="index">
         <span style="font-weight: 600; color: #ccc; font-size: 15px">주문 유형 {{ index + 1 }}</span>
@@ -144,8 +144,6 @@ function openAddressPopup() {
 const handleAddressSelected = (data) => {
   address.value = data.address
   addressDetails.value = data.buildingName
-  console.log('Selected address:', data.address)
-  console.log('Building name:', data.buildingName)
 }
 
 const name = ref()
@@ -180,13 +178,14 @@ async function fetchProfileData() {
     const decodedResponse = await response.json()
     if (decodedResponse.data && decodedResponse.data.info) {
       const userInfo = decodedResponse.data.info
+      // console.log(userInfo)
 
-      console.log(userInfo)
-      name.value = userInfo?.partner_nm
-      phoneNumber.value = userInfo?.phone_number
-
-      address.value = userInfo?.address
-      addressDetails.value = userInfo?.dtl_address
+      if (!props.orderId) {
+        name.value = userInfo?.partner_nm
+        phoneNumber.value = userInfo?.phone_number
+        address.value = userInfo?.address
+        addressDetails.value = userInfo?.dtl_address
+      }
     }
   } catch (error) {
     useSnackbarStore().show(error.toString())
@@ -206,10 +205,11 @@ async function createOrder() {
       useSnackbarStore().show('주문 항목의 모든 필드를 채워주세요.')
       return
     }
-    console.log(item)
+    // console.log(item)
   }
 
   try {
+    await fetchProfileData()
     const accessToken = localStorage.getItem('accessToken')
     if (!accessToken) return
 
@@ -241,10 +241,8 @@ async function createOrder() {
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
     const decodedResponse = await response.json()
     useSnackbarStore().show(decodedResponse?.message ?? 'Order success')
-
     if (decodedResponse?.success) emit('closePopup', true)
-
-    console.log(decodedResponse)
+    // console.log(decodedResponse)
   } catch (error) {
     console.error('Error fetching data:', error)
     useSnackbarStore().show(error.toString())
@@ -253,9 +251,9 @@ async function createOrder() {
 
 // fetch order if order id is given
 async function fetchOrderToEdit() {
-  console.log('fetchordertoedit called', props.orderId)
-
+  // console.log('fetchordertoedit called', props.orderId)
   try {
+    await fetchProfileData()
     const accessToken = localStorage.getItem('accessToken')
     if (!accessToken) return
 
@@ -270,7 +268,11 @@ async function fetchOrderToEdit() {
 
     if (!response.ok) throw new Error(`HTTP error! status: ${response?.status}`)
     const decodedResponse = await response.json()
-    console.log(decodedResponse)
+
+    name.value = decodedResponse?.receiver_name
+    phoneNumber.value = decodedResponse?.phone_number
+    address.value = decodedResponse?.address
+    addressDetails.value = decodedResponse?.address_details
 
     for (var item of decodedResponse?.order_items ?? []) {
       usimOrderTypeList.push({

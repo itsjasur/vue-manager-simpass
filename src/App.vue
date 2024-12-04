@@ -22,8 +22,8 @@
       },
     }"
   >
-    <router-view />
     <Loading />
+    <router-view />
     <Snackbar />
     <Warning />
   </a-config-provider>

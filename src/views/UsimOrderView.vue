@@ -49,7 +49,7 @@
             </div>
           </template>
 
-          <template v-if="column.dataIndex === 'agent_cd'">
+          <template v-if="column.dataIndex === 'agent_code'">
             <div class="order_items_content">
               <span v-for="(item, index) in record.order_items" :key="index">
                 <!-- :style="{ fontWeight: 'bold', color: getColor(index) }" -->
@@ -66,7 +66,7 @@
             </div>
           </template>
 
-          <template v-if="column.dataIndex === 'mvno_cd'">
+          <template v-if="column.dataIndex === 'mvno_code'">
             <div class="order_items_content">
               <span v-for="(item, index) in record.order_items" :key="index">
                 {{ MVNO_CODES?.[item?.mvno_code] ?? '' }}
@@ -83,30 +83,88 @@
           </template>
 
           <template v-if="column.dataIndex === 'sender_comment'">
-            <span style="color: orangered">{{ text }}</span>
+            <span style="color: orange">{{ text }}</span>
           </template>
 
           <template v-if="column.dataIndex === 'actions'">
-            <div v-if="record.status === 'confirmed'" class="tabel_actions">
+            <div v-if="record.status === 'confirmed'" class="table_actions">
               <span class="material-symbols-outlined" style="color: #3393ff" @click="openPopup(record?.order_id)">
                 edit
               </span>
-              <span
-                class="material-symbols-outlined"
-                style="color: red"
-                @click="
-                  () => {
-                    selectedOrderId = record?.order_id
-                    isDeleteModalVisible = true
-                  }
-                "
-              >
+              <span class="material-symbols-outlined" style="color: red" @click="showDeleteModal(record?.order_id)">
                 delete
               </span>
             </div>
           </template>
         </template>
       </a-table>
+    </div>
+
+    <div class="cards_part">
+      <a-pagination
+        class="pagination"
+        size="small"
+        :total="totalCount"
+        :current="currentPage"
+        :pageSize="rowLimit"
+        show-size-changer
+        :show-total="(total, range) => `${range[0]}-${range[1]} / ${total}`"
+        @change="onPagChange"
+      >
+        <template #buildOptionText="props">
+          <span>{{ props.value }} / 페이지</span>
+        </template>
+      </a-pagination>
+
+      <div class="card_box" v-for="(item, index) in dataList" :key="index">
+        <div class="card_row">
+          <span>상태: </span>
+          <div
+            :style="{
+              backgroundColor: statusColors?.[item?.status],
+              color: '#fff',
+              borderRadius: '30px',
+              padding: '4px 10px',
+              whiteSpace: 'nowrap',
+              fontSize: '15px',
+            }"
+          >
+            {{ statuses?.[item?.status] }}
+          </div>
+        </div>
+
+        <div class="card_row">
+          <span>판매자명: </span>
+          <span>{{ item?.receiver_name }}</span>
+        </div>
+
+        <div class="card_row">
+          <span>연락처: </span>
+          <span>{{ item?.phone_number }}</span>
+        </div>
+
+        <div class="card_row">
+          <span>주소: </span>
+          <span>{{ item?.address + ' ' + item?.address_details }}</span>
+        </div>
+
+        <div class="card_row">
+          <span>코맨트: </span>
+          <span>{{ item?.sender_comment }}</span>
+        </div>
+
+        <div class="card_row">
+          <span>행위</span>
+          <div style="display: flex; gap: 20px">
+            <span class="material-symbols-outlined" style="color: #3393ff" @click="openPopup(item?.order_id)"
+              >edit
+            </span>
+            <span class="material-symbols-outlined" style="color: red" @click="showDeleteModal(item?.order_id)">
+              delete
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -179,8 +237,8 @@ const columns = ref([
     children: [
       {
         title: '대리점',
-        dataIndex: 'agent_cd',
-        key: 'agent_cd',
+        dataIndex: 'agent_code',
+        key: 'agent_code',
         align: 'center',
         customHeaderCell: () => ({ style: { whiteSpace: 'nowrap' } }),
       },
@@ -193,8 +251,8 @@ const columns = ref([
       },
       {
         title: '통신사',
-        dataIndex: 'mvno_cd',
-        key: 'mvno_cd',
+        dataIndex: 'mvno_code',
+        key: 'mvno_code',
         align: 'center',
         customHeaderCell: () => ({ style: { whiteSpace: 'nowrap' } }),
       },
@@ -284,11 +342,17 @@ function closePopup(shouldRefresh) {
 
 const isDeleteModalVisible = ref(false)
 
+function showDeleteModal(orderId) {
+  selectedOrderId.value = orderId
+  isDeleteModalVisible.value = true
+}
+
 // deletes order
 async function deleteOrder() {
-  console.log('deleteoder called', selectedOrderId.value)
-
+  // console.log('deleteoder called', selectedOrderId.value)
   try {
+    await tokenUpdate()
+
     const accessToken = localStorage.getItem('accessToken')
     if (!accessToken) return
 
@@ -300,7 +364,7 @@ async function deleteOrder() {
 
     if (!response.ok) throw new Error(`HTTP error! status: ${response?.status}`)
     const decodedResponse = await response.json()
-    console.log(decodedResponse)
+    // console.log(decodedResponse)
     useSnackbarStore().show(decodedResponse?.message ?? 'Order deleted')
 
     // close modal
@@ -327,7 +391,7 @@ onMounted(fetchData)
 
 <style scoped>
 .usim_order_container {
-  padding: 0 20px;
+  margin: 0 20px;
   display: flex;
   gap: 20px;
   flex-flow: column;
@@ -351,6 +415,10 @@ onMounted(fetchData)
   overflow-x: auto;
 }
 
+.table {
+  min-width: 1000px;
+}
+
 .order_items_content {
   display: flex;
   flex-flow: column;
@@ -362,14 +430,49 @@ onMounted(fetchData)
   text-overflow: ellipsis;
 }
 
-.tabel_actions {
+.table_actions {
   display: flex;
   flex-flow: wrap;
   gap: 20px;
   justify-content: center;
 }
 
-.tabel_actions .material-symbols-outlined {
+.material-symbols-outlined {
   cursor: pointer;
+}
+
+.cards_part {
+  display: none;
+  flex-flow: column;
+  gap: 20px;
+  margin-bottom: 200px;
+}
+
+.card_box {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-radius: 4px;
+  box-sizing: border-box;
+  background-color: #fff;
+}
+
+.card_row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+@media (max-width: 600px) {
+  .table-part {
+    display: none;
+  }
+  .cards_part {
+    display: flex;
+  }
 }
 </style>
