@@ -413,9 +413,9 @@ watch(companyRegNumber, (oldV, newV) => {
 .group {
   display: flex;
   flex-flow: column;
-  /* align-items: flex-start; */
   justify-content: flex-start;
   width: 100%;
+  /* align-items: flex-start; */
   /* background-color: #ffff005f; */
 }
 
@@ -427,7 +427,8 @@ watch(companyRegNumber, (oldV, newV) => {
 }
 
 .group-inner-row button {
-  max-width: 100px;
+  word-break: keep-all;
+  padding: 0 10px;
   background-color: #8b97a9;
 }
 

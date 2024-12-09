@@ -318,6 +318,9 @@ const fetchData = async () => {
     const decodedResponse = await response.json()
     dataList.value = decodedResponse.usim_orders
     // console.log(dataList.value)
+    console.table(decodedResponse?.usim_orders)
+    // console.trace(decodedResponse)
+
     totalCount.value = decodedResponse.total_count
   } catch (error) {
     console.error('Error fetching orders:', error)
@@ -364,7 +367,7 @@ async function deleteOrder() {
 
     if (!response.ok) throw new Error(`HTTP error! status: ${response?.status}`)
     const decodedResponse = await response.json()
-    // console.log(decodedResponse)
+
     useSnackbarStore().show(decodedResponse?.message ?? 'Order deleted')
 
     // close modal

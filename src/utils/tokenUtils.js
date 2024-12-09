@@ -1,44 +1,54 @@
-import { useAuthenticationStore } from '../stores/authentication'
+let refreshPromise = null // Single promise for token refresh
 
-// Function to refresh the access token
 export async function refreshToken() {
+  // If a refresh is already in progress, return the existing promise
+  if (refreshPromise) {
+    return refreshPromise
+  }
+
   try {
-    let currentRefreshToken = localStorage.getItem('refreshToken')
+    refreshPromise = (async () => {
+      const currentRefreshToken = localStorage.getItem('refreshToken')
+      if (!currentRefreshToken) {
+        throw new Error('No refresh token available')
+      }
 
-    if (!currentRefreshToken) {
-      throw new Error('No Refresh token available')
-    }
+      const response = await fetch(import.meta.env.VITE_API_BASE_URL + 'auth/refreshtoken', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ refreshToken: currentRefreshToken }),
+      })
 
-    const response = await fetch(import.meta.env.VITE_API_BASE_URL + 'auth/refreshtoken', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ refreshToken: currentRefreshToken }),
-    })
+      if (!response.ok) {
+        throw new Error(`Token refresh failed: ${response.status}`)
+      }
 
-    if (response.ok) {
       const data = await response.json()
-      const newAccessToken = data.accessToken
-      const newRefreshToken = data.refreshToken
-      localStorage.setItem('accessToken', newAccessToken)
-      localStorage.setItem('refreshToken', newRefreshToken)
-      return newAccessToken // returns the new access token
-    } else {
-      throw new Error('Could not refresh the token')
-    }
+      if (!data.accessToken || !data.refreshToken) {
+        throw new Error('Invalid token response format')
+      }
+
+      localStorage.setItem('accessToken', data.accessToken)
+      localStorage.setItem('refreshToken', data.refreshToken)
+      return data.accessToken
+    })()
+
+    return await refreshPromise
   } catch (error) {
     useAuthenticationStore().logout()
     throw error
+  } finally {
+    refreshPromise = null
   }
 }
 
-// function to make HTTP requests with token refresh logic
-export async function fetchWithTokenRefresh(url, options = {}) {
-  let fullUrl = import.meta.env.VITE_API_BASE_URL + url
-  let accessToken = localStorage.getItem('accessToken')
+export async function fetchWithTokenRefresh(url, options = {}, retryCount = 0) {
+  const MAX_RETRIES = 2
+  const fullUrl = import.meta.env.VITE_API_BASE_URL + url
+  const accessToken = localStorage.getItem('accessToken')
 
-  // merges headers instead of overwriting
   options.headers = {
     ...options.headers,
     Authorization: `Bearer ${accessToken}`,
@@ -48,23 +58,21 @@ export async function fetchWithTokenRefresh(url, options = {}) {
     options.body = JSON.stringify(options.body)
     options.headers['Content-Type'] = 'application/json'
   }
-  // console.log(options.body)
 
   try {
-    let response = await fetch(fullUrl, options)
+    const response = await fetch(fullUrl, options)
 
-    if (response.status === 401 && !options._retry) {
-      options._retry = true
+    if (response.status === 401 && retryCount < MAX_RETRIES) {
       try {
         const newAccessToken = await refreshToken()
         options.headers['Authorization'] = `Bearer ${newAccessToken}`
-        return fetchWithTokenRefresh(url, options) // Note: using url, not fullUrl
+        return fetchWithTokenRefresh(url, options, retryCount + 1)
       } catch (refreshError) {
-        // if refresh fails, logout and throw the error
         useAuthenticationStore().logout()
         throw refreshError
       }
     }
+
     return response
   } catch (error) {
     throw error
