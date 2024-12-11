@@ -229,7 +229,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, reactive, watchEffect } from 'vue'
+import { ref, onMounted, reactive } from 'vue'
 import * as cleavePatterns from '../utils/cleavePatterns'
 import { useSnackbarStore } from '@/stores/snackbar'
 import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
@@ -243,6 +243,7 @@ import { usePrintablePdfPopup } from '@/stores/printable-pdf-popup'
 import { useDeviceTypeStore } from '@/stores/device-type-store'
 import GlobalPopupWithOverlay from './GlobalPopupWithOverlay.vue'
 import SendSmsPopupContent from './SendSmsPopupContent.vue'
+import { MAX_FILE_SIZE } from '@/assets/constants'
 
 //sign and seal popup
 const smsPopupRef = ref(null)
@@ -324,6 +325,8 @@ const handleAddressSelected = (data) => {
 
 const partnerInfoFetched = ref(false)
 async function fetchData() {
+  console.log('partnerInfo called')
+
   try {
     const response = await fetchWithTokenRefresh('agent/partnerInfo', { method: 'GET' })
 
@@ -331,6 +334,9 @@ async function fetchData() {
 
     const decodedResponse = await response.json()
     const info = decodedResponse.data.info
+
+    console.log(info)
+
     serverData.value = info
 
     forms.telNumber = info.store_contact
@@ -385,18 +391,36 @@ async function submit() {
     return
   }
 
-  if (imageUploads.businessLicence.new && imageUploads.businessLicence.new instanceof File)
+  if (imageUploads.businessLicence.new && imageUploads.businessLicence.new instanceof File) {
+    if (imageUploads.businessLicence.new.size > MAX_FILE_SIZE) {
+      useSnackbarStore().show('사업자등록증 파일 30MB 이하 이어야 합니다.')
+      return
+    }
+
     formData.set(
       'bs_reg_no_attach',
       imageUploads.businessLicence.new,
       imageUploads?.businessLicence?.new?.name ?? 'filename'
     )
+  }
 
-  if (imageUploads.directorId.new && imageUploads.directorId.new instanceof File)
+  if (imageUploads.directorId.new && imageUploads.directorId.new instanceof File) {
+    if (imageUploads.businessLicence.new.size > MAX_FILE_SIZE) {
+      useSnackbarStore().show('대표자 신분증 파일 30MB 이하 이어야 합니다.')
+      return
+    }
+
     formData.set('id_card_attach', imageUploads.directorId.new, imageUploads?.directorId?.new?.name ?? 'filename')
+  }
 
-  if (imageUploads.bankBook.new && imageUploads.bankBook.new instanceof File)
+  if (imageUploads.bankBook.new && imageUploads.bankBook.new instanceof File) {
+    if (imageUploads.businessLicence.new.size > MAX_FILE_SIZE) {
+      useSnackbarStore().show('통장 사본 파일 30MB 이하 이어야 합니다.')
+      return
+    }
+
     formData.set('bank_book_attach', imageUploads.bankBook.new, imageUploads?.bankBook?.new?.name ?? '')
+  }
 
   formData.set('agent_cd', props.agentCd)
 

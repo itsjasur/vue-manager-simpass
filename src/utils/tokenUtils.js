@@ -1,34 +1,23 @@
+import { useAuthenticationStore } from '@/stores/authentication'
+
 let refreshPromise = null // Single promise for token refresh
 
 export async function refreshToken() {
   // If a refresh is already in progress, return the existing promise
-  if (refreshPromise) {
-    return refreshPromise
-  }
-
+  if (refreshPromise) return refreshPromise
   try {
     refreshPromise = (async () => {
       const currentRefreshToken = localStorage.getItem('refreshToken')
-      if (!currentRefreshToken) {
-        throw new Error('No refresh token available')
-      }
+      if (!currentRefreshToken) throw new Error('No refresh token available')
 
       const response = await fetch(import.meta.env.VITE_API_BASE_URL + 'auth/refreshtoken', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ refreshToken: currentRefreshToken }),
       })
-
-      if (!response.ok) {
-        throw new Error(`Token refresh failed: ${response.status}`)
-      }
-
+      if (!response.ok) throw new Error(`Token refresh failed: ${response.status}`)
       const data = await response.json()
-      if (!data.accessToken || !data.refreshToken) {
-        throw new Error('Invalid token response format')
-      }
+      if (!data.accessToken || !data.refreshToken) throw new Error('Invalid token response format')
 
       localStorage.setItem('accessToken', data.accessToken)
       localStorage.setItem('refreshToken', data.refreshToken)
@@ -49,10 +38,7 @@ export async function fetchWithTokenRefresh(url, options = {}, retryCount = 0) {
   const fullUrl = import.meta.env.VITE_API_BASE_URL + url
   const accessToken = localStorage.getItem('accessToken')
 
-  options.headers = {
-    ...options.headers,
-    Authorization: `Bearer ${accessToken}`,
-  }
+  options.headers = { ...options.headers, Authorization: `Bearer ${accessToken}` }
 
   if (options.method === 'POST' && options.body && !(options.body instanceof FormData)) {
     options.body = JSON.stringify(options.body)

@@ -76,7 +76,7 @@ function deletePad(pfor) {
   border-radius: 5px;
   border: 1px dashed var(--main-color);
   box-sizing: border-box;
-  height: 60px;
+  height: 70px;
   background-color: #ffffff;
   position: relative;
   display: flex;

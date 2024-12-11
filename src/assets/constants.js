@@ -43,3 +43,5 @@ export const MVNO_CODES = {
 }
 export const CARRIER_CODES = { KT: 'KT', SK: 'SKT', LG: 'LG U+' }
 export const AGENT_CODES = { SJ: '에스제이', BP: '바로폼' }
+
+export const MAX_FILE_SIZE = 30 * 1024 * 1024 // 30MB in bytes
