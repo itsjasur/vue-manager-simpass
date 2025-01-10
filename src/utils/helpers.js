@@ -40,6 +40,7 @@ export const formatDate = (today) => {
   const day = String(today.getDate()).padStart(2, '0')
   return `${year}-${month}-${day}`
 }
+
 export function base64ToBlobUrl(base64Data) {
   let contentType = 'image/png' // Default content type set to PNG
   let raw = base64Data

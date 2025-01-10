@@ -24,6 +24,14 @@
         </span>
         <span v-else>로그인</span>
       </button>
+
+      <a-checkbox
+        v-model:checked="isAutoLoginChecked"
+        class="checkbox"
+        @change="(value) => console.log(value.target.checked)"
+        >자동 로그인</a-checkbox
+      >
+
       <hr />
 
       <button @click="router.push('/signup')" class="signup-button">판매점 회원 가입</button>
@@ -85,6 +93,8 @@ const isLoading = ref(false)
 
 const router = useRouter()
 
+const isAutoLoginChecked = ref(false)
+
 async function login(event) {
   isLoading.value = true
 
@@ -109,6 +119,7 @@ async function login(event) {
       body: JSON.stringify({
         username: username.value.replaceAll(' ', ''),
         password: password.value.replaceAll(' ', ''),
+        isAutoLoginEnabled: isAutoLoginChecked.value,
       }),
     })
 
