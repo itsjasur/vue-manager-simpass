@@ -41,7 +41,7 @@
           </template>
         </div>
       </template>
-      <button v-if="agent.status === 'P'" @click="openPopup(agent.agent_cd)">계약서명</button>
+      <button v-if="agent.status === 'P'" @click="openModal(agent.agent_cd)">계약서명</button>
       <!-- <button @click="openPopup(agent.agent_cd)">계약서명</button> -->
 
       <button v-if="agent.status === 'Y'" @click="fetchContractPDFAndPrint(agent.agent_cd)">
@@ -57,9 +57,16 @@
     </div>
   </div>
 
-  <GlobalPopupWithOverlay ref="popupRef">
-    <BusinessPartnersPopup v-if="businessPartnersPopup" :agentCd="selectedAgentCd" @closePopup="closePopup" />
-  </GlobalPopupWithOverlay>
+  <a-modal
+    destroy-on-close
+    v-model:open="isModalOpen"
+    wrap-class-name="full-modal"
+    :footer="null"
+    :title="null"
+    width="100%"
+  >
+    <BusinessPartnersPopup :agentCd="agentCd" @closePopup="closeModal" />
+  </a-modal>
 
   <PrintablePdfPopup v-if="printablePdfPopup.active" />
 </template>
@@ -72,25 +79,23 @@ import { useRouter } from 'vue-router'
 import BusinessPartnersPopup from '../components/BusinessPartnersPopup.vue'
 import { usePrintablePdfPopup } from '@/stores/printable-pdf-popup'
 import PrintablePdfPopup from '../components/PrintablePdfPopup.vue'
-import GlobalPopupWithOverlay from '@/components/GlobalPopupWithOverlay.vue'
+
 import { useDeviceTypeStore } from '@/stores/device-type-store'
 
 const router = useRouter()
 
 const printablePdfPopup = usePrintablePdfPopup()
 
-const popupRef = ref(null)
-//business request popup
-const businessPartnersPopup = ref(false)
-const selectedAgentCd = ref()
+const isModalOpen = ref(false)
+const agentCd = ref()
 
-function openPopup(agentCd) {
-  businessPartnersPopup.value = true
-  selectedAgentCd.value = agentCd
-  popupRef.value.showPopup()
+function openModal(agentCode) {
+  agentCd.value = agentCode
+  isModalOpen.value = true
 }
-const closePopup = () => {
-  popupRef.value.closePopup()
+
+function closeModal() {
+  isModalOpen.value = false
 }
 
 const data = ref([])

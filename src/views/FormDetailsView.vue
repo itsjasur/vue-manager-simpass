@@ -6,22 +6,23 @@
         <span> * {{ serverData?.agent_role_message_2 ?? '' }} </span>
       </div>
 
-      <button
+      <a-button
+        type="primary"
         v-if="serverData.chk_agent_role_info === 'W' || serverData.chk_agent_role_info === 'P'"
         @click="router.push('/business-partners')"
       >
         거래요청 상태으로 가기
-      </button>
-      <button v-else @click="router.push('/business-request')">거래요청으로 가기</button>
+      </a-button>
+      <a-button type="primary" v-else @click="router.push('/business-request')">거래요청으로 가기</a-button>
     </div>
 
     <!-- FORMS -->
     <template v-for="(part, index) of displayingForms" :key="index">
       <template v-if="part.forms.length > 0">
-        <div class="partition">
+        <div style="display: flex; flex-flow: wrap; gap: 15px">
           <div v-if="part.type === 'payment'" class="title">
             <span> 자동이체 </span>
-            <a-checkbox class="checkbox left-margin" v-model:checked="selfRegisterChecked">가입자와 동일</a-checkbox>
+            <a-checkbox style="margin-left: 15px" v-model:checked="selfRegisterChecked">가입자와 동일</a-checkbox>
           </div>
 
           <div v-else :class="part.type === 'empty' ? 'empty_title' : 'title'">
@@ -34,9 +35,9 @@
 
               <!-- input -->
               <template v-if="FIXED_FORMS[formName].type === 'input'">
-                <div class="group-input-moon" v-if="formName === 'usim_plan_nm'">
+                <div style="display: flex; gap: 20px" v-if="formName === 'usim_plan_nm'">
                   <input v-model="FIXED_FORMS[formName].value" v-bind="inputBindings(formName)" />
-                  <button @click="changeUsimPlan">변경</button>
+                  <a-button type="primary" style="height: 40px" @click="changeUsimPlan">변경</a-button>
                 </div>
 
                 <input v-else v-model="FIXED_FORMS[formName].value" v-bind="inputBindings(formName)" />
@@ -77,25 +78,25 @@
     </template>
 
     <!-- IMAGE UPLOAD -->
-    <div class="supperted-images">
-      <a-checkbox class="checkbox" v-model:checked="supportedImagesChecked">증빙자료첨부(선택사항)</a-checkbox>
-      <input id="file-input" @change="handleFileUpload" type="file" style="display: none" accept="image/*" multiple />
+    <!-- <div style="margin-top: 20px"> -->
+    <a-checkbox v-model:checked="supportedImagesChecked">증빙자료첨부(선택사항)</a-checkbox>
+    <input id="file-input" @change="handleFileUpload" type="file" style="display: none" accept="image/*" multiple />
 
-      <div v-if="supportedImagesChecked" class="uploadedImagesRow">
-        <label for="file-input" class="uploadImageBox">
-          <span class="inner-icon material-symbols-outlined"> add </span>
-          <p>이미지 업로드</p>
-        </label>
+    <div v-if="supportedImagesChecked" class="uploadedImagesRow">
+      <label for="file-input" class="uploadImageBox">
+        <span class="inner-icon material-symbols-outlined"> add </span>
+        <p>이미지 업로드</p>
+      </label>
 
-        <div v-for="(image, index) in supportedImages" :key="index" class="uploadImageBox">
-          <img :src="image" :alt="index" />
-          <span @click="deleteDocImages(index)" class="delete-icon material-symbols-outlined"> delete </span>
-        </div>
+      <div v-for="(image, index) in supportedImages" :key="index" class="uploadImageBox">
+        <img :src="image" :alt="index" />
+        <span @click="deleteDocImages(index)" class="delete-icon material-symbols-outlined"> delete </span>
       </div>
     </div>
+    <!-- </div> -->
 
     <!-- checks and enables sign container -->
-    <a-checkbox v-if="useDeviceTypeStore().isDeviceMobile()" class="checkbox" v-model:checked="signAfterPrintChecked"
+    <a-checkbox v-if="useDeviceTypeStore().isDeviceMobile()" v-model:checked="signAfterPrintChecked"
       >신청서 프린트 인쇄후 서명/사인 자필</a-checkbox
     >
 
@@ -177,19 +178,34 @@
         "
         :errorMessage="!agreePadData && formSubmitted ? '가입약관에 동의하지 않았습니다.' : null"
       />
+
+      <AgreeTermsContainer
+        v-if="serverData?.usim_plan_info?.mvno_cd === 'KTS'"
+        title="개통/악용 입력"
+        @updateTermsData="
+          (data) => {
+            term1PadData = data?.padData1
+            term2PadData = data?.padData2
+          }
+        "
+        :errorMessage="(!term1PadData || !term2PadData) && formSubmitted ? '개통/악용 입력하지 않았습니다.' : null"
+      />
     </div>
 
-    <button class="submit" @click="submit" :disabled="formSubmitting">
-      <LoadingSpinner v-if="formSubmitting" height="20px" color="#ffffff" />
-      <span v-else> 개통 신청/서식출력</span>
-    </button>
+    <br />
+    <a-button type="primary" style="height: 45px; align-self: flex-start" @click="submit" :loading="formSubmitting">
+      개통 신청/서식출력
+    </a-button>
+
+    <br />
+    <br />
   </div>
 
   <div v-else class="plan-not-found">요금제를 찾을 수 없습니다</div>
 
   <GlobalPopupWithOverlay ref="imageViewerRef">
     <ImageViewPopup
-      @closePopup="closeImageViewPopup"
+      @closePopup="closeImagePopup"
       :imageUrls="imageBlobUrls"
       :baseFilename="FIXED_FORMS.name?.value"
       :canPrint="canPrintImages"
@@ -209,7 +225,6 @@ import { useRoute, useRouter } from 'vue-router'
 import { FORMS, PLANSINFO, displayingForms, generateDisplayingForms } from '../assets/plans_forms'
 import _ from 'lodash'
 import SignImageRowContainer from '../components/SignImageRowContainer.vue'
-import LoadingSpinner from '../components/Loader.vue'
 import { useSelectPlansPopup } from '../stores/select-plans-popup'
 import { useDeviceTypeStore } from '@/stores/device-type-store'
 import AgreePadContainer from '../components/AgreePadContainer.vue'
@@ -217,6 +232,7 @@ import ImageViewPopup from '../components/ImageViewPopup.vue'
 import { base64ToBlobUrl } from '@/utils/helpers'
 import * as cleavePatterns from '../utils/cleavePatterns'
 import { validateBirthday } from '@/utils/validators'
+import AgreeTermsContainer from '@/components/AgreeTermsContainer.vue'
 
 const availableForms = ref([])
 
@@ -236,9 +252,9 @@ function openImageViewPopup(base64Images) {
     useSnackbarStore().show('이미지가 없습니다!')
   }
 }
-function closeImageViewPopup() {
+
+function closeImagePopup() {
   imageViewerRef.value.closePopup()
-  router.push('/')
 }
 
 const route = useRoute()
@@ -249,6 +265,7 @@ const FIXED_FORMS = reactive(_.cloneDeep(FORMS))
 
 // address select popup and setting value
 const addressPopupRef = ref(null)
+
 const closeAddressPopup = () => {
   addressPopupRef.value.closePopup()
 }
@@ -479,6 +496,7 @@ const supportedImages = ref([])
 
 //  a ref for storing File objects
 const fileObjects = ref([])
+
 const handleFileUpload = async (event) => {
   const selectedFiles = event.target.files
   for (let i = 0; i < selectedFiles.length; i++) {
@@ -520,6 +538,10 @@ const partnerSignImageData = ref()
 //i agreee pad
 const agreePadData = ref()
 
+// 개통, 악용 pads
+const term1PadData = ref()
+const term2PadData = ref()
+
 //SUBMIT //FORM DATA REQUEST
 const formSubmitting = ref(false)
 const formSubmitted = ref(false)
@@ -557,9 +579,15 @@ async function submit() {
       }
     }
 
+    if (serverData.value?.usim_plan_info?.mvno_cd === 'KTS') {
+      if (!term1PadData.value || !term2PadData.value) {
+        useSnackbarStore().show('개통/악용 입력하지 않았습니다.')
+        return
+      }
+    }
     if (serverData.value?.usim_plan_info?.mvno_cd === 'UPM') {
       if (!agreePadData.value) {
-        useSnackbarStore().show('판매자서명을 하지 않았습니다.')
+        useSnackbarStore().show('동의 하지 않았습니다.')
         return
       }
     }
@@ -591,6 +619,9 @@ async function fetchForms() {
   formData.set('deputy_sign', deputyNameImageData?.value ?? '')
   formData.set('deputy_seal', deputySignImageData?.value ?? '')
   formData.set('agree_sign', agreePadData?.value ?? '')
+
+  formData.set('terms_seal_1', term1PadData?.value ?? '')
+  formData.set('terms_seal_2', term2PadData?.value ?? '')
 
   formData.set('carrier_type', serverData.value?.usim_plan_info?.carrier_type)
   formData.set('carrier_cd', serverData.value?.usim_plan_info?.carrier_cd)
@@ -694,13 +725,6 @@ async function fetchForms() {
   margin-top: 20px;
 }
 
-.partition {
-  display: flex;
-  flex-flow: wrap;
-  gap: 15px;
-  box-sizing: border-box;
-}
-
 .empty_title {
   width: 100%;
 }
@@ -718,14 +742,6 @@ async function fetchForms() {
   /* background-color: aquamarine; */
 }
 
-.checkbox {
-  font-size: 16px;
-  font-weight: 500;
-}
-
-.left-margin {
-  margin-left: 15px;
-}
 .uploadedImagesRow {
   display: flex;
   flex-flow: wrap;
@@ -776,23 +792,6 @@ async function fetchForms() {
   height: 100%;
   /* font-size: 16px; */
 }
-.submit {
-  height: 45px;
-  margin-top: 30px;
-  max-width: 200px;
-  margin-bottom: 400px;
-}
-
-.group-input-moon {
-  display: flex;
-  flex-flow: row;
-  gap: 20px;
-}
-
-.group-input-moon button {
-  width: auto;
-  min-width: 70px;
-}
 
 .info-note {
   margin-top: 20px;
@@ -817,10 +816,6 @@ async function fetchForms() {
   width: auto;
   padding: 0 10px;
   white-space: nowrap;
-}
-
-.supperted-images {
-  margin-top: 20px;
 }
 
 @media (max-width: 600px) {

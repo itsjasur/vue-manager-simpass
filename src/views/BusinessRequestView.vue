@@ -40,7 +40,7 @@
       </template>
 
       <!-- <button @click="router.push({ name: '/business-request-form', params: { id: 1 } })">거래요청</button> -->
-      <button @click="openPopup(agent.agent_cd)">거래요청</button>
+      <button @click="openModal(agent.agent_cd)">거래요청</button>
     </div>
 
     <div v-if="!data" class="not-found-cont">
@@ -49,9 +49,16 @@
     </div>
   </div>
 
-  <GlobalPopupWithOverlay ref="popupRef">
-    <BusinessRequestPopup v-if="businessRequestPopup" :agentCd="selectedAgentCd" @closePopup="closePopup" />
-  </GlobalPopupWithOverlay>
+  <a-modal
+    destroy-on-close
+    v-model:open="isModalOpen"
+    wrap-class-name="full-modal"
+    :footer="null"
+    :title="null"
+    width="100%"
+  >
+    <BusinessRequestPopup :agentCd="agentCd" @closePopup="closeModal" />
+  </a-modal>
 </template>
 
 <script setup>
@@ -60,23 +67,19 @@ import { fetchWithTokenRefresh } from '@/utils/tokenUtils'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import BusinessRequestPopup from '@/components/BusinessRequestPopup.vue'
-import GlobalPopupWithOverlay from '@/components/GlobalPopupWithOverlay.vue'
 
 const router = useRouter()
 
-const popupRef = ref(null)
-//business request popup
-const businessRequestPopup = ref(false)
-const selectedAgentCd = ref()
+const isModalOpen = ref(false)
+const agentCd = ref()
 
-const closePopup = () => {
-  popupRef.value.closePopup()
+function openModal(agentCode) {
+  agentCd.value = agentCode
+  isModalOpen.value = true
 }
 
-function openPopup(agentCd) {
-  businessRequestPopup.value = true
-  selectedAgentCd.value = agentCd
-  popupRef.value.showPopup()
+function closeModal() {
+  isModalOpen.value = false
 }
 
 const data = ref()

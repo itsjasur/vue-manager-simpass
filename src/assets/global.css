@@ -169,12 +169,39 @@ input:focus {
   min-height: unset !important;
 }
 
-/* BACKGROUND IMAGE AND HOW TO GIVE PADDING */
-/* 
-.carriers .button {
-  background-size: contain; Add this line
-  background-repeat: no-repeat; Add this line
-  background-position: center; Add this line
-  padding: 15px;
-  background-origin: content-box; this applies padding to background image
-} */
+.full-modal {
+  .ant-modal {
+    max-width: 100%;
+    top: 0;
+    padding: 0;
+    margin: 0;
+  }
+  .ant-modal-content {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh);
+    overflow-y: scroll;
+    gap: 0;
+    padding: 0;
+    margin: 0;
+  }
+
+  .ant-modal-header {
+    height: 50px;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    margin: 0;
+    /* background-color: blueviolet; */
+    /* display: flex; */
+    /* padding: 20px; */
+  }
+
+  .ant-modal-body {
+    flex: 1;
+    overflow-y: scroll;
+    padding: 0 20px;
+    margin: 0;
+    /* background-color: pink; */
+  }
+}

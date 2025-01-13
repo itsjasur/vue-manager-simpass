@@ -1,11 +1,8 @@
 <template>
-  <div class="popup-content">
-    <div class="fixed-header">
-      <p class="title">판매점 계약 동의 및 계약내용 확인</p>
-      <span @click="$emit('closePopup')" class="material-symbols-outlined close-button"> cancel </span>
-    </div>
+  <div style="display: flex; flex-flow: column; align-items: center; justify-content: center">
+    <div class="popup-content">
+      <h3>Title</h3>
 
-    <div class="scrollable-content">
       <span class="title-note"
         >본 신청서는 심패스에서 직접 운영하는 판매점 전자계약서이며 고객님에 소중한 개인정보는 암호화되어 안전하게
         보호됩니다.
@@ -213,6 +210,7 @@
       </button>
     </div>
   </div>
+
   <PrintablePdfPopup v-if="printablePdfPopup.active" />
 
   <GlobalPopupWithOverlay ref="smsPopupRef">
@@ -226,6 +224,8 @@
   <GlobalPopupWithOverlay ref="addressPopupRef">
     <GlobalSearchAddress @selected="handleAddressSelected" @closePopup="closeAddressPopup" />
   </GlobalPopupWithOverlay>
+
+  <a-modal></a-modal>
 </template>
 
 <script setup>
@@ -511,22 +511,12 @@ onMounted(fetchData)
 
 <style scoped>
 .popup-content {
-  background-color: var(--main-background-color);
-  border-radius: 8px;
-  max-width: 900px;
+  max-width: 700px;
   display: flex;
   flex-flow: column;
-  box-sizing: border-box;
-  margin: 20px;
-}
-
-.scrollable-content {
-  padding: 25px;
-  box-sizing: border-box;
-  display: flex;
-  flex-flow: column;
-  gap: 30px;
+  gap: 20px;
   overflow-y: auto;
+  /* box-sizing: border-box; */
 }
 
 .title-note {
@@ -534,7 +524,7 @@ onMounted(fetchData)
   color: #6e7881;
   line-height: 1.5;
   font-weight: 500;
-  margin-top: 10px;
+  /* margin-top: 10px; */
 }
 
 .checkbox-contract-row {

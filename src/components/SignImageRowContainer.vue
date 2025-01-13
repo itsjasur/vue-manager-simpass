@@ -1,169 +1,287 @@
 <template>
-  <div class="sign_seal_container">
-    <p class="sign_title">{{ props.title }}</p>
-    <div class="group">
-      <div class="group_title">서명</div>
-      <div class="image_container sign">
-        <span v-if="!signData" class="edit_icon material-symbols-outlined" @click="showPopup('sign')">
-          stylus_note
-        </span>
-        <span v-else class="delete_icon material-symbols-outlined" @click="deletePad('sign')"> delete </span>
-        <img v-if="signData" class="data_image" :src="signData" alt="서명 오류" @error="signData = null" />
+  <div class="sign-seal-container">
+    <div style="margin-bottom: 5px">{{ title }}</div>
+    <div class="containers-wrapper">
+      <!-- Signature Container -->
+      <div class="image-container" style="width: 200px">
+        <template v-if="!signatureImage">
+          <a-button class="draw-button" @click="openModal('sign')" type="text" shape="circle" size="middle">
+            <span style="text-align: center" class="material-symbols-outlined">stylus_note</span>
+          </a-button>
+        </template>
+        <template v-else>
+          <img class="signature-image" :src="signatureImage" @error="handleImageError('sign')" />
+          <a-button class="clear-button" type="text" shape="circle" size="small" danger @click="clearImage('sign')">
+            <span style="font-size: 20px; text-align: center" class="material-symbols-outlined">delete</span>
+          </a-button>
+        </template>
       </div>
-    </div>
-    <div class="group">
-      <div class="group_title">사인</div>
-      <div class="image_container seal">
-        <span v-if="!sealData" class="edit_icon material-symbols-outlined" @click="showPopup('seal')">
-          stylus_note
-        </span>
-        <span v-else class="delete_icon material-symbols-outlined" @click="deletePad('seal')"> delete </span>
 
-        <img v-if="sealData" class="data_image" :src="sealData" alt="서명 오류" @error="sealData = null" />
+      <!-- Seal Container -->
+      <div class="image-container" style="width: 100px">
+        <template v-if="!sealImage">
+          <a-button class="draw-button" @click="openModal('seal')" type="text" shape="circle" size="middle">
+            <span class="material-symbols-outlined">stylus_note</span>
+          </a-button>
+        </template>
+        <template v-else>
+          <img class="seal-image" :src="sealImage" @error="handleImageError('seal')" />
+          <a-button class="clear-button" type="text" shape="circle" size="small" danger @click="clearImage('seal')">
+            <span style="font-size: 20px; text-align: center" class="material-symbols-outlined">delete</span>
+          </a-button>
+        </template>
       </div>
     </div>
-    <div class="input-error-message" v-if="errorMessage">{{ errorMessage }}</div>
+    <div v-if="errorMessage" class="input-error-message">{{ errorMessage }}</div>
   </div>
 
-  <GlobalPopupWithOverlay ref="popupRef">
-    <SignPadPopupContent
-      @closePopup="closePopup"
-      @savePad="savePadData"
-      :comment="popupFor === 'sign' ? props.signComment : sealComment"
-      :popupFor="popupFor"
-    />
-  </GlobalPopupWithOverlay>
+  <!-- Drawing Modal -->
+  <a-modal
+    v-model:open="isModalOpen"
+    :title="title"
+    destroy-on-close
+    width="100%"
+    :bodyStyle="{ padding: '20px', margin: 0 }"
+    wrap-class-name="full-modal"
+    :footer="null"
+    @after-close="handleModalClose"
+  >
+    <div class="signpad-content">
+      <div style="display: flex; gap: 20px">
+        <a-button style="min-width: 80px" @click="clearCanvas" danger type="primary">지우기</a-button>
+        <a-button style="min-width: 80px" @click="saveDrawing" type="primary">저장</a-button>
+      </div>
+
+      <div style="display: flex; gap: 10px; align-items: center">
+        <span style="font-size: 14" class="pen-label">펜 잉크 멀미: {{ penWidth }}</span>
+        <a-slider style="width: 150px" v-model:value="penWidth" :min="2" :max="8" :step="1" />
+      </div>
+
+      <span style="margin: 5px 0; line-height: 0; color: orange; font-size: 15px">{{
+        modalType == 'sign' ? props.signComment : props.sealComment
+      }}</span>
+
+      <div class="canvas_container">
+        <canvas
+          :style="{ width: '100%', maxWidth: modalType === 'seal' ? '400px' : '700px' }"
+          ref="drawingCanvas"
+          class="signature-pad"
+        ></canvas>
+        <span class="placeholder_text">{{ modalType === 'sign' ? '서명' : '사인' }}</span>
+      </div>
+    </div>
+  </a-modal>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import SignPadPopupContent from './SignPadPopupContent.vue'
-import GlobalPopupWithOverlay from './GlobalPopupWithOverlay.vue'
-import { useDeviceTypeStore } from '@/stores/device-type-store'
+import { ref, watch, onUnmounted, nextTick } from 'vue'
+import SignaturePad from 'signature_pad'
+import { message } from 'ant-design-vue'
 
 const props = defineProps({
-  errorMessage: { type: String, default: null },
-  signComment: { type: String, default: '' },
-  sealComment: { type: String, default: '' },
-
-  title: { type: String, default: 'Sign title' },
   overlayText: { type: String, default: '' },
+  title: { type: String, default: 'Sign & Seal' },
+  errorMessage: { type: String, default: null },
   signImageData: { type: String, default: null },
   sealImageData: { type: String, default: null },
+  signComment: { type: String, default: '' },
+  sealComment: { type: String, default: '' },
 })
-
-const popupRef = ref(null)
-
-const signData = ref(props.signImageData)
-const sealData = ref(props.sealImageData)
-
-var popupFor = null
-const showPopup = (pfor) => {
-  if (useDeviceTypeStore().isDeviceMobile()) {
-    popupFor = pfor
-    popupRef.value.showPopup()
-  }
-}
-
-const closePopup = () => {
-  if (useDeviceTypeStore().isDeviceMobile()) {
-    popupRef.value.closePopup()
-  }
-}
 
 const emits = defineEmits(['updateSignSeal'])
 
-function savePadData(data) {
-  if (popupFor === 'sign') signData.value = data
-  else sealData.value = data
-  emits('updateSignSeal', signData.value, sealData.value)
+// State
+const isModalOpen = ref(false)
+const modalType = ref(null)
+const penWidth = ref(4)
+const signatureImage = ref(props.initialSignature)
+const sealImage = ref(props.initialSeal)
+const drawingCanvas = ref(null)
+let signaturePad = null
+
+// Computed
+// const modalTitle = computed(() => (modalType.value === 'sign' ? 'Draw Signature' : 'Draw Seal'))
+
+// Methods
+const openModal = (type) => {
+  modalType.value = type
+  isModalOpen.value = true
+  nextTick(() => initializeCanvas())
 }
 
-function deletePad(pfor) {
-  console.log(pfor)
-  if (pfor === 'sign') signData.value = null
-  else sealData.value = null
-  emits('updateSignSeal', signData.value, sealData.value)
+const initializeCanvas = () => {
+  if (!drawingCanvas.value) return
+
+  const canvas = drawingCanvas.value
+  const ratio = Math.max(window.devicePixelRatio || 1, 1)
+  const context = canvas.getContext('2d')
+
+  // Set canvas size
+  canvas.width = canvas.offsetWidth * ratio
+  canvas.height = canvas.offsetHeight * ratio
+  context.scale(ratio, ratio)
+
+  // Initialize SignaturePad
+  signaturePad = new SignaturePad(canvas, {
+    velocityFilterWeight: 0.1,
+    minWidth: penWidth.value,
+    maxWidth: penWidth.value,
+
+    throttle: 1,
+    minPointDistance: 1,
+    penColor: 'black',
+    backgroundColor: 'rgba(0,0,0,0)',
+  })
 }
+
+const clearCanvas = () => {
+  if (signaturePad) {
+    signaturePad.clear()
+  }
+}
+
+const saveDrawing = async () => {
+  if (!signaturePad || signaturePad.isEmpty()) {
+    message.error('비어 있을 수 없습니다')
+    return
+  }
+
+  try {
+    const imageData = await signaturePad.toDataURL()
+
+    if (modalType.value === 'sign') {
+      signatureImage.value = imageData
+      // emit('update:sign', imageData)
+    } else {
+      sealImage.value = imageData
+      // emit('update:seal', imageData)
+    }
+
+    emits('updateSignSeal', signatureImage.value, sealImage.value)
+
+    isModalOpen.value = false
+  } catch (error) {
+    message.error('Failed to save drawing')
+    console.error('Save drawing error:', error)
+  }
+}
+
+const clearImage = (type) => {
+  if (type === 'sign') {
+    signatureImage.value = null
+    // emit('update:sign', null)
+  } else {
+    sealImage.value = null
+    // emit('update:seal', null)
+  }
+  emits('updateSignSeal', signatureImage.value, sealImage.value)
+}
+
+const handleImageError = (type) => {
+  message.error(`Failed to load ${type} image`)
+  clearImage(type)
+}
+
+const handleModalClose = () => {
+  signaturePad = null
+}
+
+// Watch pen width changes
+watch(penWidth, (newWidth) => {
+  if (signaturePad) {
+    signaturePad.minWidth = newWidth
+    signaturePad.maxWidth = newWidth
+  }
+})
+
+// Clean up on unmount
+onUnmounted(() => {
+  if (signaturePad) {
+    signaturePad.off()
+    signaturePad = null
+  }
+})
 </script>
 
 <style scoped>
-.sign_seal_container {
+.sign-seal-container {
   display: flex;
-  flex-flow: wrap;
-  gap: 10px;
-
-  width: 100%;
-  box-sizing: border-box;
+  flex-direction: column;
 }
 
-.sign_title {
-  width: 100%;
-  padding: 0;
-  margin: 0;
-  margin-bottom: 5px;
-  line-height: 1;
-  font-weight: 600;
+.containers-wrapper {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
 }
 
-.group_title {
-  font-size: 13px;
-  margin-bottom: 2px;
-}
-
-.image_container {
-  border-radius: 5px;
-  border: 1px dashed var(--main-color);
-  box-sizing: border-box;
-  height: 100px;
-  background-color: #ffffff;
+.image-container {
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
-
-  width: auto;
+  border: 1px dashed var(--main-color);
+  background-color: #ffffff;
+  height: 70px;
+  border-radius: 5px;
 }
 
-.image_container.no_data {
-  border-color: #ff3535;
+.signature-image,
+.seal-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
-.image_container.sign {
-  width: 300px;
-}
-.image_container.seal {
-  width: 200px;
+.draw-button {
+  min-height: unset;
 }
 
-.delete_icon {
+.clear-button {
   position: absolute;
   top: 5px;
   right: 5px;
-  color: #ff3535 !important;
-  cursor: pointer !important;
-  background-color: #e4e4e4;
-  padding: 2px;
-  border-radius: 20px;
-  font-size: 22px;
+  min-height: unset;
 }
 
-.edit_icon {
-  color: var(--main-color);
-  cursor: pointer;
-  font-size: 24px;
-  padding: 10px;
-  border-radius: 50px;
+.error-message {
+  color: #ff4d4f;
+  margin-top: -5px;
 }
 
-.data_image {
+/* Modal Styles */
+.signpad-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   height: 100%;
   width: 100%;
-  /* object-fit: contain; */
+  gap: 10px;
 }
 
-.input-error-message {
-  margin-top: -5px;
+.canvas_container {
+  display: flex;
+  height: 200px;
   width: 100%;
+  justify-content: center;
+  position: relative;
+  align-items: center;
+  /* padding: 10px; */
+  box-sizing: border-box;
+}
+
+.signature-pad {
+  height: 200px;
+  background-color: rgba(0, 0, 0, 0.07);
+  border-radius: 6px;
+  touch-action: none;
+  position: absolute;
+}
+
+.placeholder_text {
+  font-size: 50px;
+  font-weight: 700;
+  color: #00000020;
 }
 </style>
